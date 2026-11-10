@@ -272,7 +272,7 @@
                     <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
                         <div>
                             <h2 class="text-sm font-bold text-white">Автоподбор сечения кабеля</h2>
-                            <p class="text-[11px] text-slate-400">По длительному току, потерям &Delta;U и термической стойкости к КЗ</p>
+                            <p class="text-[11px] text-slate-400">По длительному току (в трубе), потерям &Delta;U и термической стойкости к КЗ</p>
                         </div>
                         <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -313,9 +313,8 @@
                         </div>
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1">Способ прокладки:</label>
-                            <select id="sel-laying" onchange="runCableSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
-                                <option value="ground">В земле (траншее)</option>
-                                <option value="air">В воздухе / лотке</option>
+                            <select id="sel-laying" disabled class="w-full bg-slate-900/70 border border-slate-700/70 rounded-xl px-3 py-2 text-xs font-semibold text-slate-400 outline-none cursor-not-allowed">
+                                <option value="ground">В траншее в трубе ПЭ (база)</option>
                             </select>
                         </div>
                     </div>
@@ -427,7 +426,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="text-sm font-bold text-white">Справочник погонных параметров</h3>
-                            <p class="text-[11px] text-slate-400">Активное R<sub>0</sub> и индуктивное X<sub>0</sub> сопротивление, I<sub>доп</sub></p>
+                            <p class="text-[11px] text-slate-400">Активное R<sub>0</sub>, индуктивное X<sub>0</sub>, I<sub>доп</sub> (в трубе)</p>
                         </div>
                     </div>
 
@@ -451,7 +450,7 @@
                                     <th class="py-2 px-2.5 font-semibold">S, мм²</th>
                                     <th class="py-2 px-2 font-semibold">R<sub>0</sub>, Ом/км</th>
                                     <th class="py-2 px-2 font-semibold">X<sub>0</sub>, Ом/км</th>
-                                    <th class="py-2 px-2 font-semibold">I<sub>земля</sub>, А</th>
+                                    <th class="py-2 px-2 font-semibold">I<sub>труба</sub>, А</th>
                                     <th class="py-2 px-2 font-semibold">I<sub>возд</sub>, А</th>
                                 </tr>
                             </thead>
@@ -465,7 +464,7 @@
                         <strong>Инженерная справка по расчёту:</strong><br>
                         • Расчётный ток 3ф сети: <code>I = P / (&radic;3 &middot; Uном &middot; cos φ)</code><br>
                         • Потеря напряжения (3ф): <code>&Delta;U = &radic;3 &middot; I &middot; L &middot; (R0&middot;cos φ + X0&middot;sin φ) / n</code><br>
-                        • Потеря напряжения (1ф 0,23 кВ): <code>&Delta;U = 2 &middot; I &middot; L &middot; (R0&middot;cos φ + X0&middot;sin φ) / n</code>
+                        • Базовый режим прокладки: <strong>в трубе в земле</strong> (ПУЭ).
                     </div>
                 </div>
             </section>
@@ -512,27 +511,28 @@
         // Стандартный ряд сечений кабелей (мм²) по ГОСТ 22483
         const CROSS_SECTIONS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
 
+        // База данных ПУЭ: токи для прокладки в трубе в земле (iCuGnd/iAlGnd) и на воздухе
         const CABLE_DB = {
-            1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140, iCuGnd: 27,  iCuAir: 21,  iAlGnd: 21,  iAlAir: 16  },
-            2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135, iCuGnd: 36,  iCuAir: 27,  iAlGnd: 28,  iAlAir: 21  },
-            4:    { rCu: 4.61,   rAl: 7.41,   x04: 0.085, x10: 0.130, iCuGnd: 47,  iCuAir: 36,  iAlGnd: 36,  iAlAir: 28  },
-            6:    { rCu: 3.08,   rAl: 4.61,   x04: 0.080, x10: 0.125, iCuGnd: 59,  iCuAir: 46,  iAlGnd: 45,  iAlAir: 35  },
-            10:   { rCu: 1.83,   rAl: 3.08,   x04: 0.075, x10: 0.120, iCuGnd: 79,  iCuAir: 63,  iAlGnd: 61,  iAlAir: 48  },
-            16:   { rCu: 1.15,   rAl: 1.91,   x04: 0.070, x10: 0.112, iCuGnd: 102, iCuAir: 84,  iAlGnd: 79,  iAlAir: 65  },
-            25:   { rCu: 0.727,  rAl: 1.20,   x04: 0.068, x10: 0.105, iCuGnd: 133, iCuAir: 112, iAlGnd: 102, iAlAir: 86  },
-            35:   { rCu: 0.524,  rAl: 0.868,  x04: 0.066, x10: 0.099, iCuGnd: 160, iCuAir: 137, iAlGnd: 123, iAlAir: 106 },
-            50:   { rCu: 0.387,  rAl: 0.641,  x04: 0.064, x10: 0.094, iCuGnd: 192, iCuAir: 167, iAlGnd: 147, iAlAir: 129 },
-            70:   { rCu: 0.268,  rAl: 0.443,  x04: 0.062, x10: 0.089, iCuGnd: 237, iCuAir: 211, iAlGnd: 182, iAlAir: 163 },
-            95:   { rCu: 0.193,  rAl: 0.320,  x04: 0.060, x10: 0.085, iCuGnd: 284, iCuAir: 258, iAlGnd: 219, iAlAir: 199 },
-            120:  { rCu: 0.153,  rAl: 0.253,  x04: 0.059, x10: 0.082, iCuGnd: 325, iCuAir: 299, iAlGnd: 251, iAlAir: 230 },
-            150:  { rCu: 0.124,  rAl: 0.206,  x04: 0.058, x10: 0.080, iCuGnd: 368, iCuAir: 344, iAlGnd: 284, iAlAir: 265 },
-            185:  { rCu: 0.0991, rAl: 0.164,  x04: 0.057, x10: 0.078, iCuGnd: 417, iCuAir: 396, iAlGnd: 322, iAlAir: 305 },
-            240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076, iCuGnd: 486, iCuAir: 468, iAlGnd: 375, iAlAir: 361 }
+            1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140, iCuGnd: 23,  iCuAir: 21,  iAlGnd: 18,  iAlAir: 16  },
+            2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135, iCuGnd: 31,  iCuAir: 27,  iAlGnd: 24,  iAlAir: 21  },
+            4:    { rCu: 4.61,   rAl: 7.41,   x04: 0.085, x10: 0.130, iCuGnd: 40,  iCuAir: 36,  iAlGnd: 31,  iAlAir: 28  },
+            6:    { rCu: 3.08,   rAl: 4.61,   x04: 0.080, x10: 0.125, iCuGnd: 50,  iCuAir: 46,  iAlGnd: 39,  iAlAir: 35  },
+            10:   { rCu: 1.83,   rAl: 3.08,   x04: 0.075, x10: 0.120, iCuGnd: 68,  iCuAir: 63,  iAlGnd: 53,  iAlAir: 48  },
+            16:   { rCu: 1.15,   rAl: 1.91,   x04: 0.070, x10: 0.112, iCuGnd: 91,  iCuAir: 84,  iAlGnd: 70,  iAlAir: 65  },
+            25:   { rCu: 0.727,  rAl: 1.20,   x04: 0.068, x10: 0.105, iCuGnd: 120, iCuAir: 112, iAlGnd: 92,  iAlAir: 86  },
+            35:   { rCu: 0.524,  rAl: 0.868,  x04: 0.066, x10: 0.099, iCuGnd: 145, iCuAir: 137, iAlGnd: 112, iAlAir: 106 },
+            50:   { rCu: 0.387,  rAl: 0.641,  x04: 0.064, x10: 0.094, iCuGnd: 175, iCuAir: 167, iAlGnd: 135, iAlAir: 129 },
+            70:   { rCu: 0.268,  rAl: 0.443,  x04: 0.062, x10: 0.089, iCuGnd: 215, iCuAir: 211, iAlGnd: 167, iAlAir: 163 },
+            95:   { rCu: 0.193,  rAl: 0.320,  x04: 0.060, x10: 0.085, iCuGnd: 260, iCuAir: 258, iAlGnd: 202, iAlAir: 199 },
+            120:  { rCu: 0.153,  rAl: 0.253,  x04: 0.059, x10: 0.082, iCuGnd: 300, iCuAir: 299, iAlGnd: 233, iAlAir: 230 },
+            150:  { rCu: 0.124,  rAl: 0.206,  x04: 0.058, x10: 0.080, iCuGnd: 345, iCuAir: 344, iAlGnd: 268, iAlAir: 265 },
+            185:  { rCu: 0.0991, rAl: 0.164,  x04: 0.057, x10: 0.078, iCuGnd: 395, iCuAir: 396, iAlGnd: 306, iAlAir: 305 },
+            240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076, iCuGnd: 460, iCuAir: 468, iAlGnd: 356, iAlAir: 361 }
         };
 
         const INSULATION_FACTORS = {
             XLPE:  { tempFactorR: 1.0, ampFactor: 1.18, cThermAl: 94,  cThermCu: 143, name: 'СПЭ (ПвПг/АПвПг)' },
-            PVC:   { tempFactorR: 1.0, ampFactor: 1.00, cThermAl: 76,  cThermCu: 115, name: 'ПВХ (ВВГ/АВВГ)' },
+            PVC:   { tempFactorR: 1.0, ampFactor: 1.00, cThermAl: 76,  cThermCu: 115, name: 'ПВХ (ВВГ / АВВГ)' },
             PAPER: { tempFactorR: 1.0, ampFactor: 0.96, cThermAl: 90,  cThermCu: 141, name: 'БПИ (АСБ/СБ)' }
         };
 
@@ -613,7 +613,7 @@
             const lengthKm = Math.max(0, parseFloat(seg.length) || 0) / 1000;
             const nParallel = Math.max(1, parseInt(seg.parallel) || 1);
 
-            const { r0, x0, iDop } = getCableParams(seg.section, seg.material, seg.insulation, voltageStr);
+            const { r0, x0, iDop } = getCableParams(seg.section, seg.material, seg.insulation, voltageStr, 'ground');
 
             let currentA = 0;
             let powerKw = 0;
@@ -831,8 +831,8 @@
         function renderSegmentMetricsHTML(m, isOverCurrent) {
             return `
                 <div class="flex items-center gap-3 text-[11px] text-slate-300 font-mono">
-                    <span title="Расчётный ток / Допустимый ток кабеля" class="${isOverCurrent ? 'text-rose-400 font-bold' : ''}">
-                        Iр: <strong>${m.currentA.toFixed(1)} А</strong> <span class="text-slate-400">(${Math.round(m.currentLoadPct)}% от ${m.iDop}А)</span>
+                    <span title="Расчётный ток / Допустимый ток кабеля (в трубе)" class="${isOverCurrent ? 'text-rose-400 font-bold' : ''}">
+                        Iр: <strong>${m.currentA.toFixed(1)} А</strong> <span class="text-slate-400">(${Math.round(m.currentLoadPct)}% от ${m.iDop}А в трубе)</span>
                     </span>
                     <span class="hidden sm:inline text-slate-500">|</span>
                     <span class="text-slate-400">R₀=${m.r0.toFixed(3)} X₀=${m.x0.toFixed(3)}</span>
@@ -848,7 +848,7 @@
                     <svg class="w-3.5 h-3.5 shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
-                    <span>Перегрузка по току! Расчётный ток (${m.currentA.toFixed(0)} А) превышает Iдоп (${m.iDop} А). Увеличьте сечение.</span>
+                    <span>Перегрузка по току! Расчётный ток (${m.currentA.toFixed(0)} А) превышает Iдоп в трубе (${m.iDop} А). Увеличьте сечение.</span>
                 </div>` : ''}
             `;
         }
@@ -976,6 +976,7 @@
             let lines = [];
             lines.push(`РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ В КАБЕЛЬНОЙ СЕТИ ${appState.voltage.replace('.', ',')} кВ`);
             lines.push(`Допустимая потеря напряжения &Delta;Uдоп = ${appState.maxDropPercent}%`);
+            lines.push(`Способ прокладки: в траншее в трубе ПЭ`);
             lines.push(`--------------------------------------------------`);
 
             let sumDropPct = 0;
@@ -989,7 +990,7 @@
                 const parStr = seg.parallel > 1 ? `${seg.parallel}х` : '';
                 lines.push(`${i + 1}. ${seg.name}:`);
                 lines.push(`   Кабель: ${matLabel}, ${seg.insulation}, S = ${parStr}${seg.section} мм², L = ${seg.length} м`);
-                lines.push(`   Нагрузка: P = ${m.powerKw.toFixed(1)} кВт, cos φ = ${seg.cosPhi}, Iр = ${m.currentA.toFixed(1)} А (Iдоп = ${m.iDop} А)`);
+                lines.push(`   Нагрузка: P = ${m.powerKw.toFixed(1)} кВт, cos φ = ${seg.cosPhi}, Iр = ${m.currentA.toFixed(1)} А (Iдоп в трубе = ${m.iDop} А)`);
                 lines.push(`   Потери на участке: &Delta;U = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
             });
 
@@ -1023,7 +1024,6 @@
             const voltageStr = document.getElementById('sel-voltage').value;
             const material = document.getElementById('sel-material').value;
             const insulation = document.getElementById('sel-insulation').value;
-            const laying = document.getElementById('sel-laying').value;
             const powerKw = Math.max(0.1, parseFloat(document.getElementById('sel-power').value) || 10);
             const lengthM = Math.max(1, parseFloat(document.getElementById('sel-length').value) || 50);
             const cosPhi = Math.min(1, Math.max(0.3, parseFloat(document.getElementById('sel-cosphi').value) || 0.94));
@@ -1051,7 +1051,7 @@
             }
 
             const evaluated = CROSS_SECTIONS.map(sec => {
-                const { r0, x0, iDop } = getCableParams(sec, material, insulation, voltageStr, laying);
+                const { r0, x0, iDop } = getCableParams(sec, material, insulation, voltageStr, 'ground');
                 const totalIdop = iDop * nParallel;
                 const phaseFactor = isSinglePhase ? 2.0 : Math.sqrt(3);
                 const dropV = phaseFactor * calcCurrentA * lengthKm * ((r0 * cosPhi + x0 * sinPhi) / nParallel);
@@ -1120,7 +1120,7 @@
                 <div class="bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-4 shadow-lg space-y-3">
                     <div class="flex items-start justify-between">
                         <div>
-                            <span class="text-[11px] uppercase tracking-wider font-semibold text-emerald-400 block">Рекомендуемое сечение</span>
+                            <span class="text-[11px] uppercase tracking-wider font-semibold text-emerald-400 block">Рекомендуемое сечение (в трубе)</span>
                             <div class="text-2xl font-extrabold font-mono text-white mt-0.5">
                                 ${parPrefix}${rec.section} мм² (${material === 'Cu' ? 'Медь' : 'Алюминий'})
                             </div>
