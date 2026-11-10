@@ -113,12 +113,12 @@
         <!-- Основная прокручиваемая область контента -->
         <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-24 px-3.5 pt-3 space-y-4">
 
-            <!-- ==========================================
+<!-- ==========================================
                  ВКЛАДКА 1: РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (ΔU)
                  ========================================== -->
             <section id="tab-drop" class="space-y-4">
                 
-                <!-- Карточка общих параметров сети -->
+                <!-- Карточка общих параметров сети (без потерь) -->
                 <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-3.5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -154,11 +154,20 @@
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Допустимая потеря напряжения ΔUдоп -->
-                    <div class="pt-1 flex items-center justify-between gap-2">
+                <!-- НОВОЕ ПОДОКНО: Допустимые потери напряжения ΔUдоп -->
+                <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-3.5 shadow-sm space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                            Допустимые потери напряжения ($\Delta U_{доп}$)
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
                         <div class="flex-1">
-                            <label class="block text-xs text-slate-400 mb-1">Допустимая потеря ΔU<sub>доп</sub> (%):</label>
                             <div class="flex gap-1.5">
                                 <button type="button" onclick="setMaxDropLimit(4)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4%</button>
                                 <button type="button" onclick="setMaxDropLimit(4.5)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4.5%</button>
@@ -166,11 +175,10 @@
                                 <button type="button" onclick="setMaxDropLimit(6)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">6%</button>
                             </div>
                         </div>
-                        <div class="w-24">
-                            <label class="block text-[11px] text-slate-400 mb-1 text-right">Своя уставка:</label>
+                        <div class="w-28">
                             <div class="relative">
                                 <input id="custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onCustomLimitInput(this.value)"
-                                    class="w-full bg-slate-900 border border-slate-600 focus:border-blue-500 rounded-xl py-1.5 pl-3 pr-6 text-right font-mono text-sm font-bold text-white outline-none">
+                                    class="w-full bg-slate-900 border border-slate-600 focus:border-blue-500 rounded-xl py-1.5 pl-3 pr-7 text-right font-mono text-sm font-bold text-white outline-none">
                                 <span class="absolute right-2.5 top-1.5 text-xs text-slate-400 font-mono">%</span>
                             </div>
                         </div>
