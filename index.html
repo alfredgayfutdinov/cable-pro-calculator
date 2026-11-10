@@ -161,15 +161,15 @@
                             <label class="block text-xs text-slate-400 mb-1">Допустимая потеря ΔU<sub>доп</sub> (%):</label>
                             <div class="flex gap-1.5">
                                 <button type="button" onclick="setMaxDropLimit(4)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4%</button>
+                                <button type="button" onclick="setMaxDropLimit(4.5)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4.5%</button>
                                 <button type="button" onclick="setMaxDropLimit(5)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">5%</button>
                                 <button type="button" onclick="setMaxDropLimit(6)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">6%</button>
-                                <button type="button" onclick="setMaxDropLimit(10)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">10%</button>
                             </div>
                         </div>
                         <div class="w-24">
                             <label class="block text-[11px] text-slate-400 mb-1 text-right">Своя уставка:</label>
                             <div class="relative">
-                                <input id="custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="5" oninput="onCustomLimitInput(this.value)"
+                                <input id="custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onCustomLimitInput(this.value)"
                                     class="w-full bg-slate-900 border border-slate-600 focus:border-blue-500 rounded-xl py-1.5 pl-3 pr-6 text-right font-mono text-sm font-bold text-white outline-none">
                                 <span class="absolute right-2.5 top-1.5 text-xs text-slate-400 font-mono">%</span>
                             </div>
@@ -332,7 +332,7 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1">Допустимая ΔU<sub>доп</sub>, %:</label>
-                            <input id="sel-maxdrop" type="number" step="0.5" min="0.5" max="20" value="4.0" oninput="runCableSelection()"
+                            <input id="sel-maxdrop" type="number" step="0.5" min="0.5" max="20" value="4.5" oninput="runCableSelection()"
                                 class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-3 py-2 text-sm font-mono font-bold text-white outline-none">
                         </div>
                         <div>
@@ -535,7 +535,7 @@
         // Состояние приложения
         let appState = {
             voltage: '0.4',      // '0.4', '0.23', '6', '10'
-            maxDropPercent: 5.0, // Допустимая потеря ΔU, %
+            maxDropPercent: 4.5, // Допустимая потеря ΔU, %
             segments: []
         };
 
@@ -898,7 +898,6 @@
             if (fullReRender) {
                 renderSegments();
             } else {
-                // Обновляем только нижнюю полоску метрик этого участка, чтобы клавиатура на телефоне не закрывалась
                 const m = calculateSegmentMetrics(seg, appState.voltage);
                 const isOverCurrent = m.currentLoadPct > 100;
                 const metricsEl = document.getElementById(`seg-metrics-${segId}`);
@@ -1081,12 +1080,10 @@
             const sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi));
             const lengthKm = lengthM / 1000;
 
-            // Расчётный ток нагрузки
             const calcCurrentA = isSinglePhase
                 ? powerKw / (uNomKv * cosPhi)
                 : powerKw / (Math.sqrt(3) * uNomKv * cosPhi);
 
-            // Минимальное сечение по термической стойкости к ТКЗ (если включено): Sтерм = (Iкз_А * √t) / Cтерм
             let minSectionTkz = 0;
             if (checkTkz) {
                 const ikzKa = Math.max(0.1, parseFloat(document.getElementById('sel-ikz').value) || 5);
@@ -1096,7 +1093,6 @@
                 minSectionTkz = ((ikzKa * 1000 * Math.sqrt(tSec)) / cTherm) / nParallel;
             }
 
-            // Проходим по всему ряду сечений и оцениваем каждое
             const evaluated = CROSS_SECTIONS.map(sec => {
                 const { r0, x0, iDop } = getCableParams(sec, material, insulation, voltageStr, laying);
                 const totalIdop = iDop * nParallel;
@@ -1141,7 +1137,6 @@
             const rec = evaluated[recommendedIdx];
             const parPrefix = nParallel > 1 ? `${nParallel} × ` : '';
 
-            // Выбираем 3 соседних сечения для наглядного сравнения
             const startIdx = Math.max(0, recommendedIdx - 1);
             const slice = evaluated.slice(startIdx, startIdx + 3);
 
@@ -1199,7 +1194,6 @@
                         Мин. сечение по термической стойкости к КЗ: <strong class="font-mono text-amber-300">${minSectionTkz.toFixed(1)} мм²</strong> (на 1 кабель)
                     </div>` : ''}
 
-                    <!-- Сравнительная таблица смежных сечений -->
                     <div class="pt-1">
                         <span class="text-[11px] font-semibold text-slate-400 block mb-1.5">Сравнение смежных сечений:</span>
                         <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/60">
@@ -1222,7 +1216,6 @@
             `;
         }
 
-        // Перенос подобранного кабеля в список участков первой вкладки
         function applySelectedCableToTab1(section, material, insulation, parallel, powerKw, lengthM, cosPhi) {
             appState.segments.push({
                 id: Date.now(),
@@ -1244,7 +1237,6 @@
             showToast('Кабель добавлен в участки сети!');
         }
 
-        // Отрисовка справочной таблицы во Вкладке 3
         function renderReferenceTable() {
             const mat = document.getElementById('ref-mat-filter').value;
             const ins = document.getElementById('ref-ins-filter').value;
@@ -1265,7 +1257,6 @@
             }).join('');
         }
 
-        // Переключение нижних вкладок
         function switchTab(tabName) {
             const tabs = ['drop', 'select', 'ref'];
             tabs.forEach(t => {
@@ -1284,12 +1275,11 @@
             if (tabName === 'ref') renderReferenceTable();
         }
 
-        // Сброс к демонстрационному примеру
         function resetToDemoData() {
             appState.voltage = '0.4';
-            appState.maxDropPercent = 5.0;
+            appState.maxDropPercent = 4.5;
             appState.segments = getDefaultSegments();
-            document.getElementById('custom-limit-input').value = 5;
+            document.getElementById('custom-limit-input').value = 4.5;
             saveState();
             updateVoltageButtonsUI();
             renderSegments();
@@ -1297,7 +1287,6 @@
             showToast('Загружен демонстрационный пример');
         }
 
-        // Уведомление Toast
         let toastTimer = null;
         function showToast(message) {
             const toast = document.getElementById('toast-notification');
@@ -1320,7 +1309,6 @@
                 .replace(/"/g, '&quot;');
         }
 
-        // Динамическая генерация Web App Manifest для полноценной установки PWA
         function setupInlinePWA() {
             const manifest = {
                 name: "КабельПро — Расчёт потерь ΔU и сечений",
@@ -1345,7 +1333,6 @@
             document.head.appendChild(link);
         }
 
-        // Инициализация при открытии приложения
         window.onload = function () {
             loadState();
             document.getElementById('custom-limit-input').value = appState.maxDropPercent;
