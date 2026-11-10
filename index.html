@@ -118,7 +118,7 @@
                  ========================================== -->
             <section id="tab-drop" class="space-y-4">
                 
-                <!-- Карточка общих параметров сети -->
+                <!-- Карточка общих параметров сети (без потерь) -->
                 <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-3.5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -154,24 +154,35 @@
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Допустимая потеря напряжения ΔUдоп -->
-                    <div class="pt-1 flex items-center justify-between gap-2">
-                        <div class="flex-1">
-                            <label class="block text-xs text-slate-400 mb-1">Допустимая потеря ΔU<sub>доп</sub> (%):</label>
-                            <div class="flex gap-1.5">
-                                <button type="button" onclick="setMaxDropLimit(4)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4%</button>
-                                <button type="button" onclick="setMaxDropLimit(4.5)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4.5%</button>
-                                <button type="button" onclick="setMaxDropLimit(5)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">5%</button>
-                                <button type="button" onclick="setMaxDropLimit(6)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">6%</button>
-                            </div>
+                <!-- ЕДИНОЕ ПОДОКНО: Допустимые потери напряжения в одном блоке -->
+                <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-3.5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                            Допустимая потеря &Delta;U<sub>доп</sub> (%)
+                        </span>
+                        <span class="text-[11px] text-slate-400 font-medium">Своя уставка:</span>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-2 items-center">
+                        <!-- Кнопки быстрого выбора (занимают 7 колонок) -->
+                        <div class="col-span-7 grid grid-cols-4 gap-1">
+                            <button type="button" onclick="setMaxDropLimit(4)" class="limit-chip py-2 rounded-xl text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition text-center">4%</button>
+                            <button type="button" onclick="setMaxDropLimit(4.5)" class="limit-chip py-2 rounded-xl text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition text-center">4.5%</button>
+                            <button type="button" onclick="setMaxDropLimit(5)" class="limit-chip py-2 rounded-xl text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition text-center">5%</button>
+                            <button type="button" onclick="setMaxDropLimit(6)" class="limit-chip py-2 rounded-xl text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition text-center">6%</button>
                         </div>
-                        <div class="w-24">
-                            <label class="block text-[11px] text-slate-400 mb-1 text-right">Своя уставка:</label>
+
+                        <!-- Поле ввода своей уставки (занимает 5 колонок) -->
+                        <div class="col-span-5">
                             <div class="relative">
                                 <input id="custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onCustomLimitInput(this.value)"
-                                    class="w-full bg-slate-900 border border-slate-600 focus:border-blue-500 rounded-xl py-1.5 pl-3 pr-6 text-right font-mono text-sm font-bold text-white outline-none">
-                                <span class="absolute right-2.5 top-1.5 text-xs text-slate-400 font-mono">%</span>
+                                    class="w-full bg-slate-900 border border-slate-600 focus:border-blue-500 rounded-xl py-2 pl-3 pr-7 text-right font-mono text-sm font-bold text-white outline-none">
+                                <span class="absolute right-2.5 top-2 text-xs text-slate-400 font-mono">%</span>
                             </div>
                         </div>
                     </div>
@@ -204,11 +215,11 @@
                             <span id="end-voltage-val" class="text-xs sm:text-sm font-mono font-bold text-slate-100">392.0 В</span>
                         </div>
                         <div class="bg-slate-900/60 rounded-xl p-2 border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 block">Общая длина ∑L</span>
+                            <span class="text-[10px] text-slate-400 block">Общая длина &sum;L</span>
                             <span id="total-length-val" class="text-xs sm:text-sm font-mono font-bold text-slate-100">0 м</span>
                         </div>
                         <div class="bg-slate-900/60 rounded-xl p-2 border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 block">Потери мощн. ΔP</span>
+                            <span class="text-[10px] text-slate-400 block">Потери мощн. &Delta;P</span>
                             <span id="total-power-loss-val" class="text-xs sm:text-sm font-mono font-bold text-slate-100">0.00 кВт</span>
                         </div>
                     </div>
@@ -261,7 +272,7 @@
                     <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
                         <div>
                             <h2 class="text-sm font-bold text-white">Автоподбор сечения кабеля</h2>
-                            <p class="text-[11px] text-slate-400">По длительному току, потерям ΔU и термической стойкости к КЗ</p>
+                            <p class="text-[11px] text-slate-400">По длительному току, потерям &Delta;U и термической стойкости к КЗ</p>
                         </div>
                         <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -331,7 +342,7 @@
                     <!-- Допустимая потеря и число параллельных кабелей -->
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
-                            <label class="block text-[11px] text-slate-400 mb-1">Допустимая ΔU<sub>доп</sub>, %:</label>
+                            <label class="block text-[11px] text-slate-400 mb-1">Допустимая &Delta;U<sub>доп</sub>, %:</label>
                             <input id="sel-maxdrop" type="number" step="0.5" min="0.5" max="20" value="4.5" oninput="runCableSelection()"
                                 class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-3 py-2 text-sm font-mono font-bold text-white outline-none">
                         </div>
@@ -398,7 +409,7 @@
                     <div class="space-y-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
                         <div class="flex items-start gap-2">
                             <span class="w-5 h-5 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-[11px] shrink-0">1</span>
-                            <span><strong>Android (Chrome):</strong> откройте ссылку, нажмите меню <strong>«⋮»</strong> в правом верхнем углу и выберите <em>«Добавить на гл. экран»</em> (или «Установить приложение»).</span>
+                            <span><strong>Android (Chrome):</strong> откройте ссылку, нажмите меню <strong>«&vellip;»</strong> в правом верхнем углу и выберите <em>«Добавить на гл. экран»</em> (или «Установить приложение»).</span>
                         </div>
                         <div class="flex items-start gap-2">
                             <span class="w-5 h-5 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-[11px] shrink-0">2</span>
@@ -452,9 +463,9 @@
 
                     <div class="text-[11px] text-slate-400 leading-relaxed bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
                         <strong>Инженерная справка по расчёту:</strong><br>
-                        • Расчётный ток 3ф сети: <code>I = P / (√3 · Uном · cos φ)</code><br>
-                        • Потеря напряжения (3ф): <code>ΔU = √3 · I · L · (R0·cos φ + X0·sin φ) / n</code><br>
-                        • Потеря напряжения (1ф 0,23 кВ): <code>ΔU = 2 · I · L · (R0·cos φ + X0·sin φ) / n</code>
+                        • Расчётный ток 3ф сети: <code>I = P / (&radic;3 &middot; Uном &middot; cos φ)</code><br>
+                        • Потеря напряжения (3ф): <code>&Delta;U = &radic;3 &middot; I &middot; L &middot; (R0&middot;cos φ + X0&middot;sin φ) / n</code><br>
+                        • Потеря напряжения (1ф 0,23 кВ): <code>&Delta;U = 2 &middot; I &middot; L &middot; (R0&middot;cos φ + X0&middot;sin φ) / n</code>
                     </div>
                 </div>
             </section>
@@ -475,7 +486,7 @@
                 <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
                 </svg>
-                <span class="text-[11px]">Потери ΔU</span>
+                <span class="text-[11px]">Потери &Delta;U</span>
             </button>
 
             <button type="button" onclick="switchTab('select')" id="nav-select" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-slate-400 hover:text-slate-200 font-medium">
@@ -501,12 +512,6 @@
         // Стандартный ряд сечений кабелей (мм²) по ГОСТ 22483
         const CROSS_SECTIONS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
 
-        /**
-         * Базовые параметры кабелей:
-         * r20_Cu / r20_Al — активное сопротивление при 20°C (Ом/км)
-         * x0_low (0.4 кВ) и x0_med (6-10 кВ) — индуктивное сопротивление (Ом/км)
-         * I_dop — длительно допустимые токи для ПВХ (базовые), для СПЭ применяется коэф. ~1.18, для БПИ ~0.95
-         */
         const CABLE_DB = {
             1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140, iCuGnd: 27,  iCuAir: 21,  iAlGnd: 21,  iAlAir: 16  },
             2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135, iCuGnd: 36,  iCuAir: 27,  iAlGnd: 28,  iAlAir: 21  },
@@ -525,21 +530,18 @@
             240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076, iCuGnd: 486, iCuAir: 468, iAlGnd: 375, iAlAir: 361 }
         };
 
-        // Коэффициенты учёта рабочей температуры изоляции и допустимого тока
         const INSULATION_FACTORS = {
             XLPE:  { tempFactorR: 1.12, ampFactor: 1.18, cThermAl: 94,  cThermCu: 143, name: 'СПЭ (ПвПг/АПвПг)' },
             PVC:   { tempFactorR: 1.06, ampFactor: 1.00, cThermAl: 76,  cThermCu: 115, name: 'ПВХ (ВВГ/АВВГ)' },
             PAPER: { tempFactorR: 1.05, ampFactor: 0.96, cThermAl: 90,  cThermCu: 141, name: 'БПИ (АСБ/СБ)' }
         };
 
-        // Состояние приложения
         let appState = {
-            voltage: '0.4',      // '0.4', '0.23', '6', '10'
-            maxDropPercent: 4.5, // Допустимая потеря ΔU, %
+            voltage: '0.4',
+            maxDropPercent: 4.5,
             segments: []
         };
 
-        // Демонстрационные участки по умолчанию (реалистичный пример сети 0,4 кВ)
         function getDefaultSegments() {
             return [
                 {
@@ -550,7 +552,7 @@
                     section: 95,
                     parallel: 1,
                     length: 140,
-                    loadMode: 'P', // 'P' (кВт) или 'I' (А)
+                    loadMode: 'P',
                     powerKw: 110,
                     currentA: 176,
                     cosPhi: 0.90
@@ -571,7 +573,6 @@
             ];
         }
 
-        // Загрузка из LocalStorage при старте
         function loadState() {
             try {
                 const saved = localStorage.getItem('kabelpro_state_v1');
@@ -596,12 +597,10 @@
             }
         }
 
-        // Получить погонные параметры кабеля R0, X0 и длительный ток Idop
         function getCableParams(section, material, insulation, voltageStr, laying = 'ground') {
             const row = CABLE_DB[section] || CABLE_DB[50];
             const ins = INSULATION_FACTORS[insulation] || INSULATION_FACTORS.XLPE;
             const baseR = material === 'Cu' ? row.rCu : row.rAl;
-            // Учитываем нагрев жилы в рабочем режиме
             const r0 = +(baseR * ins.tempFactorR).toFixed(4);
             const isMediumVoltage = (voltageStr === '6' || voltageStr === '10');
             const x0 = isMediumVoltage ? row.x10 : row.x04;
@@ -617,9 +616,8 @@
             return { r0, x0, iDop };
         }
 
-        // Расчёт одного участка сети
         function calculateSegmentMetrics(seg, voltageStr) {
-            const uNomKv = parseFloat(voltageStr); // 0.4, 0.23, 6, 10
+            const uNomKv = parseFloat(voltageStr);
             const uNomV = uNomKv * 1000;
             const isSinglePhase = (voltageStr === '0.23');
 
@@ -630,7 +628,6 @@
 
             const { r0, x0, iDop } = getCableParams(seg.section, seg.material, seg.insulation, voltageStr);
 
-            // Расчётный ток Iр (А)
             let currentA = 0;
             let powerKw = 0;
             if (seg.loadMode === 'I') {
@@ -649,18 +646,13 @@
                 }
             }
 
-            // Потеря напряжения ΔU (В)
-            // 3ф: ΔU = √3 * I * L * (R0*cosφ + X0*sinφ) / n
-            // 1ф: ΔU = 2 * I * L * (R0*cosφ + X0*sinφ) / n
             const phaseFactor = isSinglePhase ? 2.0 : Math.sqrt(3);
             const dropVolts = phaseFactor * currentA * lengthKm * ((r0 * cosPhi + x0 * sinPhi) / nParallel);
             const dropPercent = (dropVolts / uNomV) * 100;
 
-            // Потери активной мощности ΔP (кВт)
             const phasesCount = isSinglePhase ? 2 : 3;
             const powerLossKw = (phasesCount * Math.pow(currentA, 2) * (r0 / nParallel) * lengthKm) / 1000;
 
-            // Загрузка по длительно допустимому току
             const totalIdop = iDop * nParallel;
             const currentLoadPct = totalIdop > 0 ? (currentA / totalIdop) * 100 : 0;
 
@@ -677,7 +669,6 @@
             };
         }
 
-        // Обновление выбора номинального напряжения
         function setNetworkVoltage(vStr) {
             appState.voltage = vStr;
             saveState();
@@ -707,7 +698,6 @@
             }
         }
 
-        // Установка лимита потерь ΔUдоп
         function setMaxDropLimit(val) {
             appState.maxDropPercent = parseFloat(val);
             document.getElementById('custom-limit-input').value = appState.maxDropPercent;
@@ -724,7 +714,6 @@
             }
         }
 
-        // Отрисовка всех карточек участков
         function renderSegments() {
             const container = document.getElementById('segments-container');
             document.getElementById('segments-count-badge').textContent = appState.segments.length;
@@ -739,7 +728,6 @@
 
                 return `
                 <div class="bg-slate-800/80 border border-slate-700/90 rounded-2xl p-3.5 shadow-md space-y-3 transition-all" data-seg-id="${seg.id}">
-                    <!-- Шапка участка -->
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex items-center gap-2 flex-1">
                             <span class="w-6 h-6 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-400 font-mono text-xs font-bold flex items-center justify-center shrink-0">
@@ -767,9 +755,7 @@
                         </div>
                     </div>
 
-                    <!-- Строка 1: Материал, Изоляция, Сечение, Параллельность -->
                     <div class="grid grid-cols-12 gap-2">
-                        <!-- Материал жилы -->
                         <div class="col-span-3">
                             <label class="block text-[10px] text-slate-400 mb-1">Жила</label>
                             <div class="grid grid-cols-2 bg-slate-900 p-0.5 rounded-xl border border-slate-700">
@@ -780,7 +766,6 @@
                             </div>
                         </div>
 
-                        <!-- Тип изоляции -->
                         <div class="col-span-3">
                             <label class="block text-[10px] text-slate-400 mb-1">Изоляция</label>
                             <select onchange="updateSegmentField(${seg.id}, 'insulation', this.value, true)"
@@ -791,7 +776,6 @@
                             </select>
                         </div>
 
-                        <!-- Сечение S -->
                         <div class="col-span-4">
                             <label class="block text-[10px] text-slate-400 mb-1">Сечение S</label>
                             <select onchange="updateSegmentField(${seg.id}, 'section', parseFloat(this.value), true)"
@@ -800,7 +784,6 @@
                             </select>
                         </div>
 
-                        <!-- Кол-во параллельных кабелей n -->
                         <div class="col-span-2">
                             <label class="block text-[10px] text-slate-400 mb-1">Кол-во n</label>
                             <select onchange="updateSegmentField(${seg.id}, 'parallel', parseInt(this.value), true)"
@@ -813,9 +796,7 @@
                         </div>
                     </div>
 
-                    <!-- Строка 2: Длина L, Нагрузка (P или I), cos φ -->
                     <div class="grid grid-cols-12 gap-2">
-                        <!-- Длина L (м) -->
                         <div class="col-span-4">
                             <label class="block text-[10px] text-slate-400 mb-1">Длина L, м</label>
                             <input type="number" step="5" min="1" value="${seg.length}"
@@ -823,7 +804,6 @@
                                 class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
                         </div>
 
-                        <!-- Мощность P (кВт) или Ток I (А) -->
                         <div class="col-span-5">
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-[10px] text-slate-400">Нагрузка:</span>
@@ -845,7 +825,6 @@
                             `}
                         </div>
 
-                        <!-- Коэффициент мощности cos φ -->
                         <div class="col-span-3">
                             <label class="block text-[10px] text-slate-400 mb-1">cos φ</label>
                             <input type="number" step="0.01" min="0.5" max="1.0" value="${seg.cosPhi}"
@@ -854,7 +833,6 @@
                         </div>
                     </div>
 
-                    <!-- Нижняя панель результатов конкретного участка -->
                     <div id="seg-metrics-${seg.id}" class="pt-2.5 border-t border-slate-700/70 flex flex-wrap items-center justify-between gap-2 text-xs">
                         ${renderSegmentMetricsHTML(m, isOverCurrent)}
                     </div>
@@ -873,7 +851,7 @@
                     <span class="text-slate-400">R₀=${m.r0.toFixed(3)} X₀=${m.x0.toFixed(3)}</span>
                 </div>
                 <div class="flex items-center gap-1.5 ml-auto">
-                    <span class="text-[11px] text-slate-400">ΔU<sub>уч</sub>:</span>
+                    <span class="text-[11px] text-slate-400">&Delta;U<sub>уч</sub>:</span>
                     <span class="px-2 py-0.5 rounded-lg font-mono font-bold text-xs bg-slate-900 text-blue-300 border border-slate-700">
                         ${m.dropPercent.toFixed(2)}% (${m.dropVolts.toFixed(1)} В)
                     </span>
@@ -888,7 +866,6 @@
             `;
         }
 
-        // Обновление поля участка без потери фокуса ввода
         function updateSegmentField(segId, field, value, fullReRender = false) {
             const seg = appState.segments.find(s => s.id === segId);
             if (!seg) return;
@@ -908,7 +885,6 @@
             updateTotalSummary();
         }
 
-        // Добавление нового участка
         function addSegment() {
             const lastSeg = appState.segments[appState.segments.length - 1];
             const nextNum = appState.segments.length + 1;
@@ -953,7 +929,6 @@
             updateTotalSummary();
         }
 
-        // Обновление главной сводной карточки потерь
         function updateTotalSummary() {
             const uNomKv = parseFloat(appState.voltage);
             const uNomV = uNomKv * 1000;
@@ -986,7 +961,6 @@
                 document.getElementById('end-voltage-val').textContent = `${endVoltageV.toFixed(1)} В`;
             }
 
-            // Статус и шкала прогресса
             const limit = appState.maxDropPercent;
             const ratio = Math.min(100, (totalDropPct / limit) * 100);
             const bar = document.getElementById('drop-progress-bar');
@@ -997,11 +971,11 @@
             if (totalDropPct <= limit && !anyOverCurrent) {
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-emerald-500';
                 badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-                badge.innerHTML = `<span>В норме (≤ ${limit}%)</span>`;
+                badge.innerHTML = `<span>В норме (&le; ${limit}%)</span>`;
             } else if (totalDropPct > limit) {
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-rose-500';
                 badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse-subtle';
-                badge.innerHTML = `<span>Превышение ΔU (> ${limit}%)</span>`;
+                badge.innerHTML = `<span>Превышение &Delta;U (> ${limit}%)</span>`;
             } else {
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-amber-500';
                 badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40';
@@ -1009,13 +983,12 @@
             }
         }
 
-        // Копирование текстового отчёта в буфер обмена для пояснительной записки
         function copyEngineeringReport() {
             const uNomKv = parseFloat(appState.voltage);
             const uNomV = uNomKv * 1000;
             let lines = [];
             lines.push(`РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ В КАБЕЛЬНОЙ СЕТИ ${appState.voltage.replace('.', ',')} кВ`);
-            lines.push(`Допустимая потеря напряжения ΔUдоп = ${appState.maxDropPercent}%`);
+            lines.push(`Допустимая потеря напряжения &Delta;Uдоп = ${appState.maxDropPercent}%`);
             lines.push(`--------------------------------------------------`);
 
             let sumDropPct = 0;
@@ -1030,11 +1003,11 @@
                 lines.push(`${i + 1}. ${seg.name}:`);
                 lines.push(`   Кабель: ${matLabel}, ${seg.insulation}, S = ${parStr}${seg.section} мм², L = ${seg.length} м`);
                 lines.push(`   Нагрузка: P = ${m.powerKw.toFixed(1)} кВт, cos φ = ${seg.cosPhi}, Iр = ${m.currentA.toFixed(1)} А (Iдоп = ${m.iDop} А)`);
-                lines.push(`   Потери на участке: ΔU = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
+                lines.push(`   Потери на участке: &Delta;U = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
             });
 
             lines.push(`--------------------------------------------------`);
-            lines.push(`ИТОГО суммарные потери ∑ΔU = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
+            lines.push(`ИТОГО суммарные потери &sum;&Delta;U = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
             lines.push(`Напряжение в конце линии Uкон = ${(uNomV - sumDropV).toFixed(1)} В`);
             lines.push(`Вывод: ${sumDropPct <= appState.maxDropPercent ? 'Потери напряжения в пределах нормы.' : 'ТРЕБУЕТСЯ УВЕЛИЧЕНИЕ СЕЧЕНИЯ КАБЕЛЯ!'}`);
 
@@ -1049,9 +1022,6 @@
             showToast('Отчёт скопирован для ПЗ!');
         }
 
-        // ==========================================
-        // ЛОГИКА ВКЛАДКИ 2: АВТОПОДБОР СЕЧЕНИЯ
-        // ==========================================
         function toggleTkzInputs() {
             const checked = document.getElementById('sel-check-tkz').checked;
             const row = document.getElementById('tkz-inputs-row');
@@ -1170,7 +1140,7 @@
                         </div>
                         <button type="button" onclick="applySelectedCableToTab1(${rec.section}, '${material}', '${insulation}', ${nParallel}, ${powerKw}, ${lengthM}, ${cosPhi})"
                             class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow transition active:scale-95">
-                            + В расчёт ΔU
+                            + В расчёт &Delta;U
                         </button>
                     </div>
 
@@ -1184,7 +1154,7 @@
                             <span class="text-xs font-mono font-bold text-emerald-400">${rec.totalIdop} А</span>
                         </div>
                         <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800">
-                            <span class="text-[10px] text-slate-400 block">Потеря ΔU</span>
+                            <span class="text-[10px] text-slate-400 block">Потеря &Delta;U</span>
                             <span class="text-xs font-mono font-bold text-blue-300">${rec.dropPct.toFixed(2)}% (${rec.dropV.toFixed(1)}В)</span>
                         </div>
                     </div>
@@ -1202,7 +1172,7 @@
                                     <tr class="bg-slate-900 text-slate-400 text-[10px] border-b border-slate-800">
                                         <th class="py-2 px-2.5">Сечение</th>
                                         <th class="py-2 px-2">Iдоп (Загр.)</th>
-                                        <th class="py-2 px-2">Потери ΔU</th>
+                                        <th class="py-2 px-2">Потери &Delta;U</th>
                                         <th class="py-2 px-2 text-right">Статус</th>
                                     </tr>
                                 </thead>
@@ -1319,7 +1289,7 @@
                 theme_color: "#0f172a",
                 icons: [
                     {
-                        src: "https://placehold.co/192x192/2563eb/ffffff?text=ΔU",
+                        src: "https://placehold.co/192x192/2563eb/ffffff?text=%CE%94U",
                         sizes: "192x192",
                         type: "image/png"
                     }
