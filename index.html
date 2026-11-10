@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="КабельПро">
+    <title>КабельПро — Расчёт потерь ΔU и выбор сечения 0,4/6/10 кВ</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Мобильные улучшения и кастомный скроллбар */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
+            overscroll-behavior-y: none;
+        }
+        /* Скрытие стрелочек в числовых полях для чистого мобильного вида */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(71, 85, 105, 0.6);
+            border-radius: 9999px;
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.75; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center items-start md:py-6 md:px-4 bg-slate-950 text-slate-100 select-none">
+
+    <!-- Контейнер мобильного приложения (на ПК выглядит как смартфон, на телефоне — на весь экран) -->
+    <div class="w-full max-w-[480px] min-h-screen md:min-h-[860px] md:max-h-[92vh] bg-slate-900 md:rounded-[36px] md:border-[6px] md:border-slate-800 md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden">
+        
+        <!-- Верхняя шапка приложения (App Bar) -->
+        <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 pt-3 pb-2.5 sticky top-0 z-30 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                    <!-- Иконка молнии / кабеля -->
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <h1 class="text-base font-bold tracking-tight text-white leading-none">КабельПро</h1>
+                        <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">PWA v1.0</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Расчёт ΔU и выбор кабелей 0,4 / 6 / 10 кВ</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5">
+                <button onclick="resetToDemoData()" title="Сбросить к примеру" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 transition flex items-center gap-1 text-xs font-medium border border-slate-700/70">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span class="hidden sm:inline">Пример</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Основная прокручиваемая область контента -->
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-24 px-3.5 pt-3 space-y-4">
+
+            <!-- ==========================================
+                 ВКЛАДКА 1: РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (ΔU)
+                 ========================================== -->
+            <section id="tab-drop" class="space-y-4">
+                
+                <!-- Карточка общих параметров сети -->
+                <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-3.5 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                            </svg>
+                            Параметры сети
+                        </span>
+                        <span id="network-type-badge" class="text-[11px] font-medium text-slate-300 bg-slate-700/70 px-2 py-0.5 rounded-md">
+                            3-фазная сеть, 50 Гц
+                        </span>
+                    </div>
+
+                    <!-- Выбор номинального напряжения Uном -->
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5">Номинальное напряжение сети (U<sub>ном</sub>):</label>
+                        <div class="grid grid-cols-4 gap-1.5" id="voltage-selector">
+                            <button type="button" onclick="setNetworkVoltage('0.4')" data-v="0.4" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
+                                0,4 кВ
+                                <span class="block text-[10px] font-normal opacity-75">380/400В</span>
+                            </button>
+                            <button type="button" onclick="setNetworkVoltage('0.23')" data-v="0.23" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
+                                0,23 кВ
+                                <span class="block text-[10px] font-normal opacity-75">1-фазная</span>
+                            </button>
+                            <button type="button" onclick="setNetworkVoltage('6')" data-v="6" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
+                                6 кВ
+                                <span class="block text-[10px] font-normal opacity-75">СН (3ф)</span>
+                            </button>
+                            <button type="button" onclick="setNetworkVoltage('10')" data-v="10" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
+                                10 кВ
+                                <span class="block text-[10px] font-normal opacity-75">СН (3ф)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Допустимая потеря напряжения ΔUдоп -->
+                    <div class="pt-1 flex items-center justify-between gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-slate-400 mb-1">Допустимая потеря ΔU<sub>доп</sub> (%):</label>
+                            <div class="flex gap-1.5">
+                                <button type="button" onclick="setMaxDropLimit(4)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">4%</button>
+                                <button type="button" onclick="setMaxDropLimit(5)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">5%</button>
+                                <button type="button" onclick="setMaxDropLimit(6)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">6%</button>
+                                <button type="button" onclick="setMaxDropLimit(10)" class="limit-chip px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-700/70 hover:bg-slate-700 text-slate-300 border border-slate-600/50 transition">10%</button>
+                            </div>
+                        </div>
+                        <div class="w-24">
+                            <label class="block text-[11px] text-slate-400 mb-1 text-right">Своя уставка:</label>
+                            <div class="relative">
+                                <input id="custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="5" oninput="onCustomLimitInput(this.value)"
+                                    class="w-full bg-slate-900 border border-slate-600 focus:border-blue-500 rounded-xl py-1.5 pl-3 pr-6 text-right font-mono text-sm font-bold text-white outline-none">
+                                <span class="absolute right-2.5 top-1.5 text-xs text-slate-400 font-mono">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Сводная карточка результата (Итого по всем участкам) -->
+                <div id="summary-card" class="rounded-2xl p-4 border transition-all duration-200 shadow-lg bg-gradient-to-br from-slate-800/95 to-slate-900 border-slate-700">
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                            <span class="text-[11px] uppercase tracking-wider font-semibold text-slate-400 block">Суммарные потери в линии</span>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span id="total-du-percent" class="text-3xl font-extrabold font-mono tracking-tight text-white">0.00%</span>
+                                <span id="total-du-volts" class="text-sm font-mono text-slate-300">(0.0 В)</span>
+                            </div>
+                        </div>
+                        <div id="status-badge" class="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border">
+                            <!-- Динамический статус -->
+                        </div>
+                    </div>
+
+                    <!-- Прогресс-бар потерь -->
+                    <div class="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800 mb-3">
+                        <div id="drop-progress-bar" class="h-full rounded-full transition-all duration-300 bg-emerald-500" style="width: 20%"></div>
+                    </div>
+
+                    <!-- Показатели в конце линии -->
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-700/70 text-center">
+                        <div class="bg-slate-900/60 rounded-xl p-2 border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 block">U в конце линии</span>
+                            <span id="end-voltage-val" class="text-xs sm:text-sm font-mono font-bold text-slate-100">392.0 В</span>
+                        </div>
+                        <div class="bg-slate-900/60 rounded-xl p-2 border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 block">Общая длина ∑L</span>
+                            <span id="total-length-val" class="text-xs sm:text-sm font-mono font-bold text-slate-100">0 м</span>
+                        </div>
+                        <div class="bg-slate-900/60 rounded-xl p-2 border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 block">Потери мощн. ΔP</span>
+                            <span id="total-power-loss-val" class="text-xs sm:text-sm font-mono font-bold text-slate-100">0.00 кВт</span>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки быстрых действий с расчётом -->
+                    <div class="mt-3 pt-2.5 border-t border-slate-700/60 flex gap-2">
+                        <button type="button" onclick="copyEngineeringReport()" class="flex-1 py-2 px-3 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 active:scale-[0.99] text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Скопировать расчёт для ПЗ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Заголовок списка участков -->
+                <div class="flex items-center justify-between px-1 pt-1">
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-sm font-bold text-slate-200">Участки кабельной сети</h2>
+                        <span id="segments-count-badge" class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">2</span>
+                    </div>
+                    <button type="button" onclick="addSegment()" class="py-1.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-semibold flex items-center gap-1 shadow-md shadow-blue-600/25 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Добавить участок
+                    </button>
+                </div>
+
+                <!-- Контейнер карточек участков -->
+                <div id="segments-container" class="space-y-3.5">
+                    <!-- Карточки генерируются динамически через JS -->
+                </div>
+
+                <!-- Нижняя кнопка добавления ещё одного участка -->
+                <button type="button" onclick="addSegment()" class="w-full py-3 rounded-2xl border-2 border-dashed border-slate-700 hover:border-blue-500/60 hover:bg-slate-800/40 active:scale-[0.99] text-slate-300 text-xs font-semibold flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Добавить следующий участок цепи
+                </button>
+            </section>
+
+
+            <!-- ==========================================
+                 ВКЛАДКА 2: ПОДБОР СЕЧЕНИЯ КАБЕЛЯ
+                 ========================================== -->
+            <section id="tab-select" class="space-y-4 hidden">
+                <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-4 space-y-3.5">
+                    <div class="flex items-center justify-between border-b border-slate-700/70 pb-2.5">
+                        <div>
+                            <h2 class="text-sm font-bold text-white">Автоподбор сечения кабеля</h2>
+                            <p class="text-[11px] text-slate-400">По длительному току, потерям ΔU и термической стойкости к КЗ</p>
+                        </div>
+                        <span class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </span>
+                    </div>
+
+                    <!-- Напряжение и Материал -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Напряжение сети:</label>
+                            <select id="sel-voltage" onchange="runCableSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
+                                <option value="0.4">0,4 кВ (380/400 В)</option>
+                                <option value="0.23">0,23 кВ (1-фазная)</option>
+                                <option value="6">6 кВ (среднее)</option>
+                                <option value="10">10 кВ (среднее)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Материал жил:</label>
+                            <select id="sel-material" onchange="runCableSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
+                                <option value="Al">Алюминий (Al)</option>
+                                <option value="Cu">Медь (Cu)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Тип изоляции и способ прокладки -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Изоляция кабеля:</label>
+                            <select id="sel-insulation" onchange="runCableSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
+                                <option value="XLPE">СПЭ (ПвПг / АПвПг) 90°C</option>
+                                <option value="PVC">ПВХ (ВВГ / АВВГ) 70°C</option>
+                                <option value="PAPER">БПИ (АСБ / СБ) 65°C</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Способ прокладки:</label>
+                            <select id="sel-laying" onchange="runCableSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
+                                <option value="ground">В земле (траншее)</option>
+                                <option value="air">В воздухе / лотке</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Нагрузка, cos φ и Длина -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Мощность P, кВт</label>
+                            <input id="sel-power" type="number" step="1" min="0.1" value="120" oninput="runCableSelection()"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Длина L, м</label>
+                            <input id="sel-length" type="number" step="5" min="1" value="250" oninput="runCableSelection()"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">cos φ</label>
+                            <input id="sel-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.90" oninput="runCableSelection()"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-2 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Допустимая потеря и число параллельных кабелей -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Допустимая ΔU<sub>доп</sub>, %:</label>
+                            <input id="sel-maxdrop" type="number" step="0.5" min="0.5" max="20" value="4.0" oninput="runCableSelection()"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-3 py-2 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">Параллельных кабелей (n):</label>
+                            <select id="sel-parallel" onchange="runCableSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
+                                <option value="1">1 кабель в фазе</option>
+                                <option value="2">2 параллельных кабеля</option>
+                                <option value="3">3 параллельных кабеля</option>
+                                <option value="4">4 параллельных кабеля</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Опциональная проверка на термическую стойкость к ТКЗ (актуально для 6/10 кВ) -->
+                    <div class="pt-2 border-t border-slate-700/60">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <span class="text-xs font-medium text-slate-300">Проверка термической стойкости к КЗ (для 6–10 кВ)</span>
+                            <input id="sel-check-tkz" type="checkbox" onchange="toggleTkzInputs(); runCableSelection();" class="w-4 h-4 accent-blue-500 rounded">
+                        </label>
+                        <div id="tkz-inputs-row" class="grid grid-cols-2 gap-2.5 mt-2.5 hidden">
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Ток 3ф КЗ (I<sub>кз</sub>), кА:</label>
+                                <input id="sel-ikz" type="number" step="0.5" min="0.5" value="8.5" oninput="runCableSelection()"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-white outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] text-slate-400 mb-1">Время откл. (t<sub>откл</sub>), с:</label>
+                                <input id="sel-tkz-time" type="number" step="0.1" min="0.1" value="1.0" oninput="runCableSelection()"
+                                    class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-white outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок результата подбора сечения -->
+                <div id="selection-result-box" class="space-y-3">
+                    <!-- Заполняется скриптом -->
+                </div>
+            </section>
+
+
+            <!-- ==========================================
+                 ВКЛАДКА 3: СПРАВОЧНИК И УСТАНОВКА PWA
+                 ========================================== -->
+            <section id="tab-ref" class="space-y-4 hidden">
+                
+                <!-- Карточка: Как установить на телефон (PWA гид) -->
+                <div class="bg-gradient-to-br from-blue-950/80 via-slate-900 to-slate-900 border border-blue-500/30 rounded-2xl p-4 space-y-3 shadow-lg">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center shrink-0 text-blue-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-bold text-white">Как запустить на смартфоне как приложение</h2>
+                            <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">
+                                Этот проект уже настроен как <strong>PWA</strong> и автоматически сохраняет ваши расчёты в память устройства.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-xs text-slate-300 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-[11px] shrink-0">1</span>
+                            <span><strong>Android (Chrome):</strong> откройте ссылку, нажмите меню <strong>«⋮»</strong> в правом верхнем углу и выберите <em>«Добавить на гл. экран»</em> (или «Установить приложение»).</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-[11px] shrink-0">2</span>
+                            <span><strong>iPhone (Safari):</strong> нажмите кнопку <strong>«Поделиться»</strong> (квадрат со стрелкой вверх внизу экрана) и выберите <em>«На экран „Домой“»</em>.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-[11px] shrink-0">3</span>
+                            <span><strong>Упаковка в APK/IPA:</strong> так как весь код чистый и мобильный, его можно за 1 вечер обернуть через <code>Capacitor</code> в нативный файл для Google Play / RuStore.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Таблица справочных параметров кабелей (ПУЭ / ГОСТ) -->
+                <div class="bg-slate-800/70 border border-slate-700/80 rounded-2xl p-3.5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Справочник погонных параметров</h3>
+                            <p class="text-[11px] text-slate-400">Активное R<sub>0</sub> и индуктивное X<sub>0</sub> сопротивление, I<sub>доп</sub></p>
+                        </div>
+                    </div>
+
+                    <!-- Фильтры таблицы справочника -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="ref-mat-filter" onchange="renderReferenceTable()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none">
+                            <option value="Al">Алюминий (Al)</option>
+                            <option value="Cu">Медь (Cu)</option>
+                        </select>
+                        <select id="ref-ins-filter" onchange="renderReferenceTable()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none">
+                            <option value="XLPE">СПЭ (ПвПг / АПвПг)</option>
+                            <option value="PVC">ПВХ (ВВГ / АВВГ)</option>
+                            <option value="PAPER">БПИ (АСБ / СБ)</option>
+                        </select>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scroll rounded-xl border border-slate-700/80">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-400 border-b border-slate-700 text-[11px]">
+                                    <th class="py-2 px-2.5 font-semibold">S, мм²</th>
+                                    <th class="py-2 px-2 font-semibold">R<sub>0</sub>, Ом/км</th>
+                                    <th class="py-2 px-2 font-semibold">X<sub>0</sub>, Ом/км</th>
+                                    <th class="py-2 px-2 font-semibold">I<sub>земля</sub>, А</th>
+                                    <th class="py-2 px-2 font-semibold">I<sub>возд</sub>, А</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ref-table-body" class="divide-y divide-slate-800 font-mono text-[11px]">
+                                <!-- Строки заполняются скриптом -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 leading-relaxed bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                        <strong>Инженерная справка по расчёту:</strong><br>
+                        • Расчётный ток 3ф сети: <code>I = P / (√3 · Uном · cos φ)</code><br>
+                        • Потеря напряжения (3ф): <code>ΔU = √3 · I · L · (R0·cos φ + X0·sin φ) / n</code><br>
+                        • Потеря напряжения (1ф 0,23 кВ): <code>ΔU = 2 · I · L · (R0·cos φ + X0·sin φ) / n</code>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Всплывающее уведомление (Toast вместо системного alert) -->
+        <div id="toast-notification" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-emerald-600 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-xl flex items-center gap-2 border border-emerald-400/40">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span id="toast-text">Скопировано в буфер обмена</span>
+        </div>
+
+        <!-- Нижняя панель навигации под большой палец (Bottom Navigation Bar) -->
+        <nav class="bg-slate-900/95 backdrop-blur-md border-t border-slate-800 px-2 py-1.5 sticky bottom-0 z-30 grid grid-cols-3 gap-1">
+            <button type="button" onclick="switchTab('drop')" id="nav-drop" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-blue-400 bg-blue-500/10 font-semibold">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                </svg>
+                <span class="text-[11px]">Потери ΔU</span>
+            </button>
+
+            <button type="button" onclick="switchTab('select')" id="nav-select" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-slate-400 hover:text-slate-200 font-medium">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-[11px]">Подбор сечения</span>
+            </button>
+
+            <button type="button" onclick="switchTab('ref')" id="nav-ref" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-slate-400 hover:text-slate-200 font-medium">
+                <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                <span class="text-[11px]">Справочник</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ==========================================
+         ИНЖЕНЕРНАЯ БАЗА ДАННЫХ И ЛОГИКА РАСЧЁТА
+         ========================================== -->
+    <script>
+        // Стандартный ряд сечений кабелей (мм²) по ГОСТ 22483
+        const CROSS_SECTIONS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
+
+        /**
+         * Базовые параметры кабелей:
+         * r20_Cu / r20_Al — активное сопротивление при 20°C (Ом/км)
+         * x0_low (0.4 кВ) и x0_med (6-10 кВ) — индуктивное сопротивление (Ом/км)
+         * I_dop — длительно допустимые токи для ПВХ (базовые), для СПЭ применяется коэф. ~1.18, для БПИ ~0.95
+         */
+        const CABLE_DB = {
+            1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140, iCuGnd: 27,  iCuAir: 21,  iAlGnd: 21,  iAlAir: 16  },
+            2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135, iCuGnd: 36,  iCuAir: 27,  iAlGnd: 28,  iAlAir: 21  },
+            4:    { rCu: 4.61,   rAl: 7.41,   x04: 0.085, x10: 0.130, iCuGnd: 47,  iCuAir: 36,  iAlGnd: 36,  iAlAir: 28  },
+            6:    { rCu: 3.08,   rAl: 4.61,   x04: 0.080, x10: 0.125, iCuGnd: 59,  iCuAir: 46,  iAlGnd: 45,  iAlAir: 35  },
+            10:   { rCu: 1.83,   rAl: 3.08,   x04: 0.075, x10: 0.120, iCuGnd: 79,  iCuAir: 63,  iAlGnd: 61,  iAlAir: 48  },
+            16:   { rCu: 1.15,   rAl: 1.91,   x04: 0.070, x10: 0.112, iCuGnd: 102, iCuAir: 84,  iAlGnd: 79,  iAlAir: 65  },
+            25:   { rCu: 0.727,  rAl: 1.20,   x04: 0.068, x10: 0.105, iCuGnd: 133, iCuAir: 112, iAlGnd: 102, iAlAir: 86  },
+            35:   { rCu: 0.524,  rAl: 0.868,  x04: 0.066, x10: 0.099, iCuGnd: 160, iCuAir: 137, iAlGnd: 123, iAlAir: 106 },
+            50:   { rCu: 0.387,  rAl: 0.641,  x04: 0.064, x10: 0.094, iCuGnd: 192, iCuAir: 167, iAlGnd: 147, iAlAir: 129 },
+            70:   { rCu: 0.268,  rAl: 0.443,  x04: 0.062, x10: 0.089, iCuGnd: 237, iCuAir: 211, iAlGnd: 182, iAlAir: 163 },
+            95:   { rCu: 0.193,  rAl: 0.320,  x04: 0.060, x10: 0.085, iCuGnd: 284, iCuAir: 258, iAlGnd: 219, iAlAir: 199 },
+            120:  { rCu: 0.153,  rAl: 0.253,  x04: 0.059, x10: 0.082, iCuGnd: 325, iCuAir: 299, iAlGnd: 251, iAlAir: 230 },
+            150:  { rCu: 0.124,  rAl: 0.206,  x04: 0.058, x10: 0.080, iCuGnd: 368, iCuAir: 344, iAlGnd: 284, iAlAir: 265 },
+            185:  { rCu: 0.0991, rAl: 0.164,  x04: 0.057, x10: 0.078, iCuGnd: 417, iCuAir: 396, iAlGnd: 322, iAlAir: 305 },
+            240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076, iCuGnd: 486, iCuAir: 468, iAlGnd: 375, iAlAir: 361 }
+        };
+
+        // Коэффициенты учёта рабочей температуры изоляции и допустимого тока
+        const INSULATION_FACTORS = {
+            XLPE:  { tempFactorR: 1.12, ampFactor: 1.18, cThermAl: 94,  cThermCu: 143, name: 'СПЭ (ПвПг/АПвПг)' },
+            PVC:   { tempFactorR: 1.06, ampFactor: 1.00, cThermAl: 76,  cThermCu: 115, name: 'ПВХ (ВВГ/АВВГ)' },
+            PAPER: { tempFactorR: 1.05, ampFactor: 0.96, cThermAl: 90,  cThermCu: 141, name: 'БПИ (АСБ/СБ)' }
+        };
+
+        // Состояние приложения
+        let appState = {
+            voltage: '0.4',      // '0.4', '0.23', '6', '10'
+            maxDropPercent: 5.0, // Допустимая потеря ΔU, %
+            segments: []
+        };
+
+        // Демонстрационные участки по умолчанию (реалистичный пример сети 0,4 кВ)
+        function getDefaultSegments() {
+            return [
+                {
+                    id: Date.now() + 1,
+                    name: 'ТП-10/0,4 кВ → ВРУ-1 (Магистраль)',
+                    material: 'Al',
+                    insulation: 'XLPE',
+                    section: 95,
+                    parallel: 1,
+                    length: 140,
+                    loadMode: 'P', // 'P' (кВт) или 'I' (А)
+                    powerKw: 110,
+                    currentA: 176,
+                    cosPhi: 0.90
+                },
+                {
+                    id: Date.now() + 2,
+                    name: 'ВРУ-1 → ЩС-1 (Распред. линия)',
+                    material: 'Cu',
+                    insulation: 'PVC',
+                    section: 25,
+                    parallel: 1,
+                    length: 65,
+                    loadMode: 'P',
+                    powerKw: 38,
+                    currentA: 62,
+                    cosPhi: 0.88
+                }
+            ];
+        }
+
+        // Загрузка из LocalStorage при старте
+        function loadState() {
+            try {
+                const saved = localStorage.getItem('kabelpro_state_v1');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
+                        appState = parsed;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Не удалось прочитать сохранение из LocalStorage', e);
+            }
+            appState.segments = getDefaultSegments();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem('kabelpro_state_v1', JSON.stringify(appState));
+            } catch (e) {
+                console.warn('Ошибка записи в LocalStorage', e);
+            }
+        }
+
+        // Получить погонные параметры кабеля R0, X0 и длительный ток Idop
+        function getCableParams(section, material, insulation, voltageStr, laying = 'ground') {
+            const row = CABLE_DB[section] || CABLE_DB[50];
+            const ins = INSULATION_FACTORS[insulation] || INSULATION_FACTORS.XLPE;
+            const baseR = material === 'Cu' ? row.rCu : row.rAl;
+            // Учитываем нагрев жилы в рабочем режиме
+            const r0 = +(baseR * ins.tempFactorR).toFixed(4);
+            const isMediumVoltage = (voltageStr === '6' || voltageStr === '10');
+            const x0 = isMediumVoltage ? row.x10 : row.x04;
+
+            let baseIdop = 100;
+            if (material === 'Cu') {
+                baseIdop = laying === 'ground' ? row.iCuGnd : row.iCuAir;
+            } else {
+                baseIdop = laying === 'ground' ? row.iAlGnd : row.iAlAir;
+            }
+            const iDop = Math.round(baseIdop * ins.ampFactor);
+
+            return { r0, x0, iDop };
+        }
+
+        // Расчёт одного участка сети
+        function calculateSegmentMetrics(seg, voltageStr) {
+            const uNomKv = parseFloat(voltageStr); // 0.4, 0.23, 6, 10
+            const uNomV = uNomKv * 1000;
+            const isSinglePhase = (voltageStr === '0.23');
+
+            const cosPhi = Math.min(1, Math.max(0.1, parseFloat(seg.cosPhi) || 0.9));
+            const sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi));
+            const lengthKm = Math.max(0, parseFloat(seg.length) || 0) / 1000;
+            const nParallel = Math.max(1, parseInt(seg.parallel) || 1);
+
+            const { r0, x0, iDop } = getCableParams(seg.section, seg.material, seg.insulation, voltageStr);
+
+            // Расчётный ток Iр (А)
+            let currentA = 0;
+            let powerKw = 0;
+            if (seg.loadMode === 'I') {
+                currentA = Math.max(0, parseFloat(seg.currentA) || 0);
+                if (isSinglePhase) {
+                    powerKw = (uNomKv * currentA * cosPhi);
+                } else {
+                    powerKw = (Math.sqrt(3) * uNomKv * currentA * cosPhi);
+                }
+            } else {
+                powerKw = Math.max(0, parseFloat(seg.powerKw) || 0);
+                if (isSinglePhase) {
+                    currentA = powerKw / (uNomKv * cosPhi);
+                } else {
+                    currentA = powerKw / (Math.sqrt(3) * uNomKv * cosPhi);
+                }
+            }
+
+            // Потеря напряжения ΔU (В)
+            // 3ф: ΔU = √3 * I * L * (R0*cosφ + X0*sinφ) / n
+            // 1ф: ΔU = 2 * I * L * (R0*cosφ + X0*sinφ) / n
+            const phaseFactor = isSinglePhase ? 2.0 : Math.sqrt(3);
+            const dropVolts = phaseFactor * currentA * lengthKm * ((r0 * cosPhi + x0 * sinPhi) / nParallel);
+            const dropPercent = (dropVolts / uNomV) * 100;
+
+            // Потери активной мощности ΔP (кВт)
+            const phasesCount = isSinglePhase ? 2 : 3;
+            const powerLossKw = (phasesCount * Math.pow(currentA, 2) * (r0 / nParallel) * lengthKm) / 1000;
+
+            // Загрузка по длительно допустимому току
+            const totalIdop = iDop * nParallel;
+            const currentLoadPct = totalIdop > 0 ? (currentA / totalIdop) * 100 : 0;
+
+            return {
+                r0,
+                x0,
+                iDop: totalIdop,
+                currentA,
+                powerKw,
+                dropVolts,
+                dropPercent,
+                powerLossKw,
+                currentLoadPct
+            };
+        }
+
+        // Обновление выбора номинального напряжения
+        function setNetworkVoltage(vStr) {
+            appState.voltage = vStr;
+            saveState();
+            updateVoltageButtonsUI();
+            renderSegments();
+            updateTotalSummary();
+        }
+
+        function updateVoltageButtonsUI() {
+            const buttons = document.querySelectorAll('#voltage-selector .v-btn');
+            buttons.forEach(btn => {
+                const isSelected = btn.getAttribute('data-v') === appState.voltage;
+                if (isSelected) {
+                    btn.className = 'v-btn py-2 px-1 rounded-xl text-xs font-bold transition border bg-blue-600 text-white border-blue-400 shadow-md shadow-blue-600/30';
+                } else {
+                    btn.className = 'v-btn py-2 px-1 rounded-xl text-xs font-bold transition border bg-slate-900/90 text-slate-300 border-slate-700 hover:bg-slate-800';
+                }
+            });
+
+            const badge = document.getElementById('network-type-badge');
+            if (appState.voltage === '0.23') {
+                badge.textContent = '1-фазная сеть 230 В, 50 Гц';
+            } else if (appState.voltage === '0.4') {
+                badge.textContent = '3-фазная сеть 400 В, 50 Гц';
+            } else {
+                badge.textContent = `Сеть СН ${appState.voltage} кВ (3ф, 50 Гц)`;
+            }
+        }
+
+        // Установка лимита потерь ΔUдоп
+        function setMaxDropLimit(val) {
+            appState.maxDropPercent = parseFloat(val);
+            document.getElementById('custom-limit-input').value = appState.maxDropPercent;
+            saveState();
+            updateTotalSummary();
+        }
+
+        function onCustomLimitInput(val) {
+            const num = parseFloat(val);
+            if (!isNaN(num) && num > 0) {
+                appState.maxDropPercent = num;
+                saveState();
+                updateTotalSummary();
+            }
+        }
+
+        // Отрисовка всех карточек участков
+        function renderSegments() {
+            const container = document.getElementById('segments-container');
+            document.getElementById('segments-count-badge').textContent = appState.segments.length;
+
+            container.innerHTML = appState.segments.map((seg, idx) => {
+                const m = calculateSegmentMetrics(seg, appState.voltage);
+                const isOverCurrent = m.currentLoadPct > 100;
+
+                const sectionOptions = CROSS_SECTIONS.map(s => 
+                    `<option value="${s}" ${Number(seg.section) === s ? 'selected' : ''}>${s} мм²</option>`
+                ).join('');
+
+                return `
+                <div class="bg-slate-800/80 border border-slate-700/90 rounded-2xl p-3.5 shadow-md space-y-3 transition-all" data-seg-id="${seg.id}">
+                    <!-- Шапка участка -->
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 flex-1">
+                            <span class="w-6 h-6 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-400 font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                                ${idx + 1}
+                            </span>
+                            <input type="text" value="${escapeHtml(seg.name)}" 
+                                oninput="updateSegmentField(${seg.id}, 'name', this.value, false)"
+                                placeholder="Название участка..."
+                                class="w-full bg-transparent border-b border-transparent focus:border-blue-500 text-xs sm:text-sm font-bold text-white outline-none py-0.5">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button type="button" onclick="duplicateSegment(${seg.id})" title="Дублировать участок"
+                                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-700/70 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                            ${appState.segments.length > 1 ? `
+                            <button type="button" onclick="removeSegment(${seg.id})" title="Удалить участок"
+                                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Строка 1: Материал, Изоляция, Сечение, Параллельность -->
+                    <div class="grid grid-cols-12 gap-2">
+                        <!-- Материал жилы -->
+                        <div class="col-span-3">
+                            <label class="block text-[10px] text-slate-400 mb-1">Жила</label>
+                            <div class="grid grid-cols-2 bg-slate-900 p-0.5 rounded-xl border border-slate-700">
+                                <button type="button" onclick="updateSegmentField(${seg.id}, 'material', 'Al', true)"
+                                    class="py-1.5 rounded-lg text-xs font-bold transition ${seg.material === 'Al' ? 'bg-blue-600 text-white' : 'text-slate-400'}">Al</button>
+                                <button type="button" onclick="updateSegmentField(${seg.id}, 'material', 'Cu', true)"
+                                    class="py-1.5 rounded-lg text-xs font-bold transition ${seg.material === 'Cu' ? 'bg-amber-600 text-white' : 'text-slate-400'}">Cu</button>
+                            </div>
+                        </div>
+
+                        <!-- Тип изоляции -->
+                        <div class="col-span-3">
+                            <label class="block text-[10px] text-slate-400 mb-1">Изоляция</label>
+                            <select onchange="updateSegmentField(${seg.id}, 'insulation', this.value, true)"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-1.5 py-2 text-xs font-semibold text-white outline-none focus:border-blue-500">
+                                <option value="XLPE" ${seg.insulation === 'XLPE' ? 'selected' : ''}>СПЭ</option>
+                                <option value="PVC" ${seg.insulation === 'PVC' ? 'selected' : ''}>ПВХ</option>
+                                <option value="PAPER" ${seg.insulation === 'PAPER' ? 'selected' : ''}>БПИ</option>
+                            </select>
+                        </div>
+
+                        <!-- Сечение S -->
+                        <div class="col-span-4">
+                            <label class="block text-[10px] text-slate-400 mb-1">Сечение S</label>
+                            <select onchange="updateSegmentField(${seg.id}, 'section', parseFloat(this.value), true)"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs font-mono font-bold text-white outline-none focus:border-blue-500">
+                                ${sectionOptions}
+                            </select>
+                        </div>
+
+                        <!-- Кол-во параллельных кабелей n -->
+                        <div class="col-span-2">
+                            <label class="block text-[10px] text-slate-400 mb-1">Кол-во n</label>
+                            <select onchange="updateSegmentField(${seg.id}, 'parallel', parseInt(this.value), true)"
+                                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-1.5 py-2 text-xs font-mono font-bold text-white outline-none focus:border-blue-500">
+                                <option value="1" ${seg.parallel == 1 ? 'selected' : ''}>1х</option>
+                                <option value="2" ${seg.parallel == 2 ? 'selected' : ''}>2х</option>
+                                <option value="3" ${seg.parallel == 3 ? 'selected' : ''}>3х</option>
+                                <option value="4" ${seg.parallel == 4 ? 'selected' : ''}>4х</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Строка 2: Длина L, Нагрузка (P или I), cos φ -->
+                    <div class="grid grid-cols-12 gap-2">
+                        <!-- Длина L (м) -->
+                        <div class="col-span-4">
+                            <label class="block text-[10px] text-slate-400 mb-1">Длина L, м</label>
+                            <input type="number" step="5" min="1" value="${seg.length}"
+                                oninput="updateSegmentField(${seg.id}, 'length', this.value, false)"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+
+                        <!-- Мощность P (кВт) или Ток I (А) -->
+                        <div class="col-span-5">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] text-slate-400">Нагрузка:</span>
+                                <div class="inline-flex rounded bg-slate-900 p-0.5 border border-slate-700 text-[10px]">
+                                    <button type="button" onclick="updateSegmentField(${seg.id}, 'loadMode', 'P', true)"
+                                        class="px-1.5 rounded font-bold ${seg.loadMode === 'P' ? 'bg-blue-600 text-white' : 'text-slate-400'}">P, кВт</button>
+                                    <button type="button" onclick="updateSegmentField(${seg.id}, 'loadMode', 'I', true)"
+                                        class="px-1.5 rounded font-bold ${seg.loadMode === 'I' ? 'bg-blue-600 text-white' : 'text-slate-400'}">I, А</button>
+                                </div>
+                            </div>
+                            ${seg.loadMode === 'P' ? `
+                            <input type="number" step="1" min="0" value="${seg.powerKw}"
+                                oninput="updateSegmentField(${seg.id}, 'powerKw', this.value, false)"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                            ` : `
+                            <input type="number" step="1" min="0" value="${seg.currentA}"
+                                oninput="updateSegmentField(${seg.id}, 'currentA', this.value, false)"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                            `}
+                        </div>
+
+                        <!-- Коэффициент мощности cos φ -->
+                        <div class="col-span-3">
+                            <label class="block text-[10px] text-slate-400 mb-1">cos φ</label>
+                            <input type="number" step="0.01" min="0.5" max="1.0" value="${seg.cosPhi}"
+                                oninput="updateSegmentField(${seg.id}, 'cosPhi', this.value, false)"
+                                class="w-full bg-slate-900 border border-slate-700 focus:border-blue-500 rounded-xl px-2 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Нижняя панель результатов конкретного участка -->
+                    <div id="seg-metrics-${seg.id}" class="pt-2.5 border-t border-slate-700/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        ${renderSegmentMetricsHTML(m, isOverCurrent)}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderSegmentMetricsHTML(m, isOverCurrent) {
+            return `
+                <div class="flex items-center gap-3 text-[11px] text-slate-300 font-mono">
+                    <span title="Расчётный ток / Допустимый ток кабеля" class="${isOverCurrent ? 'text-rose-400 font-bold' : ''}">
+                        Iр: <strong>${m.currentA.toFixed(1)} А</strong> <span class="text-slate-400">(${Math.round(m.currentLoadPct)}% от ${m.iDop}А)</span>
+                    </span>
+                    <span class="hidden sm:inline text-slate-500">|</span>
+                    <span class="text-slate-400">R₀=${m.r0.toFixed(3)} X₀=${m.x0.toFixed(3)}</span>
+                </div>
+                <div class="flex items-center gap-1.5 ml-auto">
+                    <span class="text-[11px] text-slate-400">ΔU<sub>уч</sub>:</span>
+                    <span class="px-2 py-0.5 rounded-lg font-mono font-bold text-xs bg-slate-900 text-blue-300 border border-slate-700">
+                        ${m.dropPercent.toFixed(2)}% (${m.dropVolts.toFixed(1)} В)
+                    </span>
+                </div>
+                ${isOverCurrent ? `
+                <div class="w-full text-[11px] bg-rose-500/15 border border-rose-500/40 text-rose-300 px-2.5 py-1 rounded-lg flex items-center gap-1.5 mt-0.5">
+                    <svg class="w-3.5 h-3.5 shrink-0 text-rose-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>Перегрузка по току! Расчётный ток (${m.currentA.toFixed(0)} А) превышает Iдоп (${m.iDop} А). Увеличьте сечение.</span>
+                </div>` : ''}
+            `;
+        }
+
+        // Обновление поля участка без потери фокуса ввода
+        function updateSegmentField(segId, field, value, fullReRender = false) {
+            const seg = appState.segments.find(s => s.id === segId);
+            if (!seg) return;
+            seg[field] = value;
+            saveState();
+
+            if (fullReRender) {
+                renderSegments();
+            } else {
+                // Обновляем только нижнюю полоску метрик этого участка, чтобы клавиатура на телефоне не закрывалась
+                const m = calculateSegmentMetrics(seg, appState.voltage);
+                const isOverCurrent = m.currentLoadPct > 100;
+                const metricsEl = document.getElementById(`seg-metrics-${segId}`);
+                if (metricsEl) {
+                    metricsEl.innerHTML = renderSegmentMetricsHTML(m, isOverCurrent);
+                }
+            }
+            updateTotalSummary();
+        }
+
+        // Добавление нового участка
+        function addSegment() {
+            const lastSeg = appState.segments[appState.segments.length - 1];
+            const nextNum = appState.segments.length + 1;
+            appState.segments.push({
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                name: `Участок ${nextNum}`,
+                material: lastSeg ? lastSeg.material : 'Al',
+                insulation: lastSeg ? lastSeg.insulation : 'XLPE',
+                section: lastSeg ? lastSeg.section : 50,
+                parallel: 1,
+                length: 80,
+                loadMode: 'P',
+                powerKw: lastSeg ? Math.max(10, Math.round(lastSeg.powerKw * 0.5)) : 40,
+                currentA: 65,
+                cosPhi: lastSeg ? lastSeg.cosPhi : 0.90
+            });
+            saveState();
+            renderSegments();
+            updateTotalSummary();
+        }
+
+        function duplicateSegment(segId) {
+            const idx = appState.segments.findIndex(s => s.id === segId);
+            if (idx === -1) return;
+            const copy = {
+                ...appState.segments[idx],
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                name: appState.segments[idx].name + ' (копия)'
+            };
+            appState.segments.splice(idx + 1, 0, copy);
+            saveState();
+            renderSegments();
+            updateTotalSummary();
+            showToast('Участок дублирован');
+        }
+
+        function removeSegment(segId) {
+            if (appState.segments.length <= 1) return;
+            appState.segments = appState.segments.filter(s => s.id !== segId);
+            saveState();
+            renderSegments();
+            updateTotalSummary();
+        }
+
+        // Обновление главной сводной карточки потерь
+        function updateTotalSummary() {
+            const uNomKv = parseFloat(appState.voltage);
+            const uNomV = uNomKv * 1000;
+
+            let totalDropV = 0;
+            let totalDropPct = 0;
+            let totalLengthM = 0;
+            let totalPowerLossKw = 0;
+            let anyOverCurrent = false;
+
+            appState.segments.forEach(seg => {
+                const m = calculateSegmentMetrics(seg, appState.voltage);
+                totalDropV += m.dropVolts;
+                totalDropPct += m.dropPercent;
+                totalLengthM += (parseFloat(seg.length) || 0);
+                totalPowerLossKw += m.powerLossKw;
+                if (m.currentLoadPct > 100) anyOverCurrent = true;
+            });
+
+            const endVoltageV = Math.max(0, uNomV - totalDropV);
+
+            document.getElementById('total-du-percent').textContent = `${totalDropPct.toFixed(2)}%`;
+            document.getElementById('total-du-volts').textContent = `(${totalDropV.toFixed(1)} В)`;
+            document.getElementById('total-length-val').textContent = `${Math.round(totalLengthM)} м`;
+            document.getElementById('total-power-loss-val').textContent = `${totalPowerLossKw.toFixed(2)} кВт`;
+
+            if (uNomKv >= 6) {
+                document.getElementById('end-voltage-val').textContent = `${(endVoltageV / 1000).toFixed(2)} кВ`;
+            } else {
+                document.getElementById('end-voltage-val').textContent = `${endVoltageV.toFixed(1)} В`;
+            }
+
+            // Статус и шкала прогресса
+            const limit = appState.maxDropPercent;
+            const ratio = Math.min(100, (totalDropPct / limit) * 100);
+            const bar = document.getElementById('drop-progress-bar');
+            const badge = document.getElementById('status-badge');
+
+            bar.style.width = `${Math.max(4, ratio)}%`;
+
+            if (totalDropPct <= limit && !anyOverCurrent) {
+                bar.className = 'h-full rounded-full transition-all duration-300 bg-emerald-500';
+                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+                badge.innerHTML = `<span>В норме (≤ ${limit}%)</span>`;
+            } else if (totalDropPct > limit) {
+                bar.className = 'h-full rounded-full transition-all duration-300 bg-rose-500';
+                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse-subtle';
+                badge.innerHTML = `<span>Превышение ΔU (> ${limit}%)</span>`;
+            } else {
+                bar.className = 'h-full rounded-full transition-all duration-300 bg-amber-500';
+                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40';
+                badge.innerHTML = `<span>Перегруз по току Iдоп</span>`;
+            }
+        }
+
+        // Копирование текстового отчёта в буфер обмена для пояснительной записки
+        function copyEngineeringReport() {
+            const uNomKv = parseFloat(appState.voltage);
+            const uNomV = uNomKv * 1000;
+            let lines = [];
+            lines.push(`РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ В КАБЕЛЬНОЙ СЕТИ ${appState.voltage.replace('.', ',')} кВ`);
+            lines.push(`Допустимая потеря напряжения ΔUдоп = ${appState.maxDropPercent}%`);
+            lines.push(`--------------------------------------------------`);
+
+            let sumDropPct = 0;
+            let sumDropV = 0;
+
+            appState.segments.forEach((seg, i) => {
+                const m = calculateSegmentMetrics(seg, appState.voltage);
+                sumDropPct += m.dropPercent;
+                sumDropV += m.dropVolts;
+                const matLabel = seg.material === 'Cu' ? 'Медь (Cu)' : 'Алюминий (Al)';
+                const parStr = seg.parallel > 1 ? `${seg.parallel}х` : '';
+                lines.push(`${i + 1}. ${seg.name}:`);
+                lines.push(`   Кабель: ${matLabel}, ${seg.insulation}, S = ${parStr}${seg.section} мм², L = ${seg.length} м`);
+                lines.push(`   Нагрузка: P = ${m.powerKw.toFixed(1)} кВт, cos φ = ${seg.cosPhi}, Iр = ${m.currentA.toFixed(1)} А (Iдоп = ${m.iDop} А)`);
+                lines.push(`   Потери на участке: ΔU = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
+            });
+
+            lines.push(`--------------------------------------------------`);
+            lines.push(`ИТОГО суммарные потери ∑ΔU = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
+            lines.push(`Напряжение в конце линии Uкон = ${(uNomV - sumDropV).toFixed(1)} В`);
+            lines.push(`Вывод: ${sumDropPct <= appState.maxDropPercent ? 'Потери напряжения в пределах нормы.' : 'ТРЕБУЕТСЯ УВЕЛИЧЕНИЕ СЕЧЕНИЯ КАБЕЛЯ!'}`);
+
+            const text = lines.join('\n');
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast('Отчёт скопирован для ПЗ!');
+        }
+
+        // ==========================================
+        // ЛОГИКА ВКЛАДКИ 2: АВТОПОДБОР СЕЧЕНИЯ
+        // ==========================================
+        function toggleTkzInputs() {
+            const checked = document.getElementById('sel-check-tkz').checked;
+            const row = document.getElementById('tkz-inputs-row');
+            if (checked) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        }
+
+        function runCableSelection() {
+            const voltageStr = document.getElementById('sel-voltage').value;
+            const material = document.getElementById('sel-material').value;
+            const insulation = document.getElementById('sel-insulation').value;
+            const laying = document.getElementById('sel-laying').value;
+            const powerKw = Math.max(0.1, parseFloat(document.getElementById('sel-power').value) || 10);
+            const lengthM = Math.max(1, parseFloat(document.getElementById('sel-length').value) || 50);
+            const cosPhi = Math.min(1, Math.max(0.3, parseFloat(document.getElementById('sel-cosphi').value) || 0.9));
+            const maxDropPct = Math.max(0.5, parseFloat(document.getElementById('sel-maxdrop').value) || 5);
+            const nParallel = parseInt(document.getElementById('sel-parallel').value) || 1;
+            const checkTkz = document.getElementById('sel-check-tkz').checked;
+
+            const uNomKv = parseFloat(voltageStr);
+            const uNomV = uNomKv * 1000;
+            const isSinglePhase = (voltageStr === '0.23');
+            const sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi));
+            const lengthKm = lengthM / 1000;
+
+            // Расчётный ток нагрузки
+            const calcCurrentA = isSinglePhase
+                ? powerKw / (uNomKv * cosPhi)
+                : powerKw / (Math.sqrt(3) * uNomKv * cosPhi);
+
+            // Минимальное сечение по термической стойкости к ТКЗ (если включено): Sтерм = (Iкз_А * √t) / Cтерм
+            let minSectionTkz = 0;
+            if (checkTkz) {
+                const ikzKa = Math.max(0.1, parseFloat(document.getElementById('sel-ikz').value) || 5);
+                const tSec = Math.max(0.05, parseFloat(document.getElementById('sel-tkz-time').value) || 1);
+                const insInfo = INSULATION_FACTORS[insulation];
+                const cTherm = material === 'Cu' ? insInfo.cThermCu : insInfo.cThermAl;
+                minSectionTkz = ((ikzKa * 1000 * Math.sqrt(tSec)) / cTherm) / nParallel;
+            }
+
+            // Проходим по всему ряду сечений и оцениваем каждое
+            const evaluated = CROSS_SECTIONS.map(sec => {
+                const { r0, x0, iDop } = getCableParams(sec, material, insulation, voltageStr, laying);
+                const totalIdop = iDop * nParallel;
+                const phaseFactor = isSinglePhase ? 2.0 : Math.sqrt(3);
+                const dropV = phaseFactor * calcCurrentA * lengthKm * ((r0 * cosPhi + x0 * sinPhi) / nParallel);
+                const dropPct = (dropV / uNomV) * 100;
+                const loadPct = (calcCurrentA / totalIdop) * 100;
+
+                const passCurrent = totalIdop >= calcCurrentA;
+                const passDrop = dropPct <= maxDropPct;
+                const passTkz = !checkTkz || (sec >= minSectionTkz);
+
+                return {
+                    section: sec,
+                    totalIdop,
+                    dropV,
+                    dropPct,
+                    loadPct,
+                    passCurrent,
+                    passDrop,
+                    passTkz,
+                    isSuitable: passCurrent && passDrop && passTkz
+                };
+            });
+
+            const recommendedIdx = evaluated.findIndex(item => item.isSuitable);
+            const resultBox = document.getElementById('selection-result-box');
+
+            if (recommendedIdx === -1) {
+                resultBox.innerHTML = `
+                    <div class="bg-rose-950/60 border border-rose-500/50 rounded-2xl p-4 text-xs text-rose-200 space-y-2">
+                        <div class="font-bold text-sm text-rose-300 flex items-center gap-2">
+                            <span>Одиночного сечения до 240 мм² недостаточно!</span>
+                        </div>
+                        <p>Расчётный ток линии составляет <strong>${calcCurrentA.toFixed(1)} А</strong> на длине <strong>${lengthM} м</strong>.</p>
+                        <p>Рекомендация: увеличьте число параллельных кабелей (n = 2..4), выберите медную жилу или перейдите на более высокий класс напряжения.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const rec = evaluated[recommendedIdx];
+            const parPrefix = nParallel > 1 ? `${nParallel} × ` : '';
+
+            // Выбираем 3 соседних сечения для наглядного сравнения
+            const startIdx = Math.max(0, recommendedIdx - 1);
+            const slice = evaluated.slice(startIdx, startIdx + 3);
+
+            const comparisonRows = slice.map(item => {
+                const isRec = item.section === rec.section;
+                return `
+                    <tr class="border-b border-slate-800 ${isRec ? 'bg-emerald-500/15 text-white font-semibold' : 'text-slate-300'}">
+                        <td class="py-2.5 px-2.5 font-mono">
+                            ${parPrefix}${item.section} мм²
+                            ${isRec ? '<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-bold">РЕК.</span>' : ''}
+                        </td>
+                        <td class="py-2.5 px-2 font-mono ${item.passCurrent ? '' : 'text-rose-400'}">${item.totalIdop} А (${Math.round(item.loadPct)}%)</td>
+                        <td class="py-2.5 px-2 font-mono ${item.passDrop ? '' : 'text-rose-400'}">${item.dropPct.toFixed(2)}%</td>
+                        <td class="py-2.5 px-2 text-right">
+                            ${item.isSuitable 
+                                ? '<span class="text-emerald-400 font-bold">Подходит</span>' 
+                                : '<span class="text-rose-400">Мало</span>'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            resultBox.innerHTML = `
+                <div class="bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-4 shadow-lg space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-[11px] uppercase tracking-wider font-semibold text-emerald-400 block">Рекомендуемое сечение</span>
+                            <div class="text-2xl font-extrabold font-mono text-white mt-0.5">
+                                ${parPrefix}${rec.section} мм² (${material === 'Cu' ? 'Медь' : 'Алюминий'})
+                            </div>
+                        </div>
+                        <button type="button" onclick="applySelectedCableToTab1(${rec.section}, '${material}', '${insulation}', ${nParallel}, ${powerKw}, ${lengthM}, ${cosPhi})"
+                            class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow transition active:scale-95">
+                            + В расчёт ΔU
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                        <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">Расчётный ток Iр</span>
+                            <span class="text-xs font-mono font-bold text-white">${calcCurrentA.toFixed(1)} А</span>
+                        </div>
+                        <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">Допустимый Iдоп</span>
+                            <span class="text-xs font-mono font-bold text-emerald-400">${rec.totalIdop} А</span>
+                        </div>
+                        <div class="bg-slate-900/80 rounded-xl p-2 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 block">Потеря ΔU</span>
+                            <span class="text-xs font-mono font-bold text-blue-300">${rec.dropPct.toFixed(2)}% (${rec.dropV.toFixed(1)}В)</span>
+                        </div>
+                    </div>
+
+                    ${checkTkz ? `
+                    <div class="text-[11px] text-slate-300 bg-slate-900/70 px-3 py-1.5 rounded-xl border border-slate-800">
+                        Мин. сечение по термической стойкости к КЗ: <strong class="font-mono text-amber-300">${minSectionTkz.toFixed(1)} мм²</strong> (на 1 кабель)
+                    </div>` : ''}
+
+                    <!-- Сравнительная таблица смежных сечений -->
+                    <div class="pt-1">
+                        <span class="text-[11px] font-semibold text-slate-400 block mb-1.5">Сравнение смежных сечений:</span>
+                        <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/60">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-900 text-slate-400 text-[10px] border-b border-slate-800">
+                                        <th class="py-2 px-2.5">Сечение</th>
+                                        <th class="py-2 px-2">Iдоп (Загр.)</th>
+                                        <th class="py-2 px-2">Потери ΔU</th>
+                                        <th class="py-2 px-2 text-right">Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${comparisonRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Перенос подобранного кабеля в список участков первой вкладки
+        function applySelectedCableToTab1(section, material, insulation, parallel, powerKw, lengthM, cosPhi) {
+            appState.segments.push({
+                id: Date.now(),
+                name: `Подобранный кабель ${section} мм²`,
+                material,
+                insulation,
+                section,
+                parallel,
+                length: lengthM,
+                loadMode: 'P',
+                powerKw,
+                currentA: 50,
+                cosPhi
+            });
+            saveState();
+            renderSegments();
+            updateTotalSummary();
+            switchTab('drop');
+            showToast('Кабель добавлен в участки сети!');
+        }
+
+        // Отрисовка справочной таблицы во Вкладке 3
+        function renderReferenceTable() {
+            const mat = document.getElementById('ref-mat-filter').value;
+            const ins = document.getElementById('ref-ins-filter').value;
+            const tbody = document.getElementById('ref-table-body');
+
+            tbody.innerHTML = CROSS_SECTIONS.map(sec => {
+                const gnd = getCableParams(sec, mat, ins, appState.voltage, 'ground');
+                const air = getCableParams(sec, mat, ins, appState.voltage, 'air');
+                return `
+                    <tr class="hover:bg-slate-800/60">
+                        <td class="py-2 px-2.5 font-bold text-white">${sec}</td>
+                        <td class="py-2 px-2 text-slate-300">${gnd.r0.toFixed(3)}</td>
+                        <td class="py-2 px-2 text-slate-300">${gnd.x0.toFixed(3)}</td>
+                        <td class="py-2 px-2 text-emerald-400 font-semibold">${gnd.iDop}</td>
+                        <td class="py-2 px-2 text-blue-300">${air.iDop}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Переключение нижних вкладок
+        function switchTab(tabName) {
+            const tabs = ['drop', 'select', 'ref'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`nav-${t}`);
+                if (t === tabName) {
+                    sec.classList.remove('hidden');
+                    btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-blue-400 bg-blue-500/10 font-semibold';
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = 'nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-slate-400 hover:text-slate-200 font-medium';
+                }
+            });
+
+            if (tabName === 'select') runCableSelection();
+            if (tabName === 'ref') renderReferenceTable();
+        }
+
+        // Сброс к демонстрационному примеру
+        function resetToDemoData() {
+            appState.voltage = '0.4';
+            appState.maxDropPercent = 5.0;
+            appState.segments = getDefaultSegments();
+            document.getElementById('custom-limit-input').value = 5;
+            saveState();
+            updateVoltageButtonsUI();
+            renderSegments();
+            updateTotalSummary();
+            showToast('Загружен демонстрационный пример');
+        }
+
+        // Уведомление Toast
+        let toastTimer = null;
+        function showToast(message) {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-text').textContent = message;
+            toast.classList.remove('opacity-0', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-2');
+            }, 2400);
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // Динамическая генерация Web App Manifest для полноценной установки PWA
+        function setupInlinePWA() {
+            const manifest = {
+                name: "КабельПро — Расчёт потерь ΔU и сечений",
+                short_name: "КабельПро",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#0f172a",
+                theme_color: "#0f172a",
+                icons: [
+                    {
+                        src: "https://placehold.co/192x192/2563eb/ffffff?text=ΔU",
+                        sizes: "192x192",
+                        type: "image/png"
+                    }
+                ]
+            };
+            const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+            const manifestURL = URL.createObjectURL(blob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+        }
+
+        // Инициализация при открытии приложения
+        window.onload = function () {
+            loadState();
+            document.getElementById('custom-limit-input').value = appState.maxDropPercent;
+            updateVoltageButtonsUI();
+            renderSegments();
+            updateTotalSummary();
+            runCableSelection();
+            renderReferenceTable();
+            setupInlinePWA();
+        };
+    </script>
+</body>
+</html>
