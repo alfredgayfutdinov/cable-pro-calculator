@@ -109,8 +109,8 @@
             </div>
         </header>
 
-        <!-- Основная прокручиваемая область контента -->
-        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-24 px-3.5 pt-3 space-y-3.5">
+        <!-- Основная прокручиваемая область контента (с отступом снизу, чтобы контент не перекрывался панелью) -->
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-28 px-3.5 pt-3 space-y-3.5">
 
             <!-- ==========================================
                  ВКЛАДКА 1: РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (ΔU)
@@ -441,15 +441,15 @@
         </main>
 
         <!-- Всплывающее уведомление (Toast) -->
-        <div id="toast-notification" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
+        <div id="toast-notification" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
             <span id="toast-text">Скопировано</span>
         </div>
 
-        <!-- Нижняя панель навигации (Bottom Navigation Bar) -->
-        <nav class="bg-[#070b14]/95 backdrop-blur-md border-t border-[#162238] px-2 py-1.5 sticky bottom-0 z-30 grid grid-cols-3 gap-1">
+        <!-- Нижняя панель навигации ЖЕСТКО ЗАКРЕПЛЕНА ВНИЗУ (fixed bottom-0) -->
+        <nav class="fixed bottom-0 left-0 right-0 w-full max-w-[480px] mx-auto bg-[#070b14]/95 backdrop-blur-md border-t border-[#162238] px-3 py-2 z-40 grid grid-cols-3 gap-1.5 shadow-[0_-10px_25px_rgba(0,0,0,0.5)]">
             <button type="button" onclick="switchTab('drop')" id="nav-drop" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-[#00f2fe] bg-[#0066ff]/15 font-semibold">
                 <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
@@ -949,7 +949,7 @@
             });
 
             lines.push(`--------------------------------------------------`);
-            lines.push(`ИТОГО &sum;&Delta;U = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
+            lines.push(`ИТОГО суммарные потери &sum;&Delta;U = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
             
             navigator.clipboard.writeText(lines.join('\n')).then(() => {
                 showToast('Отчёт скопирован для ПЗ!');
