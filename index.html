@@ -82,35 +82,22 @@
     <!-- Контейнер мобильного приложения -->
     <div class="w-full max-w-[480px] min-h-screen md:min-h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
         
-        <!-- Верхняя шапка приложения (App Bar) -->
-        <header class="bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3 pb-2.5 sticky top-0 z-30 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-[#00f2fe] flex items-center justify-center shadow-lg shadow-blue-600/30">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <!-- Верхняя шапка приложения (центрированная) -->
+        <header class="bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3.5 pb-2.5 sticky top-0 z-30 flex flex-col items-center justify-center text-center">
+            <div class="flex items-center justify-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-[#00f2fe] flex items-center justify-center shadow-md shadow-blue-600/30 shrink-0">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
-                <div>
-                    <div class="flex items-center gap-1.5">
-                        <h1 class="text-base font-bold tracking-tight text-white leading-none">КабельПро</h1>
-                        <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/20 text-[#00f2fe] border border-blue-500/30">PRO</span>
-                    </div>
-                    <p class="text-[11px] text-slate-400 mt-0.5">Расчёт ΔU и выбор сечений 0,4/6/10 кВ</p>
-                </div>
+                <h1 class="text-base font-bold tracking-tight text-white leading-none">КабельПро</h1>
+                <span class="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/20 text-[#00f2fe] border border-blue-500/30">PRO</span>
             </div>
-
-            <div class="flex items-center gap-1.5">
-                <button onclick="resetToDemoData()" title="Сбросить к примеру" class="p-2 rounded-xl bg-[#0e1626] hover:bg-[#131e33] active:scale-95 text-slate-300 transition flex items-center gap-1 text-xs font-medium border border-[#1e293b]">
-                    <svg class="w-4 h-4 text-[#00f2fe]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                    </svg>
-                    <span class="hidden sm:inline">Пример</span>
-                </button>
-            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ</p>
         </header>
 
-        <!-- Основная прокручиваемая область контента (с отступом снизу, чтобы контент не перекрывался панелью) -->
-        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-28 px-3.5 pt-3 space-y-3.5">
+        <!-- Основная прокручиваемая область контента -->
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-24 px-3.5 pt-3 space-y-3.5">
 
             <!-- ==========================================
                  ВКЛАДКА 1: РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (ΔU)
@@ -441,15 +428,15 @@
         </main>
 
         <!-- Всплывающее уведомление (Toast) -->
-        <div id="toast-notification" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
+        <div id="toast-notification" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
             <span id="toast-text">Скопировано</span>
         </div>
 
-        <!-- Нижняя панель навигации ЖЕСТКО ЗАКРЕПЛЕНА ВНИЗУ (fixed bottom-0) -->
-        <nav class="fixed bottom-0 left-0 right-0 w-full max-w-[480px] mx-auto bg-[#070b14]/95 backdrop-blur-md border-t border-[#162238] px-3 py-2 z-40 grid grid-cols-3 gap-1.5 shadow-[0_-10px_25px_rgba(0,0,0,0.5)]">
+        <!-- Нижняя панель навигации (Bottom Navigation Bar) -->
+        <nav class="bg-[#070b14]/95 backdrop-blur-md border-t border-[#162238] px-2 py-1.5 sticky bottom-0 z-30 grid grid-cols-3 gap-1">
             <button type="button" onclick="switchTab('drop')" id="nav-drop" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-[#00f2fe] bg-[#0066ff]/15 font-semibold">
                 <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
@@ -949,7 +936,7 @@
             });
 
             lines.push(`--------------------------------------------------`);
-            lines.push(`ИТОГО суммарные потери &sum;&Delta;U = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
+            lines.push(`ИТОГО &sum;&Delta;U = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
             
             navigator.clipboard.writeText(lines.join('\n')).then(() => {
                 showToast('Отчёт скопирован для ПЗ!');
@@ -1164,19 +1151,6 @@
 
             if (tabName === 'select') runCableSelection();
             if (tabName === 'ref') renderReferenceTable();
-        }
-
-        function resetToDemoData() {
-            appState.voltage = '0.4';
-            appState.maxDropPercent = 4.5;
-            appState.ktr = 0.9;
-            appState.segments = getDefaultSegments();
-            document.getElementById('custom-limit-input').value = 4.5;
-            saveState();
-            updateVoltageButtonsUI();
-            renderSegments();
-            updateTotalSummary();
-            showToast('Сброшено к примеру');
         }
 
         let toastTimer = null;
