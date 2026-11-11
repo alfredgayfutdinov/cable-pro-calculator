@@ -2,7 +2,7 @@
 <html lang="ru" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#070b14">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -82,11 +82,11 @@
     <!-- Контейнер мобильного приложения -->
     <div class="w-full max-w-[480px] min-h-screen md:min-h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
         
-        <!-- Верхняя шапка приложения (центрированная) -->
-        <header class="bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3.5 pb-2.5 sticky top-0 z-30 flex flex-col items-center justify-center text-center">
+        <!-- Верхняя шапка приложения (Центрированная по Варианту 1, без кнопки «Пример») -->
+        <header class="bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3.5 pb-3 sticky top-0 z-30 flex flex-col items-center justify-center text-center">
             <div class="flex items-center justify-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-[#00f2fe] flex items-center justify-center shadow-md shadow-blue-600/30 shrink-0">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-[#00f2fe] flex items-center justify-center shadow-lg shadow-blue-600/30">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
@@ -282,9 +282,9 @@
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1">Изоляция кабеля:</label>
                             <select id="sel-insulation" onchange="runCableSelection()" class="w-full bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-[#00f2fe]">
-                                <option value="PVC">ПВХ (ВВГ / АВВГ) 70°C</option>
+                                <option value="PVC">ПВХ (ВВГ / АВБбШв) 70°C</option>
                                 <option value="XLPE">СПЭ (ПвПг / АПвПг) 90°C</option>
-                                <option value="PAPER">БПИ (АСБ / СБ) 65°C</option>
+                                <option value="PAPER">БПИ (СБ / ААБл) 65°C</option>
                             </select>
                         </div>
                         <div>
@@ -355,72 +355,51 @@
             </section>
 
             <!-- ==========================================
-                 ВКЛАДКА 3: СПРАВОЧНИК И УСТАНОВКА PWA
+                 ВКЛАДКА 3: СПРАВОЧНИК ПАРАМЕТРОВ (ХАРАКТЕРИСТИКИ КАБЕЛЕЙ)
                  ========================================== -->
             <section id="tab-ref" class="space-y-4 hidden">
-                
-                <div class="bg-gradient-to-br from-[#0e1626] via-[#070b14] to-[#070b14] border border-[#0066ff]/40 rounded-2xl p-4 space-y-3 shadow-xl">
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-[#0066ff]/20 border border-[#00f2fe]/30 flex items-center justify-center shrink-0 text-[#00f2fe]">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
+                <div class="bg-[#0e1626] border border-[#1e293b] rounded-2xl p-3.5 space-y-3.5 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-[#1e293b] pb-2.5">
                         <div>
-                            <h2 class="text-sm font-bold text-white">Установка как PWA на смартфон</h2>
-                            <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">
-                                Приложение сохраняет данные локально и работает без интернета.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2 text-xs text-slate-300 bg-[#04070d]/80 p-3 rounded-xl border border-[#1e293b]">
-                        <div class="flex items-start gap-2">
-                            <span class="w-5 h-5 rounded-full bg-[#0066ff] text-white font-bold flex items-center justify-center text-[11px] shrink-0">1</span>
-                            <span><strong>Android (Chrome):</strong> меню <strong>«&vellip;»</strong> &rarr; <em>«Установить приложение»</em>.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-5 h-5 rounded-full bg-[#0066ff] text-white font-bold flex items-center justify-center text-[11px] shrink-0">2</span>
-                            <span><strong>iPhone (Safari):</strong> кнопка <strong>«Поделиться»</strong> &rarr; <em>«На экран „Домой“»</em>.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-[#0e1626] border border-[#1e293b] rounded-2xl p-3.5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-sm font-bold text-white">Справочник параметров</h3>
-                            <p class="text-[11px] text-slate-400">ГОСТ 31996-2012</p>
+                            <h3 class="text-sm font-bold text-white">Характеристики кабелей</h3>
+                            <p class="text-[11px] text-slate-400">ГОСТ 31996-2012 / ГОСТ 18410-73 (усреднённые по заводам)</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
-                        <select id="ref-mat-filter" onchange="renderReferenceTable()" class="bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none">
+                        <select id="ref-mat-filter" onchange="renderReferenceTable()" class="bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-[#00f2fe]">
                             <option value="Al">Алюминий (Al)</option>
                             <option value="Cu">Медь (Cu)</option>
                         </select>
-                        <select id="ref-ins-filter" onchange="renderReferenceTable()" class="bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none">
-                            <option value="PVC">ПВХ (ВВГ / АВВГ)</option>
+                        <select id="ref-ins-filter" onchange="renderReferenceTable()" class="bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-[#00f2fe]">
+                            <option value="PVC">ПВХ (ВВГ / АВБбШв)</option>
                             <option value="XLPE">СПЭ (ПвПг / АПвПг)</option>
-                            <option value="PAPER">БПИ (АСБ / СБ)</option>
+                            <option value="PAPER">БПИ (СБ / ААБл)</option>
                         </select>
                     </div>
 
                     <div class="overflow-x-auto custom-scroll rounded-xl border border-[#1e293b]">
-                        <table class="w-full text-left border-collapse text-xs">
+                        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
                             <thead>
-                                <tr class="bg-[#04070d] text-slate-400 border-b border-[#1e293b] text-[11px]">
-                                    <th class="py-2 px-2.5 font-semibold">S, мм²</th>
-                                    <th class="py-2 px-2 font-semibold">R<sub>0</sub></th>
-                                    <th class="py-2 px-2 font-semibold">X<sub>0</sub></th>
-                                    <th class="py-2 px-2 font-semibold">I<sub>баз.земля</sub></th>
-                                    <th class="py-2 px-2 font-semibold">I<sub>баз.возд</sub></th>
+                                <tr class="bg-[#04070d] text-slate-400 border-b border-[#1e293b] text-[10px]">
+                                    <th class="py-2 px-2.5 font-semibold">Сечение, мм²</th>
+                                    <th class="py-2 px-2 font-semibold">I<sub>земля</sub>, А</th>
+                                    <th class="py-2 px-2 font-semibold">I<sub>возд</sub>, А</th>
+                                    <th class="py-2 px-2 font-semibold">D<sub>нар</sub>, мм</th>
+                                    <th class="py-2 px-2 font-semibold">Масса, кг/м</th>
+                                    <th class="py-2 px-2 font-semibold">R<sub>0</sub>, Ом/км</th>
+                                    <th class="py-2 px-2.5 font-semibold">X<sub>0</sub>, Ом/км</th>
                                 </tr>
                             </thead>
                             <tbody id="ref-table-body" class="divide-y divide-[#1e293b]/60 font-mono text-[11px]">
                                 <!-- Заполняется скриптом -->
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="text-[11px] text-slate-400 leading-relaxed bg-[#04070d]/60 p-2.5 rounded-xl border border-[#1e293b]">
+                        <strong>Примечание к справочнику:</strong><br>
+                        • Диаметры и массы приведены для стандартных бронированных исполнений: <strong>АВБбШв-1</strong> (4-жильный), <strong>АПвПг-10</strong> (1-жильный с экраном), <strong>ААБл-10</strong> (3-жильный).
                     </div>
                 </div>
             </section>
@@ -460,10 +439,11 @@
         </nav>
     </div>
 
-    <!-- Логика расчетов -->
+    <!-- Логика расчетов и база характеристик -->
     <script>
         const CROSS_SECTIONS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
 
+        // База данных ГОСТ 31996-2012 / ГОСТ 18410-73
         const CABLE_DB = {
             1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140, iCuGnd: 27,  iCuAir: 21,  iAlGnd: 21,  iAlAir: 16  },
             2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135, iCuGnd: 36,  iCuAir: 27,  iAlGnd: 28,  iAlAir: 21  },
@@ -480,6 +460,78 @@
             150:  { rCu: 0.124,  rAl: 0.206,  x04: 0.058, x10: 0.080, iCuGnd: 368, iCuAir: 344, iAlGnd: 284, iAlAir: 265 },
             185:  { rCu: 0.0991, rAl: 0.164,  x04: 0.057, x10: 0.078, iCuGnd: 417, iCuAir: 396, iAlGnd: 322, iAlAir: 305 },
             240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076, iCuGnd: 486, iCuAir: 468, iAlGnd: 375, iAlAir: 361 }
+        };
+
+        // Усреднённые справочные диаметры (мм) и массы (кг/м)
+        const CABLE_PHYSICAL_DB = {
+            PVC: {
+                Al: { // АВБбШв-1 (4-жильный)
+                    16:  { d: 21.7, m: 0.775 },
+                    25:  { d: 25.0, m: 1.080 },
+                    35:  { d: 27.5, m: 1.310 },
+                    50:  { d: 31.2, m: 1.630 },
+                    70:  { d: 35.2, m: 2.120 },
+                    95:  { d: 39.6, m: 2.710 },
+                    120: { d: 43.1, m: 3.250 },
+                    150: { d: 47.7, m: 3.920 },
+                    185: { d: 52.8, m: 4.820 },
+                    240: { d: 59.4, m: 6.050 }
+                },
+                Cu: { // ВБбШв-1 (4-жильный)
+                    16:  { d: 21.7, m: 1.090 },
+                    25:  { d: 25.0, m: 1.580 },
+                    35:  { d: 27.5, m: 2.010 },
+                    50:  { d: 31.2, m: 2.620 },
+                    70:  { d: 35.2, m: 3.510 },
+                    95:  { d: 39.6, m: 4.600 },
+                    120: { d: 43.1, m: 5.640 },
+                    150: { d: 47.7, m: 6.910 },
+                    185: { d: 52.8, m: 8.520 },
+                    240: { d: 59.4, m: 10.850 }
+                }
+            },
+            XLPE: {
+                Al: { // АПвПг-10 (1-жильный)
+                    50:  { d: 27.0, m: 0.725 },
+                    70:  { d: 28.5, m: 0.830 },
+                    95:  { d: 30.4, m: 0.960 },
+                    120: { d: 32.0, m: 1.080 },
+                    150: { d: 33.8, m: 1.290 },
+                    185: { d: 35.7, m: 1.460 },
+                    240: { d: 38.3, m: 1.730 }
+                },
+                Cu: { // ПвПг-10 (1-жильный)
+                    50:  { d: 27.0, m: 0.980 },
+                    70:  { d: 28.5, m: 1.180 },
+                    95:  { d: 30.4, m: 1.440 },
+                    120: { d: 32.0, m: 1.690 },
+                    150: { d: 33.8, m: 2.040 },
+                    185: { d: 35.7, m: 2.390 },
+                    240: { d: 38.3, m: 2.940 }
+                }
+            },
+            PAPER: {
+                Al: { // ААБл-10 (3-жильный)
+                    35:  { d: 35.6, m: 2.150 },
+                    50:  { d: 38.3, m: 2.460 },
+                    70:  { d: 42.1, m: 3.020 },
+                    95:  { d: 45.5, m: 3.560 },
+                    120: { d: 48.7, m: 4.100 },
+                    150: { d: 52.3, m: 4.760 },
+                    185: { d: 56.0, m: 5.420 },
+                    240: { d: 62.2, m: 6.580 }
+                },
+                Cu: { // СБл-10 (3-жильный)
+                    35:  { d: 35.6, m: 2.680 },
+                    50:  { d: 38.3, m: 3.220 },
+                    70:  { d: 42.1, m: 4.090 },
+                    95:  { d: 45.5, m: 5.010 },
+                    120: { d: 48.7, m: 5.950 },
+                    150: { d: 52.3, m: 7.080 },
+                    185: { d: 56.0, m: 8.320 },
+                    240: { d: 62.2, m: 10.510 }
+                }
+            }
         };
 
         const INSULATION_FACTORS = {
@@ -515,7 +567,7 @@
 
         function loadState() {
             try {
-                const saved = localStorage.getItem('kabelpro_state_v3');
+                const saved = localStorage.getItem('kabelpro_state_v4');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
@@ -531,7 +583,7 @@
 
         function saveState() {
             try {
-                localStorage.setItem('kabelpro_state_v3', JSON.stringify(appState));
+                localStorage.setItem('kabelpro_state_v4', JSON.stringify(appState));
             } catch (e) {
                 console.warn('LocalStorage save error', e);
             }
@@ -1119,18 +1171,27 @@
             const ins = document.getElementById('ref-ins-filter').value;
             const tbody = document.getElementById('ref-table-body');
 
+            const physicalType = CABLE_PHYSICAL_DB[ins] ? CABLE_PHYSICAL_DB[ins][mat] : null;
+
             tbody.innerHTML = CROSS_SECTIONS.map(sec => {
                 const { r0, x0 } = getCableParams(sec, mat, ins, appState.voltage);
                 const row = CABLE_DB[sec];
                 const gndBase = mat === 'Cu' ? row.iCuGnd : row.iAlGnd;
                 const airBase = mat === 'Cu' ? row.iCuAir : row.iAlAir;
+
+                const phys = physicalType && physicalType[sec] ? physicalType[sec] : null;
+                const dStr = phys ? phys.d.toFixed(1) : '—';
+                const mStr = phys ? phys.m.toFixed(3) : '—';
+
                 return `
                     <tr class="hover:bg-[#131e33]/50">
                         <td class="py-2 px-2.5 font-bold text-white">${sec}</td>
-                        <td class="py-2 px-2 text-slate-300">${r0.toFixed(3)}</td>
-                        <td class="py-2 px-2 text-slate-300">${x0.toFixed(3)}</td>
                         <td class="py-2 px-2 text-[#00f2fe] font-semibold">${gndBase}</td>
-                        <td class="py-2 px-2 text-blue-300">${airBase}</td>
+                        <td class="py-2 px-2 text-blue-400 font-medium">${airBase}</td>
+                        <td class="py-2 px-2 text-slate-200">${dStr}</td>
+                        <td class="py-2 px-2 text-slate-200">${mStr}</td>
+                        <td class="py-2 px-2 text-slate-400">${r0.toFixed(3)}</td>
+                        <td class="py-2 px-2.5 text-slate-400">${x0.toFixed(3)}</td>
                     </tr>
                 `;
             }).join('');
@@ -1151,6 +1212,19 @@
 
             if (tabName === 'select') runCableSelection();
             if (tabName === 'ref') renderReferenceTable();
+        }
+
+        function resetToDemoData() {
+            appState.voltage = '0.4';
+            appState.maxDropPercent = 4.5;
+            appState.ktr = 0.9;
+            appState.segments = getDefaultSegments();
+            document.getElementById('custom-limit-input').value = 4.5;
+            saveState();
+            updateVoltageButtonsUI();
+            renderSegments();
+            updateTotalSummary();
+            showToast('Сброшено к примеру');
         }
 
         let toastTimer = null;
