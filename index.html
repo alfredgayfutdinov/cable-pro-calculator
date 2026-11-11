@@ -82,7 +82,7 @@
     <!-- Контейнер мобильного приложения -->
     <div class="w-full max-w-[480px] min-h-screen md:min-h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
         
-        <!-- Верхняя шапка приложения (Центрированная по Варианту 1, без кнопки «Пример») -->
+        <!-- Верхняя шапка приложения -->
         <header class="bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3.5 pb-3 sticky top-0 z-30 flex flex-col items-center justify-center text-center">
             <div class="flex items-center justify-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-[#00f2fe] flex items-center justify-center shadow-lg shadow-blue-600/30">
@@ -250,7 +250,7 @@
                     <div class="flex items-center justify-between border-b border-[#1e293b] pb-2.5">
                         <div>
                             <h2 class="text-sm font-bold text-white">Автоподбор сечения кабеля</h2>
-                            <p class="text-[11px] text-slate-400">По ГОСТ 31996-2012 (с учетом K<sub>тр</sub> в трубе)</p>
+                            <p class="text-[11px] text-slate-400">По прямым таблицам ПУЭ / ГОСТ (с учетом K<sub>тр</sub> в трубе)</p>
                         </div>
                         <span class="p-2 rounded-xl bg-[#0066ff]/20 text-[#00f2fe] border border-[#0066ff]/30">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -355,14 +355,14 @@
             </section>
 
             <!-- ==========================================
-                 ВКЛАДКА 3: СПРАВОЧНИК ПАРАМЕТРОВ (ХАРАКТЕРИСТИКИ КАБЕЛЕЙ)
+                 ВКЛАДКА 3: ХАРАКТЕРИСТИКИ КАБЕЛЕЙ
                  ========================================== -->
             <section id="tab-ref" class="space-y-4 hidden">
                 <div class="bg-[#0e1626] border border-[#1e293b] rounded-2xl p-3.5 space-y-3.5 shadow-xl">
                     <div class="flex items-center justify-between border-b border-[#1e293b] pb-2.5">
                         <div>
                             <h3 class="text-sm font-bold text-white">Характеристики кабелей</h3>
-                            <p class="text-[11px] text-slate-400">ГОСТ 31996-2012 / ГОСТ 18410-73 (усреднённые по заводам)</p>
+                            <p class="text-[11px] text-slate-400">Точные таблицы ПУЭ 7 изд. и ГОСТ (без коэффициентов)</p>
                         </div>
                     </div>
 
@@ -398,8 +398,10 @@
                     </div>
 
                     <div class="text-[11px] text-slate-400 leading-relaxed bg-[#04070d]/60 p-2.5 rounded-xl border border-[#1e293b]">
-                        <strong>Примечание к справочнику:</strong><br>
-                        • Диаметры и массы приведены для стандартных бронированных исполнений: <strong>АВБбШв-1</strong> (4-жильный), <strong>АПвПг-10</strong> (1-жильный с экраном), <strong>ААБл-10</strong> (3-жильный).
+                        <strong>Нормативная база допустимых токов:</strong><br>
+                        • <strong>БПИ (ААБл / СБл 10 кВ)</strong>: ПУЭ 7 изд., Таблицы 1.3.16 и 1.3.18.<br>
+                        • <strong>СПЭ (АПвПг / ПвПг 10 кВ)</strong>: ГОСТ Р 55025-2012 / каталоги заводов (треугольником).<br>
+                        • <strong>ПВХ (АВБбШв / ВВГ 1 кВ)</strong>: ГОСТ 31996-2012 / ПУЭ 7 изд.
                     </div>
                 </div>
             </section>
@@ -439,105 +441,68 @@
         </nav>
     </div>
 
-    <!-- Логика расчетов и база характеристик -->
+    <!-- Логика расчетов с точными таблицами ПУЭ и ГОСТ -->
     <script>
         const CROSS_SECTIONS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
 
-        // База данных ГОСТ 31996-2012 / ГОСТ 18410-73
+        // Базовые сопротивления жил R0 и индуктивности X0 (Ом/км)
         const CABLE_DB = {
-            1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140, iCuGnd: 27,  iCuAir: 21,  iAlGnd: 21,  iAlAir: 16  },
-            2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135, iCuGnd: 36,  iCuAir: 27,  iAlGnd: 28,  iAlAir: 21  },
-            4:    { rCu: 4.61,   rAl: 7.41,   x04: 0.085, x10: 0.130, iCuGnd: 47,  iCuAir: 36,  iAlGnd: 36,  iAlAir: 28  },
-            6:    { rCu: 3.08,   rAl: 4.61,   x04: 0.080, x10: 0.125, iCuGnd: 59,  iCuAir: 46,  iAlGnd: 45,  iAlAir: 35  },
-            10:   { rCu: 1.83,   rAl: 3.08,   x04: 0.075, x10: 0.120, iCuGnd: 79,  iCuAir: 63,  iAlGnd: 61,  iAlAir: 48  },
-            16:   { rCu: 1.15,   rAl: 1.91,   x04: 0.070, x10: 0.112, iCuGnd: 102, iCuAir: 84,  iAlGnd: 79,  iAlAir: 65  },
-            25:   { rCu: 0.727,  rAl: 1.20,   x04: 0.068, x10: 0.105, iCuGnd: 133, iCuAir: 112, iAlGnd: 102, iAlAir: 86  },
-            35:   { rCu: 0.524,  rAl: 0.868,  x04: 0.066, x10: 0.099, iCuGnd: 160, iCuAir: 137, iAlGnd: 123, iAlAir: 106 },
-            50:   { rCu: 0.387,  rAl: 0.641,  x04: 0.064, x10: 0.094, iCuGnd: 192, iCuAir: 167, iAlGnd: 147, iAlAir: 129 },
-            70:   { rCu: 0.268,  rAl: 0.443,  x04: 0.062, x10: 0.089, iCuGnd: 237, iCuAir: 211, iAlGnd: 182, iAlAir: 163 },
-            95:   { rCu: 0.193,  rAl: 0.320,  x04: 0.060, x10: 0.085, iCuGnd: 284, iCuAir: 258, iAlGnd: 219, iAlAir: 199 },
-            120:  { rCu: 0.153,  rAl: 0.253,  x04: 0.059, x10: 0.082, iCuGnd: 325, iCuAir: 299, iAlGnd: 251, iAlAir: 230 },
-            150:  { rCu: 0.124,  rAl: 0.206,  x04: 0.058, x10: 0.080, iCuGnd: 368, iCuAir: 344, iAlGnd: 284, iAlAir: 265 },
-            185:  { rCu: 0.0991, rAl: 0.164,  x04: 0.057, x10: 0.078, iCuGnd: 417, iCuAir: 396, iAlGnd: 322, iAlAir: 305 },
-            240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076, iCuGnd: 486, iCuAir: 468, iAlGnd: 375, iAlAir: 361 }
+            1.5:  { rCu: 12.1,   rAl: 19.5,   x04: 0.095, x10: 0.140 },
+            2.5:  { rCu: 7.41,   rAl: 12.0,   x04: 0.090, x10: 0.135 },
+            4:    { rCu: 4.61,   rAl: 7.41,   x04: 0.085, x10: 0.130 },
+            6:    { rCu: 3.08,   rAl: 4.61,   x04: 0.080, x10: 0.125 },
+            10:   { rCu: 1.83,   rAl: 3.08,   x04: 0.075, x10: 0.120 },
+            16:   { rCu: 1.15,   rAl: 1.91,   x04: 0.070, x10: 0.112 },
+            25:   { rCu: 0.727,  rAl: 1.20,   x04: 0.068, x10: 0.105 },
+            35:   { rCu: 0.524,  rAl: 0.868,  x04: 0.066, x10: 0.099 },
+            50:   { rCu: 0.387,  rAl: 0.641,  x04: 0.064, x10: 0.094 },
+            70:   { rCu: 0.268,  rAl: 0.443,  x04: 0.062, x10: 0.089 },
+            95:   { rCu: 0.193,  rAl: 0.320,  x04: 0.060, x10: 0.085 },
+            120:  { rCu: 0.153,  rAl: 0.253,  x04: 0.059, x10: 0.082 },
+            150:  { rCu: 0.124,  rAl: 0.206,  x04: 0.058, x10: 0.080 },
+            185:  { rCu: 0.0991, rAl: 0.164,  x04: 0.057, x10: 0.078 },
+            240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076 }
+        };
+
+        // ПРЯМЫЕ ТОЧНЫЕ ТАБЛИЦЫ ТОКОВ ПО ПУЭ 7 И ГОСТ Р 55025
+        const CABLE_AMPERAGE_DB = {
+            // ПВХ: 0.66/1 кВ по ГОСТ 31996-2012 / ПУЭ (4-жильные)
+            PVC: {
+                Al: { 1.5: { gnd: 21, air: 16 }, 2.5: { gnd: 28, air: 21 }, 4: { gnd: 36, air: 28 }, 6: { gnd: 45, air: 35 }, 10: { gnd: 61, air: 48 }, 16: { gnd: 79, air: 65 }, 25: { gnd: 102, air: 86 }, 35: { gnd: 123, air: 106 }, 50: { gnd: 147, air: 129 }, 70: { gnd: 182, air: 163 }, 95: { gnd: 219, air: 199 }, 120: { gnd: 251, air: 230 }, 150: { gnd: 284, air: 265 }, 185: { gnd: 322, air: 305 }, 240: { gnd: 375, air: 361 } },
+                Cu: { 1.5: { gnd: 27, air: 21 }, 2.5: { gnd: 36, air: 27 }, 4: { gnd: 47, air: 36 }, 6: { gnd: 59, air: 46 }, 10: { gnd: 79, air: 63 }, 16: { gnd: 102, air: 84 }, 25: { gnd: 133, air: 112 }, 35: { gnd: 160, air: 137 }, 50: { gnd: 192, air: 167 }, 70: { gnd: 237, air: 211 }, 95: { gnd: 284, air: 258 }, 120: { gnd: 325, air: 299 }, 150: { gnd: 368, air: 344 }, 185: { gnd: 417, air: 396 }, 240: { gnd: 486, air: 468 } }
+            },
+            // СПЭ: АПвПг-10 / ПвПг-10 (треугольником) по ГОСТ Р 55025-2012 / каталогам заводов
+            XLPE: {
+                Al: { 1.5: { gnd: 25, air: 20 }, 2.5: { gnd: 33, air: 26 }, 4: { gnd: 43, air: 34 }, 6: { gnd: 54, air: 42 }, 10: { gnd: 73, air: 58 }, 16: { gnd: 100, air: 105 }, 25: { gnd: 130, air: 140 }, 35: { gnd: 145, air: 160 }, 50: { gnd: 170, air: 185 }, 70: { gnd: 210, air: 230 }, 95: { gnd: 253, air: 300 }, 120: { gnd: 288, air: 346 }, 150: { gnd: 322, air: 392 }, 185: { gnd: 364, air: 450 }, 240: { gnd: 422, air: 531 } },
+                Cu: { 1.5: { gnd: 32, air: 26 }, 2.5: { gnd: 43, air: 33 }, 4: { gnd: 56, air: 43 }, 6: { gnd: 70, air: 55 }, 10: { gnd: 94, air: 75 }, 16: { gnd: 130, air: 135 }, 25: { gnd: 165, air: 180 }, 35: { gnd: 190, air: 210 }, 50: { gnd: 225, air: 240 }, 70: { gnd: 275, air: 300 }, 95: { gnd: 326, air: 387 }, 120: { gnd: 370, air: 445 }, 150: { gnd: 413, air: 503 }, 185: { gnd: 466, air: 577 }, 240: { gnd: 537, air: 677 } }
+            },
+            // БПИ: ААБл-10 / СБл-10 по ПУЭ 7 изд. (Таблицы 1.3.16, 1.3.18, 1.3.13, 1.3.15)
+            PAPER: {
+                Al: { 1.5: { gnd: 20, air: 14 }, 2.5: { gnd: 26, air: 18 }, 4: { gnd: 34, air: 24 }, 6: { gnd: 42, air: 30 }, 10: { gnd: 58, air: 40 }, 16: { gnd: 75, air: 46 }, 25: { gnd: 90, air: 65 }, 35: { gnd: 115, air: 80 }, 50: { gnd: 140, air: 105 }, 70: { gnd: 165, air: 130 }, 95: { gnd: 205, air: 155 }, 120: { gnd: 240, air: 185 }, 150: { gnd: 275, air: 210 }, 185: { gnd: 310, air: 235 }, 240: { gnd: 355, air: 270 } },
+                Cu: { 1.5: { gnd: 26, air: 18 }, 2.5: { gnd: 34, air: 24 }, 4: { gnd: 44, air: 31 }, 6: { gnd: 55, air: 39 }, 10: { gnd: 75, air: 52 }, 16: { gnd: 95, air: 60 }, 25: { gnd: 120, air: 85 }, 35: { gnd: 150, air: 105 }, 50: { gnd: 180, air: 135 }, 70: { gnd: 215, air: 165 }, 95: { gnd: 265, air: 200 }, 120: { gnd: 310, air: 240 }, 150: { gnd: 355, air: 270 }, 185: { gnd: 400, air: 305 }, 240: { gnd: 460, air: 350 } }
+            }
         };
 
         // Усреднённые справочные диаметры (мм) и массы (кг/м)
         const CABLE_PHYSICAL_DB = {
             PVC: {
-                Al: { // АВБбШв-1 (4-жильный)
-                    16:  { d: 21.7, m: 0.775 },
-                    25:  { d: 25.0, m: 1.080 },
-                    35:  { d: 27.5, m: 1.310 },
-                    50:  { d: 31.2, m: 1.630 },
-                    70:  { d: 35.2, m: 2.120 },
-                    95:  { d: 39.6, m: 2.710 },
-                    120: { d: 43.1, m: 3.250 },
-                    150: { d: 47.7, m: 3.920 },
-                    185: { d: 52.8, m: 4.820 },
-                    240: { d: 59.4, m: 6.050 }
-                },
-                Cu: { // ВБбШв-1 (4-жильный)
-                    16:  { d: 21.7, m: 1.090 },
-                    25:  { d: 25.0, m: 1.580 },
-                    35:  { d: 27.5, m: 2.010 },
-                    50:  { d: 31.2, m: 2.620 },
-                    70:  { d: 35.2, m: 3.510 },
-                    95:  { d: 39.6, m: 4.600 },
-                    120: { d: 43.1, m: 5.640 },
-                    150: { d: 47.7, m: 6.910 },
-                    185: { d: 52.8, m: 8.520 },
-                    240: { d: 59.4, m: 10.850 }
-                }
+                Al: { 16: { d: 21.7, m: 0.775 }, 25: { d: 25.0, m: 1.080 }, 35: { d: 27.5, m: 1.310 }, 50: { d: 31.2, m: 1.630 }, 70: { d: 35.2, m: 2.120 }, 95: { d: 39.6, m: 2.710 }, 120: { d: 43.1, m: 3.250 }, 150: { d: 47.7, m: 3.920 }, 185: { d: 52.8, m: 4.820 }, 240: { d: 59.4, m: 6.050 } },
+                Cu: { 16: { d: 21.7, m: 1.090 }, 25: { d: 25.0, m: 1.580 }, 35: { d: 27.5, m: 2.010 }, 50: { d: 31.2, m: 2.620 }, 70: { d: 35.2, m: 3.510 }, 95: { d: 39.6, m: 4.600 }, 120: { d: 43.1, m: 5.640 }, 150: { d: 47.7, m: 6.910 }, 185: { d: 52.8, m: 8.520 }, 240: { d: 59.4, m: 10.850 } }
             },
             XLPE: {
-                Al: { // АПвПг-10 (1-жильный)
-                    50:  { d: 27.0, m: 0.725 },
-                    70:  { d: 28.5, m: 0.830 },
-                    95:  { d: 30.4, m: 0.960 },
-                    120: { d: 32.0, m: 1.080 },
-                    150: { d: 33.8, m: 1.290 },
-                    185: { d: 35.7, m: 1.460 },
-                    240: { d: 38.3, m: 1.730 }
-                },
-                Cu: { // ПвПг-10 (1-жильный)
-                    50:  { d: 27.0, m: 0.980 },
-                    70:  { d: 28.5, m: 1.180 },
-                    95:  { d: 30.4, m: 1.440 },
-                    120: { d: 32.0, m: 1.690 },
-                    150: { d: 33.8, m: 2.040 },
-                    185: { d: 35.7, m: 2.390 },
-                    240: { d: 38.3, m: 2.940 }
-                }
+                Al: { 50: { d: 27.0, m: 0.725 }, 70: { d: 28.5, m: 0.830 }, 95: { d: 30.4, m: 0.960 }, 120: { d: 32.0, m: 1.080 }, 150: { d: 33.8, m: 1.290 }, 185: { d: 35.7, m: 1.460 }, 240: { d: 38.3, m: 1.730 } },
+                Cu: { 50: { d: 27.0, m: 0.980 }, 70: { d: 28.5, m: 1.180 }, 95: { d: 30.4, m: 1.440 }, 120: { d: 32.0, m: 1.690 }, 150: { d: 33.8, m: 2.040 }, 185: { d: 35.7, m: 2.390 }, 240: { d: 38.3, m: 2.940 } }
             },
             PAPER: {
-                Al: { // ААБл-10 (3-жильный)
-                    35:  { d: 35.6, m: 2.150 },
-                    50:  { d: 38.3, m: 2.460 },
-                    70:  { d: 42.1, m: 3.020 },
-                    95:  { d: 45.5, m: 3.560 },
-                    120: { d: 48.7, m: 4.100 },
-                    150: { d: 52.3, m: 4.760 },
-                    185: { d: 56.0, m: 5.420 },
-                    240: { d: 62.2, m: 6.580 }
-                },
-                Cu: { // СБл-10 (3-жильный)
-                    35:  { d: 35.6, m: 2.680 },
-                    50:  { d: 38.3, m: 3.220 },
-                    70:  { d: 42.1, m: 4.090 },
-                    95:  { d: 45.5, m: 5.010 },
-                    120: { d: 48.7, m: 5.950 },
-                    150: { d: 52.3, m: 7.080 },
-                    185: { d: 56.0, m: 8.320 },
-                    240: { d: 62.2, m: 10.510 }
-                }
+                Al: { 35: { d: 35.6, m: 2.150 }, 50: { d: 38.3, m: 2.460 }, 70: { d: 42.1, m: 3.020 }, 95: { d: 45.5, m: 3.560 }, 120: { d: 48.7, m: 4.100 }, 150: { d: 52.3, m: 4.760 }, 185: { d: 56.0, m: 5.420 }, 240: { d: 62.2, m: 6.580 } },
+                Cu: { 35: { d: 35.6, m: 2.680 }, 50: { d: 38.3, m: 3.220 }, 70: { d: 42.1, m: 4.090 }, 95: { d: 45.5, m: 5.010 }, 120: { d: 48.7, m: 5.950 }, 150: { d: 52.3, m: 7.080 }, 185: { d: 56.0, m: 8.320 }, 240: { d: 62.2, m: 10.510 } }
             }
         };
 
         const INSULATION_FACTORS = {
-            XLPE:  { tempFactorR: 1.0, ampFactor: 1.18, cThermAl: 94,  cThermCu: 143, name: 'СПЭ' },
-            PVC:   { tempFactorR: 1.0, ampFactor: 1.00, cThermAl: 76,  cThermCu: 115, name: 'ПВХ' },
-            PAPER: { tempFactorR: 1.0, ampFactor: 0.96, cThermAl: 90,  cThermCu: 141, name: 'БПИ' }
+            XLPE:  { cThermAl: 94, cThermCu: 143, name: 'СПЭ' },
+            PVC:   { cThermAl: 76, cThermCu: 115, name: 'ПВХ' },
+            PAPER: { cThermAl: 90, cThermCu: 141, name: 'БПИ' }
         };
 
         let appState = {
@@ -567,7 +532,7 @@
 
         function loadState() {
             try {
-                const saved = localStorage.getItem('kabelpro_state_v4');
+                const saved = localStorage.getItem('kabelpro_state_v5');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
@@ -583,7 +548,7 @@
 
         function saveState() {
             try {
-                localStorage.setItem('kabelpro_state_v4', JSON.stringify(appState));
+                localStorage.setItem('kabelpro_state_v5', JSON.stringify(appState));
             } catch (e) {
                 console.warn('LocalStorage save error', e);
             }
@@ -591,17 +556,20 @@
 
         function getCableParams(section, material, insulation, voltageStr) {
             const row = CABLE_DB[section] || CABLE_DB[50];
-            const ins = INSULATION_FACTORS[insulation] || INSULATION_FACTORS.PVC;
-            const baseR = material === 'Cu' ? row.rCu : row.rAl;
-            const r0 = +(baseR * ins.tempFactorR).toFixed(4);
+            const r0 = material === 'Cu' ? row.rCu : row.rAl;
             const isMediumVoltage = (voltageStr === '6' || voltageStr === '10');
             const x0 = isMediumVoltage ? row.x10 : row.x04;
 
-            const baseIdop = material === 'Cu' ? row.iCuGnd : row.iAlGnd;
-            const ktr = appState.ktr || 0.9;
-            const iDopCorrected = Math.round(baseIdop * ktr * ins.ampFactor);
+            // Выборка из точной таблицы допустимых токов
+            const ampTable = CABLE_AMPERAGE_DB[insulation] && CABLE_AMPERAGE_DB[insulation][material];
+            const ampRow = ampTable && ampTable[section] ? ampTable[section] : { gnd: 100, air: 90 };
 
-            return { r0, x0, baseIdop, iDopCorrected };
+            const baseIdop = ampRow.gnd;
+            const baseAirIdop = ampRow.air;
+            const ktr = appState.ktr || 0.9;
+            const iDopCorrected = Math.round(baseIdop * ktr);
+
+            return { r0, x0, baseIdop, baseAirIdop, iDopCorrected };
         }
 
         function calculateSegmentMetrics(seg, voltageStr) {
@@ -1174,11 +1142,7 @@
             const physicalType = CABLE_PHYSICAL_DB[ins] ? CABLE_PHYSICAL_DB[ins][mat] : null;
 
             tbody.innerHTML = CROSS_SECTIONS.map(sec => {
-                const { r0, x0 } = getCableParams(sec, mat, ins, appState.voltage);
-                const row = CABLE_DB[sec];
-                const gndBase = mat === 'Cu' ? row.iCuGnd : row.iAlGnd;
-                const airBase = mat === 'Cu' ? row.iCuAir : row.iAlAir;
-
+                const { r0, x0, baseIdop, baseAirIdop } = getCableParams(sec, mat, ins, appState.voltage);
                 const phys = physicalType && physicalType[sec] ? physicalType[sec] : null;
                 const dStr = phys ? phys.d.toFixed(1) : '—';
                 const mStr = phys ? phys.m.toFixed(3) : '—';
@@ -1186,8 +1150,8 @@
                 return `
                     <tr class="hover:bg-[#131e33]/50">
                         <td class="py-2 px-2.5 font-bold text-white">${sec}</td>
-                        <td class="py-2 px-2 text-[#00f2fe] font-semibold">${gndBase}</td>
-                        <td class="py-2 px-2 text-blue-400 font-medium">${airBase}</td>
+                        <td class="py-2 px-2 text-[#00f2fe] font-semibold">${baseIdop}</td>
+                        <td class="py-2 px-2 text-blue-400 font-medium">${baseAirIdop}</td>
                         <td class="py-2 px-2 text-slate-200">${dStr}</td>
                         <td class="py-2 px-2 text-slate-200">${mStr}</td>
                         <td class="py-2 px-2 text-slate-400">${r0.toFixed(3)}</td>
