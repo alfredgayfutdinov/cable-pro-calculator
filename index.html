@@ -126,7 +126,7 @@
                             Параметры сети
                         </span>
                         <span id="network-type-badge" class="text-[11px] font-medium text-[#00f2fe] bg-[#00f2fe]/10 px-2 py-0.5 rounded-md border border-[#00f2fe]/20">
-                            3-фазная сеть 380 В
+                            4-проводная сеть 380 В (K=0,93)
                         </span>
                     </div>
 
@@ -135,7 +135,7 @@
                         <div class="grid grid-cols-4 gap-1.5" id="voltage-selector">
                             <button type="button" onclick="setNetworkVoltage('0.38')" data-v="0.38" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
                                 0,4 кВ
-                                <span class="block text-[10px] font-normal opacity-75">380 В</span>
+                                <span class="block text-[10px] font-normal opacity-75">380 В (4ж)</span>
                             </button>
                             <button type="button" onclick="setNetworkVoltage('0.22')" data-v="0.22" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
                                 0,22 кВ
@@ -262,7 +262,7 @@
                     <div class="flex items-center justify-between border-b border-[#1e293b] pb-2.5">
                         <div>
                             <h2 class="text-sm font-bold text-white">Автоподбор сечения кабеля</h2>
-                            <p class="text-[11px] text-slate-400">По прямым таблицам ПУЭ / ГОСТ (с учетом K<sub>тр</sub> в трубе)</p>
+                            <p class="text-[11px] text-slate-400">По ГОСТ 31996 / ПУЭ (с учетом K<sub>тр</sub> и K<sub>4ж</sub>=0,93)</p>
                         </div>
                         <span class="p-2 rounded-xl bg-[#0066ff]/20 text-[#00f2fe] border border-[#0066ff]/30">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -275,7 +275,7 @@
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1">Напряжение сети:</label>
                             <select id="sel-voltage" onchange="runCableSelection()" class="w-full bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-[#00f2fe]">
-                                <option value="0.38">0,4 кВ (380 В)</option>
+                                <option value="0.38">0,4 кВ (380 В, 4-провод.)</option>
                                 <option value="0.22">0,22 кВ (1-фазная)</option>
                                 <option value="6">6 кВ (среднее)</option>
                                 <option value="10">10 кВ (среднее)</option>
@@ -374,7 +374,7 @@
                     <div class="flex items-center justify-between border-b border-[#1e293b] pb-2.5">
                         <div>
                             <h3 class="text-sm font-bold text-white">Характеристики кабелей</h3>
-                            <p class="text-[11px] text-slate-400">Точные таблицы ПУЭ 7 изд. и ГОСТ (без коэффициентов)</p>
+                            <p class="text-[11px] text-slate-400">Базовые таблицы ПУЭ 7 изд. и ГОСТ (без поправок)</p>
                         </div>
                     </div>
 
@@ -410,10 +410,10 @@
                     </div>
 
                     <div class="text-[11px] text-slate-400 leading-relaxed bg-[#04070d]/60 p-2.5 rounded-xl border border-[#1e293b]">
-                        <strong>Нормативная база допустимых токов:</strong><br>
-                        • <strong>БПИ (ААБл / СБл 10 кВ)</strong>: ПУЭ 7 изд., Таблицы 1.3.16 и 1.3.18.<br>
-                        • <strong>СПЭ (АПвПг / ПвПг 10 кВ)</strong>: ГОСТ Р 55025-2012 / каталоги заводов (треугольником).<br>
-                        • <strong>ПВХ (АВБбШв / ВВГ 1 кВ)</strong>: ГОСТ 31996-2012 / ПУЭ 7 изд.
+                        <strong>Нормативная база и поправки:</strong><br>
+                        • <strong>Четырёхпроводная сеть 0,4 кВ (ГОСТ 31996-2012):</strong> при нагрузке во всех жилах в расчёте автоматически применяется коэффициент <strong>0,93</strong> ($I_{доп} = I_{баз} \times K_{тр} \times 0{,}93$).<br>
+                        • <strong>БПИ (ААБл / СБл 10 кВ):</strong> ПУЭ 7 изд., Таблицы 1.3.16 и 1.3.18.<br>
+                        • <strong>СПЭ (АПвПг / ПвПг 10 кВ):</strong> ГОСТ Р 55025-2012 (треугольником).
                     </div>
                 </div>
             </section>
@@ -453,7 +453,7 @@
         </nav>
     </div>
 
-    <!-- Логика расчетов с точными таблицами ПУЭ и ГОСТ -->
+    <!-- Логика расчетов с точными таблицами ПУЭ и ГОСТ 31996-2012 -->
     <script>
         const CROSS_SECTIONS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
 
@@ -476,9 +476,9 @@
             240:  { rCu: 0.0754, rAl: 0.125,  x04: 0.056, x10: 0.076 }
         };
 
-        // ПРЯМЫЕ ТОЧНЫЕ ТАБЛИЦЫ ТОКОВ ПО ПУЭ 7 И ГОСТ Р 55025
+        // ПРЯМЫЕ ТОЧНЫЕ ТАБЛИЦЫ ТОКОВ ПО ПУЭ 7 И ГОСТ 31996-2012 / ГОСТ Р 55025
         const CABLE_AMPERAGE_DB = {
-            // ПВХ: 0.66/1 кВ по ГОСТ 31996-2012 / ПУЭ (4-жильные)
+            // ПВХ: 0.66/1 кВ по ГОСТ 31996-2012 / ПУЭ (базовые токи до умножения на 0,93)
             PVC: {
                 Al: { 1.5: { gnd: 21, air: 16 }, 2.5: { gnd: 28, air: 21 }, 4: { gnd: 36, air: 28 }, 6: { gnd: 45, air: 35 }, 10: { gnd: 61, air: 48 }, 16: { gnd: 79, air: 65 }, 25: { gnd: 102, air: 86 }, 35: { gnd: 123, air: 106 }, 50: { gnd: 147, air: 129 }, 70: { gnd: 182, air: 163 }, 95: { gnd: 219, air: 199 }, 120: { gnd: 251, air: 230 }, 150: { gnd: 284, air: 265 }, 185: { gnd: 322, air: 305 }, 240: { gnd: 375, air: 361 } },
                 Cu: { 1.5: { gnd: 27, air: 21 }, 2.5: { gnd: 36, air: 27 }, 4: { gnd: 47, air: 36 }, 6: { gnd: 59, air: 46 }, 10: { gnd: 79, air: 63 }, 16: { gnd: 102, air: 84 }, 25: { gnd: 133, air: 112 }, 35: { gnd: 160, air: 137 }, 50: { gnd: 192, air: 167 }, 70: { gnd: 237, air: 211 }, 95: { gnd: 284, air: 258 }, 120: { gnd: 325, air: 299 }, 150: { gnd: 368, air: 344 }, 185: { gnd: 417, air: 396 }, 240: { gnd: 486, air: 468 } }
@@ -544,7 +544,7 @@
 
         function loadState() {
             try {
-                const saved = localStorage.getItem('kabelpro_state_v6');
+                const saved = localStorage.getItem('kabelpro_state_v7');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
@@ -560,7 +560,7 @@
 
         function saveState() {
             try {
-                localStorage.setItem('kabelpro_state_v6', JSON.stringify(appState));
+                localStorage.setItem('kabelpro_state_v7', JSON.stringify(appState));
             } catch (e) {
                 console.warn('LocalStorage save error', e);
             }
@@ -578,9 +578,13 @@
             const baseIdop = ampRow.gnd;
             const baseAirIdop = ampRow.air;
             const ktr = appState.ktr || 0.9;
-            const iDopCorrected = Math.round(baseIdop * ktr);
+            // Коэффициент 0,93 по ГОСТ 31996-2012 для 4-проводной сети (3 фазы + N/PEN под нагрузкой)
+            const isFourWire = (voltageStr === '0.38' || voltageStr === '0.4');
+            const k4 = isFourWire ? 0.93 : 1.0;
 
-            return { r0, x0, baseIdop, baseAirIdop, iDopCorrected };
+            const iDopCorrected = Math.round(baseIdop * ktr * k4);
+
+            return { r0, x0, baseIdop, baseAirIdop, k4, iDopCorrected };
         }
 
         function calculateSegmentMetrics(seg, voltageStr) {
@@ -593,7 +597,7 @@
             const lengthKm = Math.max(0, parseFloat(seg.length) || 0) / 1000;
             const nParallel = Math.max(1, parseInt(seg.parallel) || 1);
 
-            const { r0, x0, baseIdop, iDopCorrected } = getCableParams(seg.section, seg.material, seg.insulation, voltageStr);
+            const { r0, x0, baseIdop, k4, iDopCorrected } = getCableParams(seg.section, seg.material, seg.insulation, voltageStr);
 
             let currentA = 0;
             let powerKw = 0;
@@ -619,6 +623,7 @@
                 r0,
                 x0,
                 baseIdop,
+                k4,
                 iDop: totalIdop,
                 currentA,
                 powerKw,
@@ -650,8 +655,8 @@
 
             const badge = document.getElementById('network-type-badge');
             if (appState.voltage === '0.22' || appState.voltage === '0.23') badge.textContent = '1-фазная сеть 220 В';
-            else if (appState.voltage === '0.38' || appState.voltage === '0.4') badge.textContent = '3-фазная сеть 380 В';
-            else badge.textContent = `Сеть СН ${appState.voltage} кВ`;
+            else if (appState.voltage === '0.38' || appState.voltage === '0.4') badge.textContent = '4-проводная 380 В (K=0,93)';
+            else badge.textContent = `Сеть СН ${appState.voltage} кВ (3ф)`;
         }
 
         function setMaxDropLimit(val) {
@@ -797,16 +802,18 @@
         }
 
         function renderSegmentMetricsHTML(m, isOverCurrent) {
+            const k4Note = m.k4 < 1 ? ` &times; ${m.k4}` : '';
+            const factorsLabel = m.k4 < 1 ? 'с учетом Kтр и K4ж' : 'с учетом Kтр';
             return `
                 <div class="flex flex-col gap-0.5 text-[11px] text-slate-300 font-mono">
                     <div class="${isOverCurrent ? 'text-rose-400 font-bold' : 'text-white'}">
                         Ip: <strong class="text-white">${m.currentA.toFixed(1)} А</strong>
                     </div>
                     <div class="text-slate-300">
-                        Iдоп: <strong class="text-[#00f2fe]">${m.iDop} А</strong> <span class="text-[10px] text-slate-500">(база ${m.baseIdop}А &times; ${appState.ktr})</span>
+                        Iдоп: <strong class="text-[#00f2fe]">${m.iDop} А</strong> <span class="text-[10px] text-slate-500">(база ${m.baseIdop}А &times; ${appState.ktr}${k4Note})</span>
                     </div>
                     <div class="text-[#00f2fe] font-medium">
-                        ${Math.round(m.currentLoadPct)}% от ${m.iDop}А с учетом Kтр
+                        ${Math.round(m.currentLoadPct)}% от ${m.iDop}А (${factorsLabel})
                     </div>
                     <div class="text-[10px] text-slate-500 mt-0.5">
                         R₀=${m.r0.toFixed(3)} | X₀=${m.x0.toFixed(3)}
@@ -948,10 +955,12 @@
         function copyEngineeringReport() {
             const uNomKv = parseFloat(appState.voltage);
             const uNomV = uNomKv * 1000;
-            const uLabel = (appState.voltage === '0.38') ? '0,4 кВ (Uном = 380 В)' : `${appState.voltage.replace('.', ',')} кВ`;
+            const isFourWire = (appState.voltage === '0.38' || appState.voltage === '0.4');
+            const uLabel = isFourWire ? '0,4 кВ (Uном = 380 В, 4-проводная сеть)' : `${appState.voltage.replace('.', ',')} кВ`;
+            const k4Str = isFourWire ? ' | K4ж = 0.93 (ГОСТ 31996-2012)' : '';
             let lines = [];
             lines.push(`РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (${uLabel})`);
-            lines.push(`Допустимая потеря ΔUдоп = ${appState.maxDropPercent}% | Kтр = ${appState.ktr}`);
+            lines.push(`Допустимая потеря ΔUдоп = ${appState.maxDropPercent}% | Kтр = ${appState.ktr}${k4Str}`);
             lines.push(`--------------------------------------------------`);
 
             let sumDropPct = 0;
@@ -962,7 +971,7 @@
                 sumDropPct += m.dropPercent;
                 sumDropV += m.dropVolts;
                 lines.push(`${i + 1}. ${seg.name}:`);
-                lines.push(`   Кабель: ${seg.material}, ${seg.insulation}, S=${seg.section}мм², L=${seg.length}м`);
+                lines.push(`   Кабель: ${seg.material}, ${seg.insulation}, S=${seg.section}мм², L=${seg.length}м, cos φ=${seg.cosPhi}`);
                 lines.push(`   Iр = ${m.currentA.toFixed(1)} А (Iдд = ${m.iDop} А)`);
                 lines.push(`   ΔU = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
             });
@@ -1014,7 +1023,7 @@
             }
 
             const evaluated = CROSS_SECTIONS.map(sec => {
-                const { r0, x0, baseIdop, iDopCorrected } = getCableParams(sec, material, insulation, voltageStr);
+                const { r0, x0, baseIdop, k4, iDopCorrected } = getCableParams(sec, material, insulation, voltageStr);
                 const totalIdop = iDopCorrected * nParallel;
                 const phaseFactor = isSinglePhase ? 2.0 : Math.sqrt(3);
                 const dropV = phaseFactor * calcCurrentA * lengthKm * ((r0 * cosPhi + x0 * sinPhi) / nParallel);
@@ -1028,6 +1037,7 @@
                 return {
                     section: sec,
                     totalIdop,
+                    k4,
                     dropV,
                     dropPct,
                     loadPct,
@@ -1055,6 +1065,7 @@
             const parPrefix = nParallel > 1 ? `${nParallel} × ` : '';
             const startIdx = Math.max(0, recommendedIdx - 1);
             const slice = evaluated.slice(startIdx, startIdx + 3);
+            const k4Label = rec.k4 < 1 ? ` и K4ж=0,93` : '';
 
             const comparisonRows = slice.map(item => {
                 const isRec = item.section === rec.section;
@@ -1077,7 +1088,7 @@
                 <div class="bg-gradient-to-br from-[#0e1626] via-[#070b14] to-[#070b14] border border-[#0066ff]/40 rounded-2xl p-4 shadow-xl space-y-3">
                     <div class="flex items-start justify-between">
                         <div>
-                            <span class="text-[11px] uppercase tracking-wider font-semibold text-[#00f2fe] block">Рекомендуемое сечение</span>
+                            <span class="text-[11px] uppercase tracking-wider font-semibold text-[#00f2fe] block">Рекомендуемое сечение (Kтр=${ktr}${k4Label})</span>
                             <div class="text-2xl font-extrabold font-mono text-white mt-0.5">
                                 ${parPrefix}${rec.section} мм² (${material === 'Cu' ? 'Медь' : 'Алюминий'})
                             </div>
