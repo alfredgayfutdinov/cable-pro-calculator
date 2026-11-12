@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#070b14">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="КабельПро">
     <title>КабельПро — Расчёт потерь ΔU и выбор сечения 0,4/6/10 кВ</title>
@@ -43,11 +44,16 @@
         * {
             -webkit-tap-highlight-color: transparent;
         }
-        body {
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             font-family: 'Inter', sans-serif;
             background-color: #04070d;
             color: #f1f5f9;
-            overscroll-behavior-y: none;
+            overscroll-behavior: none;
         }
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
@@ -56,6 +62,9 @@
         }
         input[type=number] {
             -moz-appearance: textfield;
+        }
+        .custom-scroll {
+            -webkit-overflow-scrolling: touch;
         }
         .custom-scroll::-webkit-scrollbar {
             width: 4px;
@@ -68,6 +77,9 @@
             background: rgba(30, 41, 59, 0.8);
             border-radius: 9999px;
         }
+        .pb-safe {
+            padding-bottom: calc(0.45rem + env(safe-area-inset-bottom, 0px));
+        }
         @keyframes pulse-subtle {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.75; }
@@ -77,13 +89,13 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex justify-center items-start md:py-6 md:px-4 bg-[#04070d] text-slate-100 select-none">
+<body class="w-full h-[100dvh] flex justify-center items-start md:items-center md:py-6 md:px-4 bg-[#04070d] text-slate-100 select-none overflow-hidden">
 
     <!-- Контейнер мобильного приложения -->
-    <div class="w-full max-w-[480px] min-h-screen md:min-h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
+    <div class="w-full max-w-[480px] h-[100dvh] md:h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
         
         <!-- Верхняя шапка приложения -->
-        <header class="bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3.5 pb-3 sticky top-0 z-30 flex flex-col items-center justify-center text-center">
+        <header class="shrink-0 bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-3.5 pb-3 z-30 flex flex-col items-center justify-center text-center">
             <div class="flex items-center justify-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-600 to-[#00f2fe] flex items-center justify-center shadow-lg shadow-blue-600/30">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
@@ -97,7 +109,7 @@
         </header>
 
         <!-- Основная прокручиваемая область контента -->
-        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-24 px-3.5 pt-3 space-y-3.5">
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-28 px-3.5 pt-3 space-y-3.5">
 
             <!-- ==========================================
                  ВКЛАДКА 1: РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (ΔU)
@@ -409,15 +421,15 @@
         </main>
 
         <!-- Всплывающее уведомление (Toast) -->
-        <div id="toast-notification" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
+        <div id="toast-notification" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
             <span id="toast-text">Скопировано</span>
         </div>
 
-        <!-- Нижняя панель навигации (Bottom Navigation Bar) -->
-        <nav class="bg-[#070b14]/95 backdrop-blur-md border-t border-[#162238] px-2 py-1.5 sticky bottom-0 z-30 grid grid-cols-3 gap-1">
+        <!-- Нижняя панель навигации ЖЕСТКО ЗАКРЕПЛЕНА ВНИЗУ ЭКРАНА -->
+        <nav class="fixed bottom-0 left-0 right-0 w-full max-w-[480px] mx-auto bg-[#070b14]/95 backdrop-blur-md border-t border-[#162238] px-2 pt-1.5 pb-safe z-40 grid grid-cols-3 gap-1 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]">
             <button type="button" onclick="switchTab('drop')" id="nav-drop" class="nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition text-[#00f2fe] bg-[#0066ff]/15 font-semibold">
                 <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
@@ -560,7 +572,6 @@
             const isMediumVoltage = (voltageStr === '6' || voltageStr === '10');
             const x0 = isMediumVoltage ? row.x10 : row.x04;
 
-            // Выборка из точной таблицы допустимых токов
             const ampTable = CABLE_AMPERAGE_DB[insulation] && CABLE_AMPERAGE_DB[insulation][material];
             const ampRow = ampTable && ampTable[section] ? ampTable[section] : { gnd: 100, air: 90 };
 
