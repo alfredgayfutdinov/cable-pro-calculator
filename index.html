@@ -46,12 +46,11 @@
         }
         html, body {
             height: 100%;
-            height: 100dvh;
             margin: 0;
             padding: 0;
             overflow: hidden;
             font-family: 'Inter', sans-serif;
-            background-color: #04070d;
+            background-color: #070b14;
             color: #f1f5f9;
             overscroll-behavior: none;
         }
@@ -81,7 +80,7 @@
             padding-top: calc(0.85rem + env(safe-area-inset-top, 0px));
         }
         .pb-safe {
-            padding-bottom: calc(0.45rem + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
         }
         @keyframes pulse-subtle {
             0%, 100% { opacity: 1; }
@@ -92,10 +91,10 @@
         }
     </style>
 </head>
-<body class="w-full h-[100dvh] flex justify-center items-start md:items-center md:py-6 md:px-4 bg-[#04070d] text-slate-100 select-none overflow-hidden">
+<body class="fixed inset-0 w-full h-full flex justify-center items-start md:items-center md:py-6 md:px-4 bg-[#070b14] md:bg-[#04070d] text-slate-100 select-none overflow-hidden">
 
     <!-- Контейнер мобильного приложения -->
-    <div class="w-full max-w-[480px] h-[100dvh] md:h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
+    <div class="w-full max-w-[480px] h-full md:h-[860px] md:max-h-[92vh] bg-[#070b14] md:rounded-[36px] md:border-[6px] md:border-[#131e33] md:shadow-[0_25px_70px_-15px_rgba(0,0,0,0.9)] flex flex-col relative overflow-hidden">
         
         <!-- Верхняя шапка приложения ЖЁСТКО ЗАКРЕПЛЕНА ВВЕРХУ -->
         <header class="shrink-0 sticky top-0 bg-[#070b14]/95 backdrop-blur-md border-b border-[#162238] px-4 pt-safe pb-3 z-40 flex flex-col items-center justify-center text-center shadow-[0_6px_20px_rgba(0,0,0,0.45)]">
@@ -112,7 +111,7 @@
         </header>
 
         <!-- Основная прокручиваемая область контента -->
-        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-28 px-3.5 pt-3 space-y-3.5">
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-32 px-3.5 pt-3 space-y-3.5">
 
             <!-- ==========================================
                  ВКЛАДКА 1: РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (ΔU)
@@ -424,7 +423,7 @@
         </main>
 
         <!-- Всплывающее уведомление (Toast) -->
-        <div id="toast-notification" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
+        <div id="toast-notification" class="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 bg-[#10b981] text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-[#10b981]/40">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
             </svg>
