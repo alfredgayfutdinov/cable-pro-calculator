@@ -126,19 +126,19 @@
                             Параметры сети
                         </span>
                         <span id="network-type-badge" class="text-[11px] font-medium text-[#00f2fe] bg-[#00f2fe]/10 px-2 py-0.5 rounded-md border border-[#00f2fe]/20">
-                            3-фазная сеть, 50 Гц
+                            3-фазная сеть 380 В
                         </span>
                     </div>
 
                     <div>
                         <label class="block text-xs text-slate-400 mb-1.5">Номинальное напряжение сети (U<sub>ном</sub>):</label>
                         <div class="grid grid-cols-4 gap-1.5" id="voltage-selector">
-                            <button type="button" onclick="setNetworkVoltage('0.4')" data-v="0.4" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
+                            <button type="button" onclick="setNetworkVoltage('0.38')" data-v="0.38" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
                                 0,4 кВ
-                                <span class="block text-[10px] font-normal opacity-75">380/400В</span>
+                                <span class="block text-[10px] font-normal opacity-75">380 В</span>
                             </button>
-                            <button type="button" onclick="setNetworkVoltage('0.23')" data-v="0.23" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
-                                0,23 кВ
+                            <button type="button" onclick="setNetworkVoltage('0.22')" data-v="0.22" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
+                                0,22 кВ
                                 <span class="block text-[10px] font-normal opacity-75">1-фазная</span>
                             </button>
                             <button type="button" onclick="setNetworkVoltage('6')" data-v="6" class="v-btn py-2 px-1 rounded-xl text-xs font-bold transition border">
@@ -206,7 +206,7 @@
                     <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#1e293b] text-center">
                         <div class="bg-[#070b14]/70 rounded-xl p-2 border border-[#1e293b]/60">
                             <span class="text-[10px] text-slate-400 block">U в конце линии</span>
-                            <span id="end-voltage-val" class="text-xs sm:text-sm font-mono font-bold text-white">392.0 В</span>
+                            <span id="end-voltage-val" class="text-xs sm:text-sm font-mono font-bold text-white">371.0 В</span>
                         </div>
                         <div class="bg-[#070b14]/70 rounded-xl p-2 border border-[#1e293b]/60">
                             <span class="text-[10px] text-slate-400 block">Общая длина &sum;L</span>
@@ -275,8 +275,8 @@
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1">Напряжение сети:</label>
                             <select id="sel-voltage" onchange="runCableSelection()" class="w-full bg-[#04070d] border border-[#1e293b] rounded-xl px-3 py-2 text-xs font-semibold text-white outline-none focus:border-[#00f2fe]">
-                                <option value="0.4">0,4 кВ (380/400 В)</option>
-                                <option value="0.23">0,23 кВ (1-фазная)</option>
+                                <option value="0.38">0,4 кВ (380 В)</option>
+                                <option value="0.22">0,22 кВ (1-фазная)</option>
                                 <option value="6">6 кВ (среднее)</option>
                                 <option value="10">10 кВ (среднее)</option>
                             </select>
@@ -319,7 +319,7 @@
                         </div>
                         <div>
                             <label class="block text-[11px] text-slate-400 mb-1">cos φ</label>
-                            <input id="sel-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.94" oninput="runCableSelection()"
+                            <input id="sel-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.9" oninput="runCableSelection()"
                                 class="w-full bg-[#04070d] border border-[#1e293b] focus:border-[#00f2fe] rounded-xl px-2.5 py-2 text-sm font-mono font-bold text-white outline-none">
                         </div>
                     </div>
@@ -518,7 +518,7 @@
         };
 
         let appState = {
-            voltage: '0.4',
+            voltage: '0.38',
             maxDropPercent: 4.5,
             ktr: 0.9,
             segments: []
@@ -536,15 +536,15 @@
                     length: 100,
                     loadMode: 'P',
                     powerKw: 150,
-                    currentA: 243,
-                    cosPhi: 0.94
+                    currentA: 253,
+                    cosPhi: 0.9
                 }
             ];
         }
 
         function loadState() {
             try {
-                const saved = localStorage.getItem('kabelpro_state_v5');
+                const saved = localStorage.getItem('kabelpro_state_v6');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && Array.isArray(parsed.segments) && parsed.segments.length > 0) {
@@ -560,7 +560,7 @@
 
         function saveState() {
             try {
-                localStorage.setItem('kabelpro_state_v5', JSON.stringify(appState));
+                localStorage.setItem('kabelpro_state_v6', JSON.stringify(appState));
             } catch (e) {
                 console.warn('LocalStorage save error', e);
             }
@@ -586,9 +586,9 @@
         function calculateSegmentMetrics(seg, voltageStr) {
             const uNomKv = parseFloat(voltageStr);
             const uNomV = uNomKv * 1000;
-            const isSinglePhase = (voltageStr === '0.23');
+            const isSinglePhase = (voltageStr === '0.22' || voltageStr === '0.23');
 
-            const cosPhi = Math.min(1, Math.max(0.1, parseFloat(seg.cosPhi) || 0.94));
+            const cosPhi = Math.min(1, Math.max(0.1, parseFloat(seg.cosPhi) || 0.9));
             const sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi));
             const lengthKm = Math.max(0, parseFloat(seg.length) || 0) / 1000;
             const nParallel = Math.max(1, parseInt(seg.parallel) || 1);
@@ -649,8 +649,8 @@
             });
 
             const badge = document.getElementById('network-type-badge');
-            if (appState.voltage === '0.23') badge.textContent = '1-фазная сеть 230 В';
-            else if (appState.voltage === '0.4') badge.textContent = '3-фазная сеть 400 В';
+            if (appState.voltage === '0.22' || appState.voltage === '0.23') badge.textContent = '1-фазная сеть 220 В';
+            else if (appState.voltage === '0.38' || appState.voltage === '0.4') badge.textContent = '3-фазная сеть 380 В';
             else badge.textContent = `Сеть СН ${appState.voltage} кВ`;
         }
 
@@ -860,8 +860,8 @@
                 length: 100,
                 loadMode: 'P',
                 powerKw: 150,
-                currentA: 243,
-                cosPhi: 0.94
+                currentA: 253,
+                cosPhi: 0.9
             });
             saveState();
             renderSegments();
@@ -948,9 +948,10 @@
         function copyEngineeringReport() {
             const uNomKv = parseFloat(appState.voltage);
             const uNomV = uNomKv * 1000;
+            const uLabel = (appState.voltage === '0.38') ? '0,4 кВ (Uном = 380 В)' : `${appState.voltage.replace('.', ',')} кВ`;
             let lines = [];
-            lines.push(`РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (${appState.voltage.replace('.', ',')} кВ)`);
-            lines.push(`Допустимая потеря &Delta;Uдоп = ${appState.maxDropPercent}% | Kтр = ${appState.ktr}`);
+            lines.push(`РАСЧЁТ ПОТЕРЬ НАПРЯЖЕНИЯ (${uLabel})`);
+            lines.push(`Допустимая потеря ΔUдоп = ${appState.maxDropPercent}% | Kтр = ${appState.ktr}`);
             lines.push(`--------------------------------------------------`);
 
             let sumDropPct = 0;
@@ -963,11 +964,11 @@
                 lines.push(`${i + 1}. ${seg.name}:`);
                 lines.push(`   Кабель: ${seg.material}, ${seg.insulation}, S=${seg.section}мм², L=${seg.length}м`);
                 lines.push(`   Iр = ${m.currentA.toFixed(1)} А (Iдд = ${m.iDop} А)`);
-                lines.push(`   &Delta;U = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
+                lines.push(`   ΔU = ${m.dropVolts.toFixed(2)} В (${m.dropPercent.toFixed(2)}%)`);
             });
 
             lines.push(`--------------------------------------------------`);
-            lines.push(`ИТОГО &sum;&Delta;U = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
+            lines.push(`ИТОГО ∑ΔU = ${sumDropV.toFixed(2)} В (${sumDropPct.toFixed(2)}%)`);
             
             navigator.clipboard.writeText(lines.join('\n')).then(() => {
                 showToast('Отчёт скопирован для ПЗ!');
@@ -990,14 +991,14 @@
 
             const powerKw = Math.max(0.1, parseFloat(document.getElementById('sel-power').value) || 10);
             const lengthM = Math.max(1, parseFloat(document.getElementById('sel-length').value) || 50);
-            const cosPhi = Math.min(1, Math.max(0.3, parseFloat(document.getElementById('sel-cosphi').value) || 0.94));
+            const cosPhi = Math.min(1, Math.max(0.3, parseFloat(document.getElementById('sel-cosphi').value) || 0.9));
             const maxDropPct = Math.max(0.5, parseFloat(document.getElementById('sel-maxdrop').value) || 5);
             const nParallel = parseInt(document.getElementById('sel-parallel').value) || 1;
             const checkTkz = document.getElementById('sel-check-tkz').checked;
 
             const uNomKv = parseFloat(voltageStr);
             const uNomV = uNomKv * 1000;
-            const isSinglePhase = (voltageStr === '0.23');
+            const isSinglePhase = (voltageStr === '0.22' || voltageStr === '0.23');
             const sinPhi = Math.sqrt(Math.max(0, 1 - cosPhi * cosPhi));
             const lengthKm = lengthM / 1000;
 
@@ -1190,7 +1191,7 @@
         }
 
         function resetToDemoData() {
-            appState.voltage = '0.4';
+            appState.voltage = '0.38';
             appState.maxDropPercent = 4.5;
             appState.ktr = 0.9;
             appState.segments = getDefaultSegments();
