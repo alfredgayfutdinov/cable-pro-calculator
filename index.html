@@ -192,8 +192,8 @@
                         <div>
                             <span class="text-[11px] uppercase tracking-wider font-bold text-[#646e78] block">Суммарные потери в линии</span>
                             <div class="flex items-baseline gap-2 mt-0.5">
-                                <span id="total-du-percent" class="text-3xl font-extrabold font-mono tracking-tight text-[#1c242b]">0.00%</span>
-                                <span id="total-du-volts" class="text-sm font-mono text-[#646e78] font-medium">(0.0 В)</span>
+                                <span id="total-du-percent" class="text-3xl font-extrabold font-mono tracking-tight text-[#2e7d5b] transition-colors duration-200">0.00%</span>
+                                <span id="total-du-volts" class="text-sm font-mono text-[#2e7d5b] font-semibold transition-colors duration-200">(0.0 В)</span>
                             </div>
                         </div>
                         <div id="status-badge" class="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border">
@@ -819,13 +819,13 @@
             const factorsLabel = m.k4 < 1 ? 'с учетом Kтр и K4ж' : 'с учетом Kтр';
             return `
                 <div class="flex flex-col gap-0.5 text-[11px] text-[#4b5563] font-mono">
-                    <div class="${isOverCurrent ? 'text-[#c25934] font-bold' : 'text-[#1c242b]'}">
+                    <div class="${isOverCurrent ? 'text-[#b83a2d] font-bold' : 'text-[#1c242b]'}">
                         Ip: <strong class="text-[#1c242b]">${m.currentA.toFixed(1)} А</strong>
                     </div>
                     <div>
                         Iдоп: <strong class="text-[#4b6077]">${m.iDop} А</strong> <span class="text-[10px] text-[#646e78]">(база ${m.baseIdop}А &times; ${appState.ktr}${k4Note})</span>
                     </div>
-                    <div class="${isOverCurrent ? 'text-[#c25934] font-bold' : 'text-[#5c728a] font-semibold'}">
+                    <div class="${isOverCurrent ? 'text-[#b83a2d] font-bold' : 'text-[#5c728a] font-semibold'}">
                         ${Math.round(m.currentLoadPct)}% от ${m.iDop}А (${factorsLabel})
                     </div>
                     <div class="text-[10px] text-[#646e78] mt-0.5">
@@ -839,8 +839,8 @@
                     </span>
                 </div>
                 ${isOverCurrent ? `
-                <div class="w-full text-[11px] bg-[#f3ddd1] border border-[#e2b69f] text-[#9a3412] px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 mt-0.5 font-medium">
-                    <svg class="w-3.5 h-3.5 shrink-0 text-[#c25934]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <div class="w-full text-[11px] bg-[#f5dfdc] border border-[#e4b6b0] text-[#8f291e] px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 mt-0.5 font-medium">
+                    <svg class="w-3.5 h-3.5 shrink-0 text-[#b83a2d]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                     </svg>
                     <span>Перегрузка! Ток (${m.currentA.toFixed(0)}А) &gt; Iдоп (${m.iDop}А).</span>
@@ -932,8 +932,11 @@
 
             const endVoltageV = Math.max(0, uNomV - totalDropV);
 
-            document.getElementById('total-du-percent').textContent = `${totalDropPct.toFixed(2)}%`;
-            document.getElementById('total-du-volts').textContent = `(${totalDropV.toFixed(1)} В)`;
+            const duPercentEl = document.getElementById('total-du-percent');
+            const duVoltsEl = document.getElementById('total-du-volts');
+
+            duPercentEl.textContent = `${totalDropPct.toFixed(2)}%`;
+            duVoltsEl.textContent = `(${totalDropV.toFixed(1)} В)`;
             document.getElementById('total-length-val').textContent = `${Math.round(totalLengthM)} м`;
             document.getElementById('total-power-loss-val').textContent = `${totalPowerLossKw.toFixed(2)} кВт`;
 
@@ -950,17 +953,38 @@
 
             bar.style.width = `${Math.max(4, ratio)}%`;
 
-            if (totalDropPct <= limit && !anyOverCurrent) {
+            // Трёхуровневая цветовая индикация потерь ΔU:
+            // 1) < 3% -> спокойный зелёный (#2e7d5b)
+            // 2) от 3% до заданного предела limit -> приглушённый оранжевый / янтарь (#c87a19)
+            // 3) > заданного предела limit -> приглушённый терракотово-красный (#b83a2d)
+            if (totalDropPct < 3) {
+                duPercentEl.className = 'text-3xl font-extrabold font-mono tracking-tight text-[#2e7d5b] transition-colors duration-200';
+                duVoltsEl.className = 'text-sm font-mono text-[#2e7d5b] font-semibold transition-colors duration-200';
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-[#2e7d5b]';
-                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#e1f1e9] text-[#236347] border border-[#b7dcc9]';
-                badge.innerHTML = `<span>В норме (&le; ${limit}%)</span>`;
+            } else if (totalDropPct <= limit) {
+                duPercentEl.className = 'text-3xl font-extrabold font-mono tracking-tight text-[#c87a19] transition-colors duration-200';
+                duVoltsEl.className = 'text-sm font-mono text-[#c87a19] font-semibold transition-colors duration-200';
+                bar.className = 'h-full rounded-full transition-all duration-300 bg-[#c87a19]';
+            } else {
+                duPercentEl.className = 'text-3xl font-extrabold font-mono tracking-tight text-[#b83a2d] transition-colors duration-200';
+                duVoltsEl.className = 'text-sm font-mono text-[#b83a2d] font-semibold transition-colors duration-200';
+                bar.className = 'h-full rounded-full transition-all duration-300 bg-[#b83a2d]';
+            }
+
+            // Плашка общего статуса линии
+            if (totalDropPct <= limit && !anyOverCurrent) {
+                if (totalDropPct < 3) {
+                    badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#e1f1e9] text-[#236347] border border-[#b7dcc9]';
+                    badge.innerHTML = `<span>В норме (&le; ${limit}%)</span>`;
+                } else {
+                    badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#faeed7] text-[#9c5a0c] border border-[#ebd0a0]';
+                    badge.innerHTML = `<span>Близко к пределу (&le; ${limit}%)</span>`;
+                }
             } else if (totalDropPct > limit) {
-                bar.className = 'h-full rounded-full transition-all duration-300 bg-[#c25934]';
-                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#f3ddd1] text-[#9a3412] border border-[#e2b69f] animate-pulse-subtle';
+                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#f5dfdc] text-[#8f291e] border border-[#e4b6b0] animate-pulse-subtle';
                 badge.innerHTML = `<span>Превышение &Delta;U (&gt; ${limit}%)</span>`;
             } else {
-                bar.className = 'h-full rounded-full transition-all duration-300 bg-[#c25934]';
-                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#f3ddd1] text-[#9a3412] border border-[#e2b69f]';
+                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#f5dfdc] text-[#8f291e] border border-[#e4b6b0]';
                 badge.innerHTML = `<span>Перегруз по току</span>`;
             }
         }
@@ -1064,8 +1088,8 @@
 
             if (recommendedIdx === -1) {
                 resultBox.innerHTML = `
-                    <div class="bg-[#f3ddd1] border border-[#e2b69f] rounded-2xl p-4 text-xs text-[#9a3412] space-y-2">
-                        <div class="font-bold text-sm text-[#7c2d12]">Недостаточно сечения до 240 мм²!</div>
+                    <div class="bg-[#f5dfdc] border border-[#e4b6b0] rounded-2xl p-4 text-xs text-[#8f291e] space-y-2">
+                        <div class="font-bold text-sm text-[#782016]">Недостаточно сечения до 240 мм²!</div>
                         <p>Ток линии <strong>${calcCurrentA.toFixed(1)} А</strong>. Увеличьте число параллельных кабелей (n).</p>
                     </div>
                 `;
@@ -1086,10 +1110,10 @@
                             ${parPrefix}${item.section} мм²
                             ${isRec ? '<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-[#c25934] text-white font-bold">РЕК.</span>' : ''}
                         </td>
-                        <td class="py-2.5 px-2 font-mono ${item.passCurrent ? '' : 'text-[#c25934] font-bold'}">${item.totalIdop} А (${Math.round(item.loadPct)}%)</td>
-                        <td class="py-2.5 px-2 font-mono ${item.passDrop ? '' : 'text-[#c25934] font-bold'}">${item.dropPct.toFixed(2)}%</td>
+                        <td class="py-2.5 px-2 font-mono ${item.passCurrent ? '' : 'text-[#b83a2d] font-bold'}">${item.totalIdop} А (${Math.round(item.loadPct)}%)</td>
+                        <td class="py-2.5 px-2 font-mono ${item.passDrop ? '' : 'text-[#b83a2d] font-bold'}">${item.dropPct.toFixed(2)}%</td>
                         <td class="py-2.5 px-2 text-right">
-                            ${item.isSuitable ? '<span class="text-[#2e7d5b] font-bold">Подходит</span>' : '<span class="text-[#c25934] font-semibold">Мало</span>'}
+                            ${item.isSuitable ? '<span class="text-[#2e7d5b] font-bold">Подходит</span>' : '<span class="text-[#b83a2d] font-semibold">Мало</span>'}
                         </td>
                     </tr>
                 `;
@@ -1121,7 +1145,7 @@
                         </div>
                         <div class="bg-[#f6f4ef] rounded-xl p-2 border border-[#e5e0d5]">
                             <span class="text-[10px] text-[#646e78] font-medium block">Потеря &Delta;U</span>
-                            <span class="text-xs font-mono font-bold text-[#2e7d5b]">${rec.dropPct.toFixed(2)}%</span>
+                            <span class="text-xs font-mono font-bold ${rec.dropPct < 3 ? 'text-[#2e7d5b]' : 'text-[#c87a19]'}">${rec.dropPct.toFixed(2)}%</span>
                         </div>
                     </div>
 
