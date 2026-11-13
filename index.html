@@ -130,7 +130,7 @@
                             </svg>
                             Параметры сети
                         </span>
-                        <span id="network-type-badge" class="text-[11px] font-semibold text-[#4b6077] bg-[#eef2f6] px-2.5 py-0.5 rounded-full border border-[#d5dee7]">
+                        <span id="network-type-badge" class="text-[11px] font-semibold text-[#4b6077] bg-[#eef2f6] px-2.5 py-0.5 rounded-full border border-[#d5dee7] whitespace-nowrap">
                             4-проводная 380 В (K=0,93)
                         </span>
                     </div>
@@ -190,14 +190,14 @@
                 <!-- Сводная карточка результатов -->
                 <div id="summary-card" class="rounded-2xl p-4 border transition-all duration-200 shadow-[0_4px_16px_rgba(28,36,43,0.05)] bg-white border-[#e5e0d5]">
                     <div class="flex items-start justify-between gap-2 mb-3">
-                        <div>
-                            <span class="text-[11px] uppercase tracking-wider font-bold text-[#646e78] block">Суммарные потери в линии</span>
-                            <div class="flex items-baseline gap-2 mt-0.5">
-                                <span id="total-du-percent" class="text-3xl font-extrabold font-mono tracking-tight text-[#2e7d5b] transition-colors duration-200">0.00%</span>
-                                <span id="total-du-volts" class="text-sm font-mono text-[#2e7d5b] font-semibold transition-colors duration-200">(0.0 В)</span>
+                        <div class="min-w-0">
+                            <span class="text-[11px] uppercase tracking-wider font-bold text-[#646e78] block whitespace-nowrap">Суммарные потери</span>
+                            <div class="flex items-baseline gap-1.5 mt-0.5 flex-nowrap">
+                                <span id="total-du-percent" class="text-[28px] sm:text-3xl font-extrabold font-mono tracking-tight text-[#2e7d5b] transition-colors duration-200 whitespace-nowrap">0.00%</span>
+                                <span id="total-du-volts" class="text-xs sm:text-sm font-mono text-[#2e7d5b] font-semibold transition-colors duration-200 whitespace-nowrap">(0.0 В)</span>
                             </div>
                         </div>
-                        <div id="status-badge" class="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 border">
+                        <div id="status-badge" class="px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 border whitespace-nowrap shrink-0">
                             <!-- Динамический статус -->
                         </div>
                     </div>
@@ -955,32 +955,32 @@
             bar.style.width = `${Math.max(4, ratio)}%`;
 
             if (totalDropPct < 3) {
-                duPercentEl.className = 'text-3xl font-extrabold font-mono tracking-tight text-[#2e7d5b] transition-colors duration-200';
-                duVoltsEl.className = 'text-sm font-mono text-[#2e7d5b] font-semibold transition-colors duration-200';
+                duPercentEl.className = 'text-[28px] sm:text-3xl font-extrabold font-mono tracking-tight text-[#2e7d5b] transition-colors duration-200 whitespace-nowrap';
+                duVoltsEl.className = 'text-xs sm:text-sm font-mono text-[#2e7d5b] font-semibold transition-colors duration-200 whitespace-nowrap';
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-[#2e7d5b]';
             } else if (totalDropPct <= limit) {
-                duPercentEl.className = 'text-3xl font-extrabold font-mono tracking-tight text-[#c87a19] transition-colors duration-200';
-                duVoltsEl.className = 'text-sm font-mono text-[#c87a19] font-semibold transition-colors duration-200';
+                duPercentEl.className = 'text-[28px] sm:text-3xl font-extrabold font-mono tracking-tight text-[#c87a19] transition-colors duration-200 whitespace-nowrap';
+                duVoltsEl.className = 'text-xs sm:text-sm font-mono text-[#c87a19] font-semibold transition-colors duration-200 whitespace-nowrap';
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-[#c87a19]';
             } else {
-                duPercentEl.className = 'text-3xl font-extrabold font-mono tracking-tight text-[#b83a2d] transition-colors duration-200';
-                duVoltsEl.className = 'text-sm font-mono text-[#b83a2d] font-semibold transition-colors duration-200';
+                duPercentEl.className = 'text-[28px] sm:text-3xl font-extrabold font-mono tracking-tight text-[#b83a2d] transition-colors duration-200 whitespace-nowrap';
+                duVoltsEl.className = 'text-xs sm:text-sm font-mono text-[#b83a2d] font-semibold transition-colors duration-200 whitespace-nowrap';
                 bar.className = 'h-full rounded-full transition-all duration-300 bg-[#b83a2d]';
             }
 
             if (totalDropPct <= limit && !anyOverCurrent) {
                 if (totalDropPct < 3) {
-                    badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#e1f1e9] text-[#236347] border border-[#b7dcc9]';
+                    badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 bg-[#e1f1e9] text-[#236347] border border-[#b7dcc9] whitespace-nowrap shrink-0';
                     badge.innerHTML = `<span>В норме (&le; ${limit}%)</span>`;
                 } else {
-                    badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#faeed7] text-[#9c5a0c] border border-[#ebd0a0]';
+                    badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 bg-[#faeed7] text-[#9c5a0c] border border-[#ebd0a0] whitespace-nowrap shrink-0';
                     badge.innerHTML = `<span>Близко к пределу (&le; ${limit}%)</span>`;
                 }
             } else if (totalDropPct > limit) {
-                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#f5dfdc] text-[#8f291e] border border-[#e4b6b0] animate-pulse-subtle';
+                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 bg-[#f5dfdc] text-[#8f291e] border border-[#e4b6b0] animate-pulse-subtle whitespace-nowrap shrink-0';
                 badge.innerHTML = `<span>Превышение &Delta;U (&gt; ${limit}%)</span>`;
             } else {
-                badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1 bg-[#f5dfdc] text-[#8f291e] border border-[#e4b6b0]';
+                badge.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 bg-[#f5dfdc] text-[#8f291e] border border-[#e4b6b0] whitespace-nowrap shrink-0';
                 badge.innerHTML = `<span>Перегруз по току</span>`;
             }
         }
