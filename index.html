@@ -9,6 +9,96 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="КабельПро">
     <title>КабельПро — Расчёт потерь ΔU и выбор сечения 0,4/6/10 кВ</title>
+
+    <!-- Встроенный SVG Favicon для вкладок браузера и закладок -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300f2fe'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M34.5 14L17 36h15l-2.5 14L47 28H32l2.5-14z' fill='none' stroke='%23090814' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <!-- Плейсхолдеры для PNG-иконок iOS / Android (заполняются скриптом в 512x512 PNG) -->
+    <link id="apple-touch-icon-link" rel="apple-touch-icon" sizes="180x180" href="">
+    <link id="pwa-manifest-link" rel="manifest" href="">
+
+    <!-- Генерация высокочёткой PNG-иконки для iPhone (На экран Домой) и Android -->
+    <script>
+        (function generateAppIcons() {
+            function drawIconPng(size, rounded) {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+
+                // Фон с диагональным градиентом (#00f2fe -> #8b5cf6)
+                const grad = ctx.createLinearGradient(0, 0, size, size);
+                grad.addColorStop(0, '#00f2fe');
+                grad.addColorStop(1, '#8b5cf6');
+                ctx.fillStyle = grad;
+
+                if (rounded) {
+                    const r = size * 0.24;
+                    ctx.beginPath();
+                    ctx.moveTo(r, 0);
+                    ctx.lineTo(size - r, 0);
+                    ctx.quadraticCurveTo(size, 0, size, r);
+                    ctx.lineTo(size, size - r);
+                    ctx.quadraticCurveTo(size, size, size - r, size);
+                    ctx.lineTo(r, size);
+                    ctx.quadraticCurveTo(0, size, 0, size - r);
+                    ctx.lineTo(0, r);
+                    ctx.quadraticCurveTo(0, 0, r, 0);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    // Для iOS нужен полный квадрат без прозрачности, iOS сама скругляет углы
+                    ctx.fillRect(0, 0, size, size);
+                }
+
+                // Контурная тёмная молния по центру
+                const scale = size / 64;
+                ctx.save();
+                ctx.scale(scale, scale);
+                ctx.beginPath();
+                ctx.moveTo(34.5, 14);
+                ctx.lineTo(17, 36);
+                ctx.lineTo(32, 36);
+                ctx.lineTo(29.5, 50);
+                ctx.lineTo(47, 28);
+                ctx.lineTo(32, 28);
+                ctx.closePath();
+
+                ctx.strokeStyle = '#090814';
+                ctx.lineWidth = 4.4;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+                ctx.restore();
+
+                return canvas.toDataURL('image/png');
+            }
+
+            try {
+                const iosIconDataUrl = drawIconPng(180, false);
+                const pwaIconDataUrl = drawIconPng(512, true);
+
+                const appleLink = document.getElementById('apple-touch-icon-link');
+                if (appleLink) appleLink.href = iosIconDataUrl;
+
+                const manifest = {
+                    name: 'КабельПро PRO / by ARG',
+                    short_name: 'КабельПро',
+                    start_url: '.',
+                    display: 'standalone',
+                    background_color: '#07060e',
+                    theme_color: '#07060e',
+                    icons: [
+                        { src: pwaIconDataUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+                    ]
+                };
+                const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                const manifestLink = document.getElementById('pwa-manifest-link');
+                if (manifestLink) manifestLink.href = URL.createObjectURL(manifestBlob);
+            } catch (e) {
+                console.warn('Icon generation skipped', e);
+            }
+        })();
+    </script>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -120,7 +210,7 @@
         <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-4 pt-safe pb-3 z-40 flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
             <div class="flex items-center justify-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#00f2fe] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-violet-600/35">
-                    <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#090814]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
@@ -971,10 +1061,6 @@
 
             bar.style.width = `${Math.max(4, ratio)}%`;
 
-            // Трёхуровневая цветовая индикация ΔU в неоновом стиле:
-            // < 3% -> бирюзово-изумрудный
-            // 3% .. limit -> янтарно-золотой
-            // > limit -> неоново-малиновый
             if (totalDropPct < 3) {
                 duPercentEl.className = 'text-[28px] sm:text-3xl font-extrabold font-mono tracking-tight text-emerald-400 transition-colors duration-200 whitespace-nowrap';
                 duVoltsEl.className = 'text-xs sm:text-sm font-mono text-emerald-400 font-semibold transition-colors duration-200 whitespace-nowrap';
