@@ -130,7 +130,7 @@
                             <h2 class="text-base font-bold text-white">Расчёт КЛ 10 кВ</h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8b5cf6]/20 text-[#d8b4fe] border border-[#a855f7]/35">АПвПг / ААБл</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1 leading-snug">Выбор сечения с K<sub>1</sub>–K<sub>4</sub>, расчёт медного экрана СПЭ, потери &Delta;U и проверка на ТКЗ.</p>
+                        <p class="text-xs text-slate-400 mt-1 leading-snug">Автоподбор сечения жилы и медного экрана СПЭ с K<sub>1</sub>–K<sub>4</sub>, потери &Delta;U и проверка на ТКЗ.</p>
                     </div>
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-[#c084fc] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
@@ -267,105 +267,137 @@
                 </div>
             </section>
 
-            <!-- МОДУЛЬ 2: РАСЧЁТ КЛ 10 кВ -->
+            <!-- МОДУЛЬ 2: ПОДБОР КАБЕЛЯ И ЭКРАНА 10 кВ -->
             <section id="view-hv" class="space-y-3.5 hidden">
                 <div class="glass-panel rounded-2xl p-4 space-y-3">
-                    <div class="flex items-center justify-between border-b border-[#8b5cf6]/20 pb-2.5">
+                    <div class="flex items-center justify-between border-b border-[#8b5cf6]/20 pb-2">
                         <div>
-                            <h2 class="text-sm font-bold text-white">Расчёт кабельной линии 10 кВ</h2>
+                            <h2 class="text-sm font-bold text-white">Подбор кабеля 10 кВ</h2>
                             <p class="text-[11px] text-slate-400">ГОСТ Р 55025-2012 • ПУЭ 7 • РД 34.20.508</p>
                         </div>
-                        <span id="hv-cable-mark-badge" class="text-[11px] font-mono font-bold text-[#d8b4fe] bg-[#8b5cf6]/20 px-2.5 py-1 rounded-full border border-[#a855f7]/35">АПвПг-10 (△)</span>
+                        <span id="hv-cable-mark-badge" class="text-[11px] font-mono font-bold text-[#d8b4fe] bg-[#8b5cf6]/20 px-2.5 py-0.5 rounded-full border border-[#a855f7]/35">АПвПг-10 (△)</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div><label class="block text-[11px] text-slate-400 mb-1">Марка / изоляция:</label>
-                            <select id="hv-insulation" onchange="onHvCableTypeChange()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2.5 py-2 text-xs font-bold text-white outline-none">
-                                <option value="XLPE" selected>СПЭ (АПвПг / ПвПг)</option><option value="PAPER">БПИ (ААБл / СБл)</option>
-                            </select>
-                        </div>
-                        <div><label class="block text-[11px] text-slate-400 mb-1">Материал жил:</label>
-                            <div class="grid grid-cols-2 bg-[#0b0a17]/90 p-0.5 rounded-xl border border-[#8b5cf6]/25">
-                                <button type="button" onclick="setHvMaterial('Al')" id="hv-mat-al" class="py-1.5 rounded-lg text-xs font-bold transition">Алюм. (Al)</button>
-                                <button type="button" onclick="setHvMaterial('Cu')" id="hv-mat-cu" class="py-1.5 rounded-lg text-xs font-bold transition">Медь (Cu)</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="hv-laying-row">
-                        <label class="block text-[11px] text-slate-400 mb-1">Способ прокладки СПЭ в траншее:</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button type="button" onclick="setHvLaying('triangle')" data-lay="triangle" class="hv-lay-btn py-2 px-2 rounded-xl text-xs font-bold transition border">В треугольник (△)<span class="block text-[10px] font-normal opacity-85">По умолчанию</span></button>
-                            <button type="button" onclick="setHvLaying('flat')" data-lay="flat" class="hv-lay-btn py-2 px-2 rounded-xl text-xs font-bold transition border">В плоскости (—)<span class="block text-[10px] font-normal opacity-80">В один ряд (X₀ × 1,25)</span></button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-12 gap-2">
-                        <div class="col-span-5"><label class="block text-[11px] text-slate-400 mb-1">Сечение S, мм²</label><select id="hv-section" onchange="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white outline-none"></select></div>
-                        <div class="col-span-3"><label class="block text-[11px] text-slate-400 mb-1">Ниток (n)</label>
-                            <select id="hv-parallel" onchange="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2 py-2 text-xs font-mono font-bold text-white outline-none"><option value="1">1х</option><option value="2">2х</option><option value="3">3х</option></select>
-                        </div>
-                        <div class="col-span-4"><label class="block text-[11px] text-slate-400 mb-1">Длина L, м</label><input id="hv-length" type="number" value="850" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2.5 py-2 text-xs font-mono font-bold text-white outline-none"></div>
-                    </div>
-
+                    <!-- Марка кабеля, материал жил и нитки -->
                     <div class="grid grid-cols-12 gap-2">
                         <div class="col-span-5">
-                            <div class="flex justify-between mb-1"><span class="text-[10px] text-slate-400">Нагрузка:</span>
+                            <label class="block text-[10px] text-slate-400 mb-1">Изоляция:</label>
+                            <select id="hv-insulation" onchange="onHvCableTypeChange()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2 py-1.5 text-xs font-bold text-white outline-none">
+                                <option value="XLPE" selected>СПЭ (АПвПг)</option>
+                                <option value="PAPER">БПИ (ААБл)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-[10px] text-slate-400 mb-1">Жила:</label>
+                            <div class="grid grid-cols-2 bg-[#0b0a17]/90 p-0.5 rounded-xl border border-[#8b5cf6]/25">
+                                <button type="button" onclick="setHvMaterial('Al')" id="hv-mat-al" class="py-1 rounded-lg text-xs font-bold transition">Al</button>
+                                <button type="button" onclick="setHvMaterial('Cu')" id="hv-mat-cu" class="py-1 rounded-lg text-xs font-bold transition">Cu</button>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <label class="block text-[10px] text-slate-400 mb-1">Ниток (n):</label>
+                            <select id="hv-parallel" onchange="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2 py-1.5 text-xs font-mono font-bold text-white outline-none">
+                                <option value="1">1х</option>
+                                <option value="2">2х</option>
+                                <option value="3">3х</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Компактные кнопки прокладки СПЭ без яркой подсветки -->
+                    <div id="hv-laying-row" class="flex items-center justify-between gap-2 pt-0.5">
+                        <span class="text-[11px] text-slate-400 shrink-0">Прокладка СПЭ:</span>
+                        <div class="grid grid-cols-2 gap-1.5 flex-1 max-w-[240px]">
+                            <button type="button" onclick="setHvLaying('triangle')" data-lay="triangle" class="hv-lay-btn py-1 px-2 rounded-lg text-[11px] transition border text-center">В треугольник</button>
+                            <button type="button" onclick="setHvLaying('flat')" data-lay="flat" class="hv-lay-btn py-1 px-2 rounded-lg text-[11px] transition border text-center">В плоскости</button>
+                        </div>
+                    </div>
+
+                    <!-- Нагрузка, cos φ (0.93 по умолчанию), длина L -->
+                    <div class="grid grid-cols-12 gap-2">
+                        <div class="col-span-5">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-[10px] text-slate-400">Нагрузка:</span>
                                 <div class="inline-flex rounded bg-[#0b0a17]/90 p-0.5 border border-[#8b5cf6]/25 text-[9px]">
                                     <button type="button" onclick="setHvLoadMode('P')" id="hv-mode-p" class="px-1.5 rounded font-bold">кВт</button>
                                     <button type="button" onclick="setHvLoadMode('I')" id="hv-mode-i" class="px-1.5 rounded font-bold">А</button>
                                 </div>
                             </div>
-                            <input id="hv-load-val" type="number" value="5000" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                            <input id="hv-load-val" type="number" step="50" min="0.1" value="5000" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 focus:border-[#00f2fe] rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
                         </div>
-                        <div class="col-span-3"><label class="block text-[11px] text-slate-400 mb-1">cos φ</label><input id="hv-cosphi" type="number" step="0.01" value="0.93" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none"></div>
-                        <div class="col-span-4"><label class="block text-[11px] text-slate-400 mb-1">Доп. &Delta;U<sub>доп</sub>, %</label><input id="hv-maxdrop" type="number" step="0.5" value="5.0" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none"></div>
+                        <div class="col-span-3">
+                            <label class="block text-[10px] text-slate-400 mb-1">cos φ</label>
+                            <input id="hv-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.93" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 focus:border-[#00f2fe] rounded-xl px-2 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-[10px] text-slate-400 mb-1">Длина L, м</label>
+                            <input id="hv-length" type="number" step="10" min="1" value="850" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 focus:border-[#00f2fe] rounded-xl px-2.5 py-1.5 text-sm font-mono font-bold text-white outline-none">
+                        </div>
                     </div>
 
-                    <!-- Коэффициенты K1..K4 -->
-                    <div class="pt-2.5 border-t border-[#8b5cf6]/20 space-y-2">
+                    <!-- Данные КЗ и допустимая ΔUдоп -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Ток 3ф КЗ I⁽³⁾<sub>кз</sub>, кА</label>
+                            <input id="hv-ikz" type="number" step="0.5" min="0.1" value="10.0" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 focus:border-[#00f2fe] rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Время откл. t<sub>кз</sub>, с</label>
+                            <input id="hv-tkz-time" type="number" step="0.1" min="0.05" value="1.5" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 focus:border-[#00f2fe] rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Доп. &Delta;U<sub>доп</sub>, %</label>
+                            <input id="hv-maxdrop" type="number" step="0.5" min="0.5" max="15" value="5.0" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 focus:border-[#00f2fe] rounded-xl px-2.5 py-1.5 text-xs font-mono font-bold text-white outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Компактная сетка коэффициентов K1..K4 -->
+                    <div class="pt-2 border-t border-[#8b5cf6]/20 space-y-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Поправочные коэффициенты</span>
-                            <span id="hv-k-total-badge" class="text-[11px] font-mono font-bold text-[#00f2fe] bg-[#00f2fe]/10 px-2 py-0.5 rounded-full border border-[#00f2fe]/30">Kобщ = 0.959</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Поправочные коэффициенты</span>
+                            <span id="hv-k-total-badge" class="text-[10px] font-mono font-bold text-[#00f2fe] bg-[#00f2fe]/10 px-2 py-0.5 rounded-full border border-[#00f2fe]/30">Kобщ = 0.959</span>
                         </div>
                         <div class="grid grid-cols-2 gap-1.5">
-                            <div class="glass-sub rounded-xl px-2 py-1.5"><label class="block text-[9px] text-slate-400">K₁ (t° грунта, ПУЭ 1.3.3)</label>
-                                <select id="hv-k1" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none mt-0.5">
-                                    <option value="1.18" class="bg-[#0b0a17]">1.18 (t = +5°C)</option><option value="1.14" class="bg-[#0b0a17]">1.14 (t = +10°C)</option>
-                                    <option value="1.09" selected class="bg-[#0b0a17]">1.09 (t = +15°C)</option><option value="1.05" class="bg-[#0b0a17]">1.05 (t = +20°C)</option><option value="1.00" class="bg-[#0b0a17]">1.00 (t = +25°C)</option>
+                            <div class="glass-sub rounded-xl px-2 py-1">
+                                <label class="block text-[9px] text-slate-400">K₁ (t° грунта, ПУЭ 1.3.3)</label>
+                                <select id="hv-k1" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none">
+                                    <option value="1.18" class="bg-[#0b0a17]">1.18 (t = +5°C)</option>
+                                    <option value="1.14" class="bg-[#0b0a17]">1.14 (t = +10°C)</option>
+                                    <option value="1.09" selected class="bg-[#0b0a17]">1.09 (t = +15°C)</option>
+                                    <option value="1.05" class="bg-[#0b0a17]">1.05 (t = +20°C)</option>
+                                    <option value="1.00" class="bg-[#0b0a17]">1.00 (t = +25°C)</option>
                                 </select>
                             </div>
-                            <div class="glass-sub rounded-xl px-2 py-1.5"><label class="block text-[9px] text-slate-400">K₂ (влажн., ПУЭ 1.3.23)</label>
-                                <select id="hv-k2" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none mt-0.5">
-                                    <option value="1.00" selected class="bg-[#0b0a17]">1.00 (норм. 7–14%)</option><option value="0.93" class="bg-[#0b0a17]">0.93 (сухая 4–7%)</option><option value="0.86" class="bg-[#0b0a17]">0.86 (оч. сухая &lt;4%)</option>
+                            <div class="glass-sub rounded-xl px-2 py-1">
+                                <label class="block text-[9px] text-slate-400">K₂ (влажн., ПУЭ 1.3.23)</label>
+                                <select id="hv-k2" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none">
+                                    <option value="1.00" selected class="bg-[#0b0a17]">1.00 (норм. 7–14%)</option>
+                                    <option value="0.93" class="bg-[#0b0a17]">0.93 (сухая 4–7%)</option>
+                                    <option value="0.86" class="bg-[#0b0a17]">0.86 (оч. сухая &lt;4%)</option>
                                 </select>
                             </div>
-                            <div class="glass-sub rounded-xl px-2 py-1.5"><label class="block text-[9px] text-slate-400">K₃ (уд. сопр., ПУЭ 1.3.26)</label>
-                                <select id="hv-k3" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none mt-0.5">
-                                    <option value="1.05" class="bg-[#0b0a17]">1.05 (0.8 Ом·м)</option><option value="1.00" selected class="bg-[#0b0a17]">1.00 (1.2 Ом·м)</option><option value="0.92" class="bg-[#0b0a17]">0.92 (2.0 Ом·м)</option><option value="0.85" class="bg-[#0b0a17]">0.85 (3.0 Ом·м)</option>
+                            <div class="glass-sub rounded-xl px-2 py-1">
+                                <label class="block text-[9px] text-slate-400">K₃ (уд. сопр., ПУЭ 1.3.26)</label>
+                                <select id="hv-k3" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none">
+                                    <option value="1.05" class="bg-[#0b0a17]">1.05 (0.8 Ом·м)</option>
+                                    <option value="1.00" selected class="bg-[#0b0a17]">1.00 (1.2 Ом·м)</option>
+                                    <option value="0.92" class="bg-[#0b0a17]">0.92 (2.0 Ом·м)</option>
+                                    <option value="0.85" class="bg-[#0b0a17]">0.85 (3.0 Ом·м)</option>
                                 </select>
                             </div>
-                            <div class="glass-sub rounded-xl px-2 py-1.5"><label class="block text-[9px] text-slate-400">K₄ (труба, РД 34.20.508)</label>
-                                <select id="hv-k4" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none mt-0.5">
-                                    <option value="0.88" selected class="bg-[#0b0a17]">0.88 (в трубе 10 кВ)</option><option value="1.00" class="bg-[#0b0a17]">1.00 (откр. в траншее)</option><option value="0.85" class="bg-[#0b0a17]">0.85 (блок / пучок)</option>
+                            <div class="glass-sub rounded-xl px-2 py-1">
+                                <label class="block text-[9px] text-slate-400">K₄ (труба, РД 34.20.508)</label>
+                                <select id="hv-k4" onchange="runHvCalculation()" class="w-full bg-transparent text-[11px] font-mono font-bold text-white outline-none">
+                                    <option value="0.88" selected class="bg-[#0b0a17]">0.88 (в трубе 10 кВ)</option>
+                                    <option value="1.00" class="bg-[#0b0a17]">1.00 (откр. в траншее)</option>
+                                    <option value="0.85" class="bg-[#0b0a17]">0.85 (блок / пучок)</option>
                                 </select>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Данные КЗ на шинах 10 кВ -->
-                    <div class="pt-2.5 border-t border-[#8b5cf6]/20 space-y-2">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Данные КЗ на шинах 10 кВ</span>
-                            <span id="hv-ikz2-badge" class="text-[11px] font-mono text-[#a855f7] font-semibold">I⁽²⁾кз = 8.66 кА</span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div><label class="block text-[10px] text-slate-400 mb-1">Ток 3ф КЗ на шинах I⁽³⁾<sub>кз</sub>, кА</label><input id="hv-ikz" type="number" step="0.5" value="10.0" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-white outline-none"></div>
-                            <div><label class="block text-[10px] text-slate-400 mb-1">Время отключения t<sub>кз</sub>, с</label><input id="hv-tkz-time" type="number" step="0.1" value="1.5" oninput="runHvCalculation()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-white outline-none"></div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Блок результатов подбора и проверок 10 кВ -->
                 <div id="hv-results-box" class="space-y-3.5"></div>
             </section>
 
@@ -465,17 +497,17 @@
             lvLimit: 4.5,
             ktr: 0.9,
             lvSegs: [{ id: 1, name: 'ТП-10/0,4 кВ → ВРУ-1 (Магистраль)', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 }],
-            hv: { ins: 'XLPE', mat: 'Al', lay: 'triangle', sec: 240, par: 1, k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88, mode: 'P', val: 5000, len: 850, cos: 0.93, ikz: 10.0, t: 1.5, limit: 5.0, screenSec: null }
+            hv: { ins: 'XLPE', mat: 'Al', lay: 'triangle', par: 1, k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88, mode: 'P', val: 5000, len: 850, cos: 0.93, ikz: 10.0, t: 1.5, limit: 5.0, selectedCore: null, selectedScreen: null }
         };
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v9'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v10'));
                 if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v9', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v10', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -498,11 +530,11 @@
                 switchLvSubTab(state.lvSub || 'drop');
             } else if (mod === 'hv') {
                 document.getElementById('view-hv').classList.remove('hidden');
-                sub.textContent = 'Модуль 10 кВ • Выбор жилы, экрана и проверка ТКЗ';
-                nav.innerHTML = `<div class="grid grid-cols-3 gap-1.5">
-                    <button onclick="openModule('hub')" class="flex flex-col items-center justify-center py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-[11px]">← Назад</button>
-                    <div class="flex flex-col items-center justify-center py-2 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-[11px]">Расчёт 10 кВ</div>
-                    <button onclick="copyHvReport()" class="flex flex-col items-center justify-center py-2 rounded-2xl text-[#00f2fe] border border-[#00f2fe]/25 font-semibold text-[11px]">Отчёт в ПЗ</button>
+                sub.textContent = 'Модуль 10 кВ • Подбор жилы, экрана и проверка ТКЗ';
+                // Нижняя панель без кнопки «Отчёт в ПЗ»
+                nav.innerHTML = `<div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModule('hub')" class="py-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 hover:text-white font-bold text-xs">← Назад</button>
+                    <div class="flex items-center justify-center py-2.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs">Подбор КЛ 10 кВ</div>
                 </div>`;
                 initHvControls();
                 runHvCalculation();
@@ -510,7 +542,7 @@
                 document.getElementById('view-ref').classList.remove('hidden');
                 sub.textContent = 'Справочные таблицы ПУЭ 7 изд. и ГОСТ';
                 nav.innerHTML = `<div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModule('hub')" class="py-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 font-bold text-xs">← Назад на главный экран</button>
+                    <button onclick="openModule('hub')" class="py-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 hover:text-white font-bold text-xs">← Назад</button>
                     <div class="flex items-center justify-center py-2.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs">Справочник ПУЭ</div>
                 </div>`;
                 renderReferenceTable();
@@ -756,10 +788,8 @@
             saveState(); renderLvSegments(); updateLvSummary(); switchLvSubTab('drop'); showToast('Добавлено в схему 0,4 кВ');
         }
 
-        // === МОДУЛЬ 10 кВ ===
+        // === МОДУЛЬ 10 кВ (АВТОПОДБОР ЖИЛЫ И ЭКРАНА) ===
         function initHvControls() {
-            const sel = document.getElementById('hv-section');
-            sel.innerHTML = HV_SECS.map(s => `<option value="${s}" ${state.hv.sec == s ? 'selected' : ''}>${s} мм²</option>`).join('');
             document.getElementById('hv-insulation').value = state.hv.ins;
             document.getElementById('hv-parallel').value = state.hv.par;
             document.getElementById('hv-length').value = state.hv.len;
@@ -775,11 +805,34 @@
             updateHvUI();
         }
 
-        function onHvCableTypeChange() { state.hv.ins = document.getElementById('hv-insulation').value; saveState(); updateHvUI(); runHvCalculation(); }
-        function setHvMaterial(m) { state.hv.mat = m; saveState(); updateHvUI(); runHvCalculation(); }
-        function setHvLaying(l) { state.hv.lay = l; saveState(); updateHvUI(); runHvCalculation(); }
-        function setHvLoadMode(m) { state.hv.mode = m; saveState(); updateHvUI(); runHvCalculation(); }
-        function selectHvScreen(s) { state.hv.screenSec = s; saveState(); runHvCalculation(); }
+        function onHvCableTypeChange() {
+            state.hv.ins = document.getElementById('hv-insulation').value;
+            state.hv.selectedCore = null;
+            saveState(); updateHvUI(); runHvCalculation();
+        }
+        function setHvMaterial(m) {
+            state.hv.mat = m;
+            state.hv.selectedCore = null;
+            saveState(); updateHvUI(); runHvCalculation();
+        }
+        function setHvLaying(l) {
+            state.hv.lay = l;
+            state.hv.selectedCore = null;
+            saveState(); updateHvUI(); runHvCalculation();
+        }
+        function setHvLoadMode(m) {
+            state.hv.mode = m;
+            state.hv.selectedCore = null;
+            saveState(); updateHvUI(); runHvCalculation();
+        }
+        function pickHvCore(sec) {
+            state.hv.selectedCore = sec;
+            saveState(); runHvCalculation();
+        }
+        function pickHvScreen(sec) {
+            state.hv.selectedScreen = sec;
+            saveState(); runHvCalculation();
+        }
 
         function updateHvUI() {
             const isXlpe = state.hv.ins === 'XLPE';
@@ -788,11 +841,14 @@
                 ? `${state.hv.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'} (${state.hv.lay === 'triangle' ? '△' : '—'})`
                 : `${state.hv.mat === 'Al' ? 'ААБл-10' : 'СБл-10'} (3ж)`;
 
-            document.getElementById('hv-mat-al').className = state.hv.mat === 'Al' ? 'py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-[#00d2ff] to-[#6366f1] text-white' : 'py-1.5 rounded-lg text-xs font-bold text-slate-400';
-            document.getElementById('hv-mat-cu').className = state.hv.mat === 'Cu' ? 'py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'py-1.5 rounded-lg text-xs font-bold text-slate-400';
+            document.getElementById('hv-mat-al').className = state.hv.mat === 'Al' ? 'py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-[#00d2ff] to-[#6366f1] text-white' : 'py-1 rounded-lg text-xs font-bold text-slate-400';
+            document.getElementById('hv-mat-cu').className = state.hv.mat === 'Cu' ? 'py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-600 text-white' : 'py-1 rounded-lg text-xs font-bold text-slate-400';
 
+            // Компактные кнопки прокладки СПЭ без неоновой подсветки
             document.querySelectorAll('.hv-lay-btn').forEach(b => {
-                b.className = b.dataset.lay === state.hv.lay ? 'hv-lay-btn py-2 px-2 rounded-xl text-xs font-bold border neon-btn text-white border-[#00f2fe]/60' : 'hv-lay-btn py-2 px-2 rounded-xl text-xs font-bold border bg-[#0b0a17]/75 text-slate-300 border-[#8b5cf6]/25';
+                b.className = b.dataset.lay === state.hv.lay
+                    ? 'hv-lay-btn py-1 px-2 rounded-lg text-[11px] font-semibold bg-white/12 text-white border border-white/25 text-center transition'
+                    : 'hv-lay-btn py-1 px-2 rounded-lg text-[11px] font-medium bg-[#0b0a17]/75 text-slate-400 border border-[#8b5cf6]/20 text-center transition';
             });
 
             document.getElementById('hv-mode-p').className = state.hv.mode === 'P' ? 'px-1.5 rounded font-bold bg-[#7c3aed] text-white' : 'px-1.5 rounded font-bold text-slate-400';
@@ -832,7 +888,6 @@
 
         function runHvCalculation() {
             const h = state.hv;
-            h.sec = +document.getElementById('hv-section').value || 240;
             h.par = +document.getElementById('hv-parallel').value || 1;
             h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
             h.val = Math.max(0.1, +document.getElementById('hv-load-val').value || 100);
@@ -846,129 +901,211 @@
             h.t = Math.max(0.05, +document.getElementById('hv-tkz-time').value || 1.5);
             saveState();
 
-            const res = evalHv(h.sec, h);
-            document.getElementById('hv-k-total-badge').textContent = `Kобщ = ${res.kTotal.toFixed(3)}`;
-            document.getElementById('hv-ikz2-badge').textContent = `I⁽²⁾кз = ${res.ikz2.toFixed(3)} кА`;
+            // 1. Автоподбор сечения жилы
+            const allCores = HV_SECS.map(s => evalHv(s, h));
+            const recCoreIdx = allCores.findIndex(x => x.okAll);
+            const recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
+            const activeCore = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
 
+            document.getElementById('hv-k-total-badge').textContent = `Kобщ = ${activeCore.kTotal.toFixed(3)}`;
+
+            // Небольшой срез соседних сечений жилы (меньшее / рекомендованное / большее)
+            const centerCoreIdx = recCoreIdx !== -1 ? recCoreIdx : allCores.length - 2;
+            const coreSliceStart = Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1));
+            const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
+            const parPrefix = h.par > 1 ? `${h.par} × ` : '';
+
+            // 2. Автоподбор сечения медного экрана СПЭ
+            const ikz2 = activeCore.ikz2;
+            const kTime = activeCore.kTime;
             const lnTerm = Math.log((350 + 228) / (70 + 228));
-            const sScreenCalc = Math.sqrt((Math.pow(res.ikz2, 2) * h.t) / (Math.pow(1.089, 2) * Math.pow(226, 2) * lnTerm)) * 1000;
-            const recScreen = SCREEN_SECS.find(s => s >= sScreenCalc) || 150;
-            const chosenScreen = (h.screenSec && SCREEN_SECS.includes(h.screenSec)) ? h.screenSec : recScreen;
-            const iScreen1s = SCREEN_IKZ_1S[chosenScreen] || 13.4;
-            const iScreenPerm = +(iScreen1s * res.kTime).toFixed(3);
-            const okScreen = iScreenPerm > res.ikz2;
+            const sScreenCalc = Math.sqrt((Math.pow(ikz2, 2) * h.t) / (Math.pow(1.089, 2) * Math.pow(226, 2) * lnTerm)) * 1000;
 
-            const all = HV_SECS.map(s => evalHv(s, h));
-            const recCore = all.find(x => x.okAll);
-            const duCol = res.dPct < 3 ? 'text-emerald-400' : (res.okU ? 'text-amber-400' : 'text-rose-400');
-            const barCol = res.dPct < 3 ? 'from-[#00f2fe] to-emerald-400' : (res.okU ? 'from-amber-400 to-orange-500' : 'from-rose-500 to-pink-600');
+            const allScreens = SCREEN_SECS.map(s => {
+                const i1s = SCREEN_IKZ_1S[s];
+                const iPerm = +(i1s * kTime).toFixed(3);
+                return { sec: s, i1s, iPerm, ok: iPerm > ikz2 };
+            });
+            const recScrIdx = allScreens.findIndex(x => x.ok);
+            const recScr = recScrIdx !== -1 ? allScreens[recScrIdx] : null;
+            const activeScr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
 
-            const screenBlockHtml = h.ins === 'XLPE' ? `
-                <div class="glass-panel rounded-2xl p-4 space-y-2.5">
-                    <div class="flex items-center justify-between gap-2">
+            const centerScrIdx = recScrIdx !== -1 ? recScrIdx : allScreens.length - 2;
+            const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
+            const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
+
+            const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
+
+            // Окно 1: Расчётное сечение жилы
+            const coreSelectionHtml = `
+                <div class="glass-panel rounded-2xl p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-xs font-bold uppercase text-slate-200 block">Медный экран кабеля СПЭ</span>
-                            <span class="text-[10px] text-slate-400">e=1,089 • K=226 • Qᵢ=70°C → Qf=350°C</span>
+                            <span class="text-[11px] uppercase tracking-wider font-bold text-[#00f2fe] block">Расчётное сечение жилы</span>
+                            ${recCore
+                                ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${recCore.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${h.mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>`
+                                : `<div class="text-base font-bold text-rose-400 mt-1">Недостаточно 500 мм² — увеличьте кол-во ниток (n)</div>`
+                            }
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${okScreen ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${okScreen ? 'Экран: ОК' : 'Мало сечения!'}</span>
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${activeCore.okAll ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">
+                            ${activeCore.okAll ? 'Проходит' : 'Не проходит'}
+                        </span>
                     </div>
+
                     <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="glass-sub rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Расчётн. S<sub>экр</sub></span><strong class="text-xs font-mono text-white">${sScreenCalc.toFixed(2)} мм²</strong></div>
-                        <div class="glass-sub rounded-xl p-2"><span class="text-[9px] text-slate-400 block">Принят экран</span>
-                            <select onchange="selectHvScreen(+this.value)" class="w-full bg-transparent text-center text-xs font-mono font-extrabold text-[#00f2fe] outline-none mt-0.5">
-                                ${SCREEN_SECS.map(s => `<option value="${s}" ${chosenScreen===s?'selected':''} class="bg-[#0b0a17]">${s} мм²${s===recScreen?' (рек)':''}</option>`).join('')}
-                            </select>
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">Рабочий ток Ip</span>
+                            <strong class="text-xs font-mono text-white">${activeCore.cur.toFixed(1)} А</strong>
                         </div>
-                        <div class="glass-sub rounded-xl p-2"><span class="text-[9px] text-slate-400 block">I<sub>доп.экр</sub> (1с: ${iScreen1s})</span><strong class="text-xs font-mono ${okScreen?'text-emerald-400':'text-rose-400'}">${iScreenPerm.toFixed(2)} кА</strong></div>
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">I<sub>доп.факт</sub> (Загр.)</span>
+                            <strong class="text-xs font-mono ${activeCore.okI ? 'text-[#00f2fe]' : 'text-rose-400'}">${activeCore.iDopFact} А (${Math.round(activeCore.loadPct)}%)</strong>
+                        </div>
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">Потеря &Delta;U</span>
+                            <strong class="text-xs font-mono ${duCol}">${activeCore.dPct.toFixed(2)}% (${activeCore.dV.toFixed(0)} В)</strong>
+                        </div>
                     </div>
-                    <div class="text-[11px] font-mono text-center py-1 rounded-lg bg-[#0b0a17]/70 border border-[#8b5cf6]/20 ${okScreen?'text-emerald-300':'text-rose-300'}">
-                        I<sub>доп.экр</sub> (${iScreenPerm.toFixed(3)} кА) ${okScreen ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${res.ikz2.toFixed(3)} кА)
+
+                    <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-[#07060e]/90 text-slate-400 text-[10px] border-b border-[#8b5cf6]/20">
+                                    <th class="py-2 px-2.5 font-bold">Сечение</th>
+                                    <th class="py-2 px-2 font-bold">I<sub>доп.ф</sub> (Загр.)</th>
+                                    <th class="py-2 px-2 font-bold">&Delta;U, %</th>
+                                    <th class="py-2 px-2 text-right font-bold">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${coreSlice.map(x => {
+                                    const isRec = recCore && x.sec === recCore.sec;
+                                    const isPicked = x.sec === activeCore.sec;
+                                    return `
+                                    <tr onclick="pickHvCore(${x.sec})" class="cursor-pointer border-b border-[#8b5cf6]/15 transition ${isRec ? 'bg-emerald-500/15 text-white font-bold' : (isPicked ? 'bg-[#8b5cf6]/20 text-white' : 'text-slate-300')}">
+                                        <td class="py-2 px-2.5 font-mono">
+                                            ${parPrefix}${x.sec} мм²
+                                            ${isRec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}
+                                        </td>
+                                        <td class="py-2 px-2 font-mono ${x.okI ? '' : 'text-rose-400 font-bold'}">${x.iDopFact} А (${Math.round(x.loadPct)}%)</td>
+                                        <td class="py-2 px-2 font-mono ${x.okU ? '' : 'text-rose-400 font-bold'}">${x.dPct.toFixed(2)}%</td>
+                                        <td class="py-2 px-2 text-right font-semibold ${x.okAll ? 'text-emerald-400' : 'text-rose-400'}">
+                                            ${x.okAll ? 'Подходит' : (!x.okI ? 'Ток > Iдоп' : (!x.okCoreKz ? 'Мало ТКЗ' : 'ΔU > доп'))}
+                                        </td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // Окно 2: Расчётное сечение медного экрана (только для СПЭ)
+            const screenSelectionHtml = h.ins === 'XLPE' ? `
+                <div class="glass-panel rounded-2xl p-4 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="text-[11px] uppercase tracking-wider font-bold text-[#a855f7] block">Расчётное сечение медного экрана</span>
+                            ${recScr
+                                ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${recScr.sec} мм² <span class="text-xs font-sans font-normal text-slate-400">(расч. ${sScreenCalc.toFixed(2)} мм²)</span></div>`
+                                : `<div class="text-base font-bold text-rose-400 mt-1">Требуется экран &gt; 150 мм² (${sScreenCalc.toFixed(1)} мм²)</div>`
+                            }
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${activeScr.ok ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">
+                            ${activeScr.ok ? 'Подходит' : 'Мало'}
+                        </span>
+                    </div>
+
+                    <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="bg-[#07060e]/90 text-slate-400 text-[10px] border-b border-[#8b5cf6]/20">
+                                    <th class="py-2 px-2.5 font-bold">Экран S<sub>экр</sub></th>
+                                    <th class="py-2 px-2 font-bold">I<sub>кз.1с</sub></th>
+                                    <th class="py-2 px-2 font-bold">I<sub>доп.экр</sub> (t=${h.t}с)</th>
+                                    <th class="py-2 px-2 text-right font-bold">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${scrSlice.map(x => {
+                                    const isRec = recScr && x.sec === recScr.sec;
+                                    const isPicked = x.sec === activeScr.sec;
+                                    return `
+                                    <tr onclick="pickHvScreen(${x.sec})" class="cursor-pointer border-b border-[#8b5cf6]/15 transition ${isRec ? 'bg-emerald-500/15 text-white font-bold' : (isPicked ? 'bg-[#8b5cf6]/20 text-white' : 'text-slate-300')}">
+                                        <td class="py-2 px-2.5 font-mono">
+                                            ${x.sec} мм²
+                                            ${isRec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}
+                                        </td>
+                                        <td class="py-2 px-2 font-mono text-slate-400">${x.i1s.toFixed(1)} кА</td>
+                                        <td class="py-2 px-2 font-mono ${x.ok ? 'text-[#00f2fe]' : 'text-rose-400 font-bold'}">${x.iPerm.toFixed(2)} кА</td>
+                                        <td class="py-2 px-2 text-right font-semibold ${x.ok ? 'text-emerald-400' : 'text-rose-400'}">
+                                            ${x.ok ? 'Подходит' : 'Мало'}
+                                        </td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             ` : '';
 
-            document.getElementById('hv-results-box').innerHTML = `
-                <div class="glass-panel rounded-2xl p-4 space-y-3">
-                    <div class="flex items-start justify-between gap-2">
+            // Окно 3: Проверка жилы на ток КЗ
+            const coreKzCheckHtml = `
+                <div class="glass-panel rounded-2xl p-4 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
                         <div>
-                            <span class="text-[11px] uppercase font-bold text-slate-400 block">Потери напряжения &Delta;U (10 кВ)</span>
-                            <div class="flex items-baseline gap-2 mt-0.5">
-                                <span class="text-3xl font-extrabold font-mono ${duCol}">${res.dPct.toFixed(2)}%</span>
-                                <span class="text-sm font-mono font-semibold ${duCol}">(${res.dV.toFixed(1)} В)</span>
-                            </div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-200 block">Проверка жилы на ток КЗ</span>
+                            <span class="text-[10px] text-slate-400">Сечение ${parPrefix}${activeCore.sec} мм² • K = 1/√t<sub>кз</sub> = ${kTime} • I<sub>кз.1с</sub> = ${activeCore.iCore1s} кА</span>
                         </div>
-                        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap ${res.okU && res.okI ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">
-                            ${res.okU && res.okI ? `В норме (≤ ${h.limit}%)` : 'Требует проверки'}
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeCore.okCoreKz ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
+                            ${activeCore.okCoreKz ? 'Выполняется' : 'Не выполняется'}
                         </span>
                     </div>
-                    <div class="w-full h-2.5 bg-[#0b0a17]/90 rounded-full overflow-hidden p-0.5 border border-[#8b5cf6]/25">
-                        <div class="h-full rounded-full transition-all duration-300 bg-gradient-to-r ${barCol}" style="width: ${Math.max(4, Math.min(100, (res.dPct / h.limit) * 100))}%"></div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="glass-sub rounded-xl p-2"><span class="text-[10px] text-slate-400 block">Рабочий ток Ip</span><strong class="text-xs font-mono text-white">${res.cur.toFixed(1)} А</strong></div>
-                        <div class="glass-sub rounded-xl p-2"><span class="text-[10px] text-slate-400 block">I<sub>доп.факт</sub> (база ${res.baseIdop})</span><strong class="text-xs font-mono ${res.okI?'text-[#00f2fe]':'text-rose-400'}">${res.iDopFact} А (${Math.round(res.loadPct)}%)</strong></div>
-                        <div class="glass-sub rounded-xl p-2"><span class="text-[10px] text-slate-400 block">Потери &Delta;P</span><strong class="text-xs font-mono text-white">${res.dP.toFixed(2)} кВт</strong></div>
-                    </div>
-                    <div class="text-[11px] text-slate-400 font-mono flex justify-between pt-1 border-t border-[#8b5cf6]/20">
-                        <span>r₀=${res.r0.toFixed(4)}</span><span>x₀=${res.x0.toFixed(3)}</span><span>Uкон=${(10 - res.dV / 1000).toFixed(3)} кВ</span>
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-4 space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-bold uppercase text-slate-200 block">Проверка жилы на ток КЗ</span>
-                            <span class="text-[10px] text-slate-400">K = 1/√t<sub>кз</sub> = ${res.kTime} • I<sub>кз.1с</sub> = ${res.iCore1s} кА</span>
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">Допустимый ток КЗ жилы</span>
+                            <strong class="text-xs sm:text-sm font-mono ${activeCore.okCoreKz ? 'text-emerald-400' : 'text-rose-400'}">${activeCore.iCorePerm.toFixed(3)} кА</strong>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${res.okCoreKz ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${res.okCoreKz ? 'Жила ТКЗ: ОК' : 'Жила ТКЗ: Мало!'}</span>
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">Двухфазный ток КЗ I⁽²⁾<sub>кз</sub></span>
+                            <strong class="text-xs sm:text-sm font-mono text-white">${ikz2.toFixed(3)} кА</strong>
+                        </div>
                     </div>
-                    <div class="text-[11px] font-mono text-center py-1.5 rounded-lg bg-[#0b0a17]/70 border border-[#8b5cf6]/20 ${res.okCoreKz?'text-emerald-300':'text-rose-300'}">
-                        I<sub>доп.кз</sub> = K × I<sub>кз.1с</sub> = ${res.iCorePerm.toFixed(3)} кА ${res.okCoreKz ? '>' : '<'} I⁽²⁾<sub>кз</sub> = ${res.ikz2.toFixed(3)} кА
+                    <div class="text-[11px] font-mono text-center py-1.5 rounded-lg bg-[#0b0a17]/70 border border-[#8b5cf6]/20 ${activeCore.okCoreKz ? 'text-emerald-300' : 'text-rose-300'}">
+                        I<sub>доп.кз</sub> (${activeCore.iCorePerm.toFixed(3)} кА) ${activeCore.okCoreKz ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${ikz2.toFixed(3)} кА)
                     </div>
-                </div>
-
-                ${screenBlockHtml}
-
-                <div class="glass-panel rounded-2xl p-3.5 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-200">Ряд сечений 10 кВ (нажмите для выбора):</span>
-                        ${recCore ? `<span class="text-[11px] text-emerald-400 font-semibold">Оптимально: ${h.par>1?h.par+'×':''}${recCore.sec} мм²</span>` : '<span class="text-[11px] text-rose-400">Добавьте нитку</span>'}
-                    </div>
-                    <table class="w-full text-left text-xs rounded-xl overflow-hidden bg-[#0b0a17]/70">
-                        <thead><tr class="text-slate-400 text-[10px] border-b border-[#8b5cf6]/20"><th class="py-2 px-2.5">S, мм²</th><th class="py-2 px-2">I<sub>доп.ф</sub></th><th class="py-2 px-2">&Delta;U, %</th><th class="py-2 px-2 text-right">ТКЗ</th></tr></thead>
-                        <tbody>${all.map(x => `<tr onclick="selectHvSec(${x.sec})" class="cursor-pointer border-b border-[#8b5cf6]/15 ${x.sec===h.sec?'bg-[#8b5cf6]/25 text-white font-bold':'text-slate-400'}">
-                            <td class="py-2 px-2.5 font-mono">${h.par>1?h.par+'×':''}${x.sec} ${recCore && x.sec===recCore.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td>
-                            <td class="py-2 px-2 font-mono ${x.okI?'':'text-rose-400'}">${x.iDopFact} А (${Math.round(x.loadPct)}%)</td>
-                            <td class="py-2 px-2 font-mono ${x.okU?'':'text-rose-400'}">${x.dPct.toFixed(2)}%</td>
-                            <td class="py-2 px-2 text-right font-mono ${x.okCoreKz?'text-emerald-400 font-bold':'text-rose-400'}">${x.okCoreKz?'ОК':'Нет'}</td>
-                        </tr>`).join('')}</tbody>
-                    </table>
                 </div>
             `;
-        }
 
-        function selectHvSec(s) { state.hv.sec = s; document.getElementById('hv-section').value = s; saveState(); runHvCalculation(); }
+            // Окно 4: Проверка экрана кабеля на ток КЗ (для СПЭ)
+            const screenKzCheckHtml = h.ins === 'XLPE' ? `
+                <div class="glass-panel rounded-2xl p-4 space-y-2.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-200 block">Проверка экрана кабеля на ток КЗ</span>
+                            <span class="text-[10px] text-slate-400">Экран ${activeScr.sec} мм² • K = ${kTime} • I<sub>экр.1с</sub> = ${activeScr.i1s} кА</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeScr.ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
+                            ${activeScr.ok ? 'Выполняется' : 'Не выполняется'}
+                        </span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-center">
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">Допустимый ток КЗ экрана</span>
+                            <strong class="text-xs sm:text-sm font-mono ${activeScr.ok ? 'text-emerald-400' : 'text-rose-400'}">${activeScr.iPerm.toFixed(3)} кА</strong>
+                        </div>
+                        <div class="glass-sub rounded-xl p-2">
+                            <span class="text-[10px] text-slate-400 block">Двухфазный ток КЗ I⁽²⁾<sub>кз</sub></span>
+                            <strong class="text-xs sm:text-sm font-mono text-white">${ikz2.toFixed(3)} кА</strong>
+                        </div>
+                    </div>
+                    <div class="text-[11px] font-mono text-center py-1.5 rounded-lg bg-[#0b0a17]/70 border border-[#8b5cf6]/20 ${activeScr.ok ? 'text-emerald-300' : 'text-rose-300'}">
+                        I<sub>доп.экр</sub> (${activeScr.iPerm.toFixed(3)} кА) ${activeScr.ok ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${ikz2.toFixed(3)} кА)
+                    </div>
+                </div>
+            ` : '';
 
-        function copyHvReport() {
-            const h = state.hv, r = evalHv(h.sec, h);
-            const mark = h.ins === 'XLPE' ? (h.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10') : (h.mat === 'Al' ? 'ААБл-10' : 'СБл-10');
-            const lay = h.ins === 'XLPE' ? (h.lay === 'triangle' ? 'в треугольник' : 'в плоскости') : '3-жильный в земле';
-            const lnTerm = Math.log((350 + 228) / (70 + 228));
-            const sScrCalc = Math.sqrt((Math.pow(r.ikz2, 2) * h.t) / (Math.pow(1.089, 2) * Math.pow(226, 2) * lnTerm)) * 1000;
-            const recScr = SCREEN_SECS.find(s => s >= sScrCalc) || 150;
-            const chosenScr = (h.screenSec && SCREEN_SECS.includes(h.screenSec)) ? h.screenSec : recScr;
-            const iScrPerm = +(SCREEN_IKZ_1S[chosenScr] * r.kTime).toFixed(3);
-
-            let txt = `РАСЧЁТ КАБЕЛЬНОЙ ЛИНИИ 10 кВ (${mark})\n`;
-            txt += `Сечение: ${h.par} × ${h.sec} мм² | Прокладка: ${lay} | L = ${h.len} м | cos φ = ${h.cos}\n`;
-            txt += `Коэффициенты: K1=${h.k1}, K2=${h.k2}, K3=${h.k3}, K4=${h.k4} → Kобщ = ${r.kTotal}\n`;
-            txt += `1. Рабочий ток: Ip = ${r.cur.toFixed(2)} А ≤ Iдоп.факт = ${r.iDopFact} А (загрузка ${Math.round(r.loadPct)}%)\n`;
-            txt += `2. Потери напряжения: ΔU = ${r.dV.toFixed(1)} В (${r.dPct.toFixed(2)}%) | ΔP = ${r.dP.toFixed(2)} кВт\n`;
-            txt += `3. Проверка жилы по ТКЗ (I(3)кз=${h.ikz} кА, I(2)кз=${r.ikz2} кА, t=${h.t} с): Iдоп.кз = ${r.iCorePerm} кА > ${r.ikz2} кА (${r.okCoreKz ? 'Выполняется' : 'Не выполняется'})\n`;
-            if (h.ins === 'XLPE') {
-                txt += `4. Выбор медного экрана СПЭ: Sрасч = ${sScrCalc.toFixed(2)} мм² → принят ${chosenScr} мм² (Iдоп.экр = ${iScrPerm} кА > ${r.ikz2} кА)`;
-            }
-            navigator.clipboard.writeText(txt).then(() => showToast('Отчёт 10 кВ скопирован для ПЗ!'));
+            document.getElementById('hv-results-box').innerHTML = coreSelectionHtml + screenSelectionHtml + coreKzCheckHtml + screenKzCheckHtml;
         }
 
         // === СПРАВОЧНИК ===
