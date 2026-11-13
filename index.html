@@ -1101,10 +1101,10 @@
             const comparisonRows = slice.map(item => {
                 const isRec = item.section === rec.section;
                 return `
-                    <tr class="border-b border-[#ece7dd] ${isRec ? 'bg-[#f3ddd1]/60 text-[#1c242b] font-bold' : 'text-[#4b5563]'}">
+                    <tr class="border-b border-[#ece7dd] ${isRec ? 'bg-[#e1f1e9]/70 text-[#1c242b] font-bold' : 'text-[#4b5563]'}">
                         <td class="py-2.5 px-2.5 font-mono">
                             ${parPrefix}${item.section} мм²
-                            ${isRec ? '<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-[#c25934] text-white font-bold">РЕК.</span>' : ''}
+                            ${isRec ? '<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-[#2e7d5b] text-white font-bold">РЕК.</span>' : ''}
                         </td>
                         <td class="py-2.5 px-2 font-mono ${item.passCurrent ? '' : 'text-[#b83a2d] font-bold'}">${item.totalIdop} А (${Math.round(item.loadPct)}%)</td>
                         <td class="py-2.5 px-2 font-mono ${item.passDrop ? '' : 'text-[#b83a2d] font-bold'}">${item.dropPct.toFixed(2)}%</td>
