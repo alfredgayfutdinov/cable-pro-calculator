@@ -116,7 +116,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <h2 class="text-base font-bold text-white">Расчёт КЛ 0,4 кВ</h2>
-                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#00f2fe]/15 text-[#00f2fe] border border-[#00f2fe]/30">380 / 220 В</span>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#00f2fe]/15 text-[#00f2fe] border border-[#00f2fe]/30">380–400 / 220–230 В</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1 leading-snug">Потери напряжения &Delta;U по цепочке участков, автоподбор сечения, учёт K<sub>тр</sub> и K<sub>4ж</sub>=0,93.</p>
                     </div>
@@ -158,29 +158,27 @@
             <section id="view-lv" class="space-y-3 hidden">
                 <div id="lv-subtab-drop" class="space-y-3">
                     
-                    <!-- Компактная единая верхняя полоса настроек (Стиль №3) -->
-                    <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5 overflow-x-auto custom-scroll">
-                        <div class="flex items-center gap-1 shrink-0">
-                            <button type="button" onclick="setLvVoltage('0.38')" data-v="0.38" class="lv-v-btn px-2.5 py-1.5 rounded-full text-[11px] font-bold transition whitespace-nowrap">
-                                380В (4ж)
+                    <!-- Компактная единая верхняя полоса настроек -->
+                    <div class="glass-panel rounded-2xl p-2 px-3 flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <!-- Нажатие выбирает 3ф сеть, повторное нажатие переключает 380В <-> 400В -->
+                            <button type="button" onclick="toggleLvPhaseGroup('3ph')" id="lv-btn-3ph" class="px-3 py-1.5 rounded-full text-[11px] font-bold transition whitespace-nowrap">
+                                <span id="lv-label-3ph">380В (4ж)</span>
                             </button>
-                            <button type="button" onclick="setLvVoltage('0.22')" data-v="0.22" class="lv-v-btn px-2.5 py-1.5 rounded-full text-[11px] font-bold transition whitespace-nowrap">
-                                220В (1-ф)
+                            <!-- Нажатие выбирает 1ф сеть, повторное нажатие переключает 220В <-> 230В -->
+                            <button type="button" onclick="toggleLvPhaseGroup('1ph')" id="lv-btn-1ph" class="px-3 py-1.5 rounded-full text-[11px] font-bold transition whitespace-nowrap">
+                                <span id="lv-label-1ph">220В (1-ф)</span>
                             </button>
                         </div>
 
-                        <div class="w-px h-5 bg-[#8b5cf6]/30 shrink-0 mx-0.5"></div>
+                        <div class="w-px h-5 bg-[#8b5cf6]/30 shrink-0"></div>
 
-                        <div class="flex items-center gap-1 shrink-0">
-                            <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/50 rounded-full px-2.5 py-1 shadow-[0_0_12px_rgba(168,85,247,0.2)]">
-                                <span class="text-[10px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
-                                <input id="lv-custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onLvCustomLimitInput(this.value)"
-                                    class="w-8 bg-transparent text-right font-mono text-[11px] font-extrabold text-white outline-none">
-                                <span class="text-[10px] text-[#00f2fe] font-mono font-bold ml-0.5">%</span>
-                            </div>
-                            <button type="button" onclick="setLvMaxDropLimit(4)" data-limit="4" class="lv-limit-chip px-2 py-1 rounded-full text-[10px] font-semibold transition">4%</button>
-                            <button type="button" onclick="setLvMaxDropLimit(5)" data-limit="5" class="lv-limit-chip px-2 py-1 rounded-full text-[10px] font-semibold transition">5%</button>
-                            <button type="button" onclick="setLvMaxDropLimit(6)" data-limit="6" class="lv-limit-chip px-2 py-1 rounded-full text-[10px] font-semibold transition">6%</button>
+                        <!-- Единственное окно ΔUдоп (4.5% по умолчанию, редактируется вручную) -->
+                        <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-3 py-1.5 shadow-[0_0_12px_rgba(168,85,247,0.2)]">
+                            <span class="text-[11px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
+                            <input id="lv-custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onLvCustomLimitInput(this.value)"
+                                class="w-9 bg-transparent text-right font-mono text-xs font-extrabold text-white outline-none">
+                            <span class="text-[11px] text-[#00f2fe] font-mono font-bold ml-0.5">%</span>
                         </div>
                     </div>
 
@@ -195,7 +193,7 @@
                         </button>
                     </div>
 
-                    <!-- Контейнер компактных карточек участков (Стиль №3) -->
+                    <!-- Контейнер компактных карточек участков -->
                     <div id="lv-segments-container" class="space-y-2.5"></div>
 
                 </div>
@@ -210,7 +208,10 @@
                         <div class="grid grid-cols-2 gap-2.5">
                             <div><label class="block text-[11px] text-slate-400 mb-1">Напряжение:</label>
                                 <select id="lv-sel-voltage" onchange="runLvCableSelection()" class="w-full bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none">
-                                    <option value="0.38">0,4 кВ (380 В, 4-провод.)</option><option value="0.22">0,22 кВ (220 В, 1-фазн.)</option>
+                                    <option value="0.38">380 В (3ф, 4-провод.)</option>
+                                    <option value="0.40">400 В (3ф, 4-провод.)</option>
+                                    <option value="0.22">220 В (1-фазная)</option>
+                                    <option value="0.23">230 В (1-фазная)</option>
                                 </select>
                             </div>
                             <div><label class="block text-[11px] text-slate-400 mb-1">Материал жил:</label>
@@ -416,10 +417,10 @@
         </main>
 
         <!-- =====================================================
-             НИЖНИЙ ПЛАВАЮЩИЙ ДОК «ИТОГО ПО ЛИНИИ» (СТИЛЬ №3)
+             НИЖНИЙ ПЛАВАЮЩИЙ ДОК «ИТОГО ПО ЛИНИИ» (БЕЗ КНОПКИ ПЗ)
              ===================================================== -->
         <div id="lv-floating-dock" class="hidden shrink-0 px-3.5 pb-2.5 pt-1 relative z-30">
-            <div class="glass-panel rounded-2xl p-3.5 border border-[#00f2fe]/35 shadow-[0_-4px_25px_rgba(0,0,0,0.65)] flex items-center justify-between gap-2">
+            <div class="glass-panel rounded-2xl p-3.5 px-4 border border-[#00f2fe]/35 shadow-[0_-4px_25px_rgba(0,0,0,0.65)] flex items-center justify-between gap-3">
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Итого по линии</span>
@@ -434,18 +435,10 @@
                     </div>
                 </div>
 
-                <div class="text-right font-mono text-[11px] text-slate-300 space-y-1 shrink-0 ml-auto mr-1">
+                <div class="text-right font-mono text-xs text-slate-300 space-y-1.5 shrink-0 ml-auto">
                     <div>L = <strong id="lv-total-length-val" class="text-white">0 м</strong></div>
                     <div>&Delta;P = <strong id="lv-total-power-loss-val" class="text-white">0.00 кВт</strong></div>
                 </div>
-
-                <button type="button" onclick="copyLvReport()" title="Скопировать расчёт для ПЗ"
-                    class="w-12 h-14 rounded-2xl bg-gradient-to-br from-[#8b5cf6] to-[#6366f1] hover:from-[#9333ea] hover:to-[#4f46e5] active:scale-95 text-white flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-violet-600/35 border border-white/20 shrink-0 transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <span class="text-[10px] font-extrabold tracking-wide">ПЗ</span>
-                </button>
             </div>
         </div>
 
@@ -502,23 +495,25 @@
             mod: 'hub',
             lvSub: 'drop',
             lvV: '0.38',
+            lvV3: '0.38', // запоминает выбор 0.38 (380В) или 0.40 (400В)
+            lvV1: '0.22', // запоминает выбор 0.22 (220В) или 0.23 (230В)
             lvLimit: 4.5,
             ktr: 0.9,
+            // По умолчанию ровно 1 участок
             lvSegs: [
-                { id: 1, name: 'ТП-10/0.4 → ВРУ-1', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 },
-                { id: 2, name: 'ВРУ-1 → ГРЩ', mat: 'Al', ins: 'PVC', sec: 95, par: 1, len: 60, mode: 'P', p: 80, i: 135, cos: 0.9 }
+                { id: 1, name: 'ТП-10/0.4 → ВРУ-1', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 }
             ],
             hv: { ins: 'XLPE', mat: 'Al', lay: 'triangle', par: 1, k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88, mode: 'P', val: 5000, len: 850, cos: 0.93, ikz: 10.0, t: 1.5, limit: 5.0, selectedCore: null, selectedScreen: null }
         };
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v11'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v12'));
                 if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v11', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v12', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -579,16 +574,20 @@
         }
 
         // === МОДУЛЬ 0,4 кВ (СТИЛЬ №3) ===
+        function isLvSinglePhase(vStr) {
+            return vStr === '0.22' || vStr === '0.23';
+        }
+
         function getLvParams(sec, mat, ins, vStr) {
             const rx = R_X_DB[sec] || R_X_DB[50];
             const r0 = mat === 'Cu' ? rx[0] : rx[1], x0 = rx[2];
             const base = (AMP_DB[ins] && AMP_DB[ins][mat] && AMP_DB[ins][mat][sec]) ? AMP_DB[ins][mat][sec][0] : 100;
-            const k4 = vStr === '0.38' ? 0.93 : 1.0;
+            const k4 = !isLvSinglePhase(vStr) ? 0.93 : 1.0;
             return { r0, x0, base, k4, iDop: Math.round(base * state.ktr * k4) };
         }
 
         function calcLvSeg(seg) {
-            const uKv = parseFloat(state.lvV), is1Ph = state.lvV === '0.22';
+            const uKv = parseFloat(state.lvV), is1Ph = isLvSinglePhase(state.lvV);
             const cos = Math.min(1, Math.max(0.1, parseFloat(seg.cos) || 0.9));
             const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
             const lKm = (parseFloat(seg.len) || 0) / 1000, n = Math.max(1, parseInt(seg.par) || 1);
@@ -601,21 +600,54 @@
             return { ...p, totIdop, cur, dV, dPct, dP, loadPct: totIdop > 0 ? (cur / totIdop) * 100 : 0 };
         }
 
-        function setLvVoltage(v) { state.lvV = v; saveState(); updateLvUI(); renderLvSegments(); updateLvSummary(); }
-        function setLvMaxDropLimit(v) { state.lvLimit = parseFloat(v); document.getElementById('lv-custom-limit-input').value = state.lvLimit; saveState(); updateLvUI(); renderLvSegments(); updateLvSummary(); }
-        function onLvCustomLimitInput(v) { const n = parseFloat(v); if (n > 0) { state.lvLimit = n; saveState(); updateLvUI(); renderLvSegments(); updateLvSummary(); } }
+        // Переключение 380/400В и 220/230В по нажатию на соответствующую кнопку
+        function toggleLvPhaseGroup(group) {
+            const currently1Ph = isLvSinglePhase(state.lvV);
+            if (group === '3ph') {
+                if (!currently1Ph) {
+                    state.lvV3 = (state.lvV3 === '0.38') ? '0.40' : '0.38';
+                }
+                state.lvV = state.lvV3 || '0.38';
+            } else {
+                if (currently1Ph) {
+                    state.lvV1 = (state.lvV1 === '0.22') ? '0.23' : '0.22';
+                }
+                state.lvV = state.lvV1 || '0.22';
+            }
+            saveState();
+            updateLvUI();
+            renderLvSegments();
+            updateLvSummary();
+        }
+
+        function onLvCustomLimitInput(v) {
+            const n = parseFloat(v);
+            if (n > 0) {
+                state.lvLimit = n;
+                saveState();
+                renderLvSegments();
+                updateLvSummary();
+            }
+        }
 
         function updateLvUI() {
-            document.querySelectorAll('.lv-v-btn').forEach(b => {
-                b.className = b.dataset.v === state.lvV
-                    ? 'lv-v-btn px-2.5 py-1 rounded-full text-[11px] font-bold transition whitespace-nowrap bg-[#00f2fe]/15 text-[#00f2fe] border border-[#00f2fe]/55 shadow-[0_0_12px_rgba(0,242,254,0.22)]'
-                    : 'lv-v-btn px-2.5 py-1 rounded-full text-[11px] font-medium transition whitespace-nowrap bg-[#0b0a17]/80 text-slate-400 border border-[#8b5cf6]/20 hover:text-white';
-            });
-            document.querySelectorAll('.lv-limit-chip').forEach(b => {
-                b.className = Math.abs(parseFloat(b.dataset.limit) - state.lvLimit) < 0.01
-                    ? 'lv-limit-chip px-2 py-1 rounded-full text-[10px] font-bold bg-[#8b5cf6]/30 text-white border border-[#a855f7]/60 transition'
-                    : 'lv-limit-chip px-2 py-1 rounded-full text-[10px] font-medium bg-[#0b0a17]/80 text-slate-400 border border-[#8b5cf6]/20 hover:text-white transition';
-            });
+            const v3 = state.lvV3 || '0.38';
+            const v1 = state.lvV1 || '0.22';
+            const is1Ph = isLvSinglePhase(state.lvV);
+
+            const btn3 = document.getElementById('lv-btn-3ph');
+            const btn1 = document.getElementById('lv-btn-1ph');
+            const lbl3 = document.getElementById('lv-label-3ph');
+            const lbl1 = document.getElementById('lv-label-1ph');
+
+            lbl3.textContent = `${v3 === '0.40' ? '400В' : '380В'} (4ж)`;
+            lbl1.textContent = `${v1 === '0.23' ? '230В' : '220В'} (1-ф)`;
+
+            const activeCls = 'px-3 py-1.5 rounded-full text-[11px] font-bold transition whitespace-nowrap bg-[#00f2fe]/15 text-[#00f2fe] border border-[#00f2fe]/55 shadow-[0_0_12px_rgba(0,242,254,0.22)]';
+            const inactiveCls = 'px-3 py-1.5 rounded-full text-[11px] font-medium transition whitespace-nowrap bg-[#0b0a17]/80 text-slate-400 border border-[#8b5cf6]/20 hover:text-white';
+
+            btn3.className = !is1Ph ? activeCls : inactiveCls;
+            btn1.className = is1Ph ? activeCls : inactiveCls;
         }
 
         function getSegVisualClasses(m) {
@@ -637,7 +669,7 @@
 
                 return `
                 <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2.5 transition-all">
-                    <!-- Левая вертикальная полоса статуса (Стиль №3) -->
+                    <!-- Левая вертикальная полоса статуса -->
                     <div id="lv-stripe-${seg.id}" class="absolute left-0 top-0 bottom-0 w-1.5 ${v.stripeColor} transition-colors"></div>
 
                     <!-- Верхняя строка: номер, название, бейдж ΔU и удаление -->
@@ -657,7 +689,7 @@
                         </div>
                     </div>
 
-                    <!-- Основной ряд капсул (Стиль №3: Жила + Сечение | Длина | Нагрузка | cos φ) -->
+                    <!-- Основной ряд капсул: Жила + Сечение | Длина м | Нагрузка кВт/А | cos φ -->
                     <div class="grid grid-cols-12 gap-1.5 items-center">
                         <!-- Капсула 1: Материал + Сечение -->
                         <div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 pr-2 shadow-[0_0_12px_rgba(0,242,254,0.12)]">
@@ -686,10 +718,11 @@
                                 class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">${seg.mode === 'P' ? 'кВт' : 'А'}</button>
                         </div>
 
-                        <!-- Капсула 4: cos φ -->
-                        <div class="col-span-2 pill-control px-1.5 py-1 flex items-center justify-center">
+                        <!-- Капсула 4: косинус со значком φ -->
+                        <div class="col-span-2 pill-control px-2 py-1 flex items-center justify-center gap-0.5">
                             <input type="number" step="0.01" min="0.5" max="1" value="${seg.cos}" oninput="updLvSeg(${seg.id},'cos',this.value,false)"
-                                title="cos φ" class="w-full bg-transparent text-center font-mono text-[11px] font-bold text-white outline-none">
+                                title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
+                            <span class="text-[10px] text-slate-400 shrink-0">&phi;</span>
                         </div>
                     </div>
 
@@ -766,7 +799,6 @@
             document.getElementById('lv-total-power-loss-val').textContent = `${dP.toFixed(2)} кВт`;
 
             const lim = state.lvLimit;
-            // Трёхуровневая цветовая индикация (< 3% зеленый, 3%..lim оранжевый, > lim красный)
             if (dPct < 3) {
                 pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-emerald-400 whitespace-nowrap';
                 vEl.className = 'text-xs font-mono text-emerald-400 font-semibold whitespace-nowrap';
@@ -789,22 +821,12 @@
             }
         }
 
-        function copyLvReport() {
-            let sumPct = 0, sumV = 0;
-            const rows = state.lvSegs.map((s, i) => {
-                const m = calcLvSeg(s); sumPct += m.dPct; sumV += m.dV;
-                return `${i+1}. ${s.name}: ${s.mat} ${s.ins} ${s.par}×${s.sec}мм², L=${s.len}м | Ip=${m.cur.toFixed(1)}А (Iдоп=${m.totIdop}А) | ΔU=${m.dV.toFixed(1)}В (${m.dPct.toFixed(2)}%)`;
-            });
-            const txt = `РАСЧЁТ КЛ 0,4 кВ (Uном=${state.lvV === '0.38' ? '380 В, 4-провод., K4ж=0,93' : '220 В'}, Kтр=${state.ktr})\n` + rows.join('\n') + `\nИТОГО ∑ΔU = ${sumV.toFixed(1)} В (${sumPct.toFixed(2)}%)`;
-            navigator.clipboard.writeText(txt).then(() => showToast('Отчёт 0,4 кВ скопирован для ПЗ!'));
-        }
-
         function runLvCableSelection() {
             const vStr = document.getElementById('lv-sel-voltage').value, mat = document.getElementById('lv-sel-material').value, ins = document.getElementById('lv-sel-insulation').value;
             state.ktr = Math.min(1, Math.max(0.5, +document.getElementById('lv-sel-ktr').value || 0.9));
             const P = +document.getElementById('lv-sel-power').value || 10, L = +document.getElementById('lv-sel-length').value || 50, cos = +document.getElementById('lv-sel-cosphi').value || 0.9;
             const lim = +document.getElementById('lv-sel-maxdrop').value || 4.5, par = +document.getElementById('lv-sel-parallel').value || 1;
-            const is1Ph = vStr === '0.22', uKv = parseFloat(vStr), sin = Math.sqrt(Math.max(0, 1 - cos * cos));
+            const is1Ph = isLvSinglePhase(vStr), uKv = parseFloat(vStr), sin = Math.sqrt(Math.max(0, 1 - cos * cos));
             const cur = P / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos);
 
             const list = LV_SECS.map(sec => {
