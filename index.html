@@ -134,7 +134,7 @@
                             <h2 class="text-base font-bold text-white">Расчёт КЛ 10 кВ</h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8b5cf6]/20 text-[#d8b4fe] border border-[#a855f7]/35">АПвПг / ААБл</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1 leading-snug">Автоподбор сечения жилы и медного экрана СПЭ с K<sub>1</sub>–K<sub>4</sub>, потери &Delta;U и проверка на ТКЗ.</p>
+                        <p class="text-xs text-slate-400 mt-1 leading-snug">Подбор жилы и медного экрана СПЭ, наведённое напряжение (50 В), транспозиция и ТКЗ.</p>
                     </div>
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-[#c084fc] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
@@ -298,11 +298,11 @@
             </section>
 
             <!-- =====================================================
-                 МОДУЛЬ 2: ПОДБОР КАБЕЛЯ И ЭКРАНА 10 кВ (В СТИЛЕ №3)
+                 МОДУЛЬ 2: ПОДБОР КАБЕЛЯ, ЭКРАНА И ТРАНСПОЗИЦИИ 10 кВ (СТИЛЬ №3)
                  ===================================================== -->
             <section id="view-hv" class="space-y-3 hidden">
                 
-                <!-- Верхняя компактная панель уставок 10 кВ (в едином стиле с 0,4 кВ) -->
+                <!-- Верхняя компактная панель уставок 10 кВ -->
                 <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
                     <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
                         <select id="hv-insulation" onchange="onHvCableTypeChange()"
@@ -330,7 +330,7 @@
                     <span id="hv-cable-mark-badge" class="text-[10px] font-mono text-[#d8b4fe]">АПвПг-10 (△)</span>
                 </div>
 
-                <!-- Матричная карточка исходных данных 10 кВ (Стиль №3) -->
+                <!-- Матричная карточка исходных данных 10 кВ -->
                 <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#a855f7]"></div>
 
@@ -370,11 +370,23 @@
                         </div>
                     </div>
 
+                    <!-- Дополнительная капсула шага S (показывается только при выборе прокладки «В плоскости») -->
+                    <div id="hv-flat-spacing-row" class="hidden pt-0.5">
+                        <div class="pill-control px-3 py-1 flex items-center justify-between">
+                            <span class="text-[10px] text-slate-300">Шаг между осями фаз в плоскости (S):</span>
+                            <div class="flex items-center gap-1">
+                                <input id="hv-flat-spacing" type="number" step="10" min="40" max="500" value="100" oninput="runHvCalculation()"
+                                    class="w-14 bg-transparent text-right font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
+                                <span class="text-[10px] text-slate-400">мм</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Ряд 2 капсул: Длина L, м | Нагрузка (кВт / А по клику) | cos φ -->
                     <div class="grid grid-cols-12 gap-1.5 items-center">
                         <div class="col-span-4 pill-control px-2.5 py-1 flex items-center justify-center gap-0.5">
                             <span class="text-[10px] text-slate-400 shrink-0">L:</span>
-                            <input id="hv-length" type="number" step="10" min="1" value="850" oninput="runHvCalculation()"
+                            <input id="hv-length" type="number" step="50" min="1" value="2400" oninput="runHvCalculation()"
                                 class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
                             <span class="text-[10px] text-slate-400 shrink-0">м</span>
                         </div>
@@ -397,7 +409,7 @@
                     <div class="grid grid-cols-12 gap-1.5 items-center">
                         <div class="col-span-4 pill-control px-2.5 py-1 flex items-center justify-center gap-0.5">
                             <span class="text-[10px] text-slate-400 shrink-0">Iкз:</span>
-                            <input id="hv-ikz" type="number" step="0.5" min="0.1" value="10.0" oninput="runHvCalculation()"
+                            <input id="hv-ikz" type="number" step="0.5" min="0.1" value="15.24" oninput="runHvCalculation()"
                                 class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
                             <span class="text-[10px] text-[#a855f7] font-bold shrink-0">кА</span>
                         </div>
@@ -410,7 +422,7 @@
                         </div>
 
                         <div class="col-span-4 pill-control px-2 py-1 text-center font-mono text-[10px] text-slate-300 truncate">
-                            I⁽²⁾: <strong id="hv-ikz2-inline" class="text-[#a855f7]">8.66 кА</strong>
+                            I⁽²⁾: <strong id="hv-ikz2-inline" class="text-[#a855f7]">13.20 кА</strong>
                         </div>
                     </div>
 
@@ -458,7 +470,7 @@
                     </div>
                 </div>
 
-                <!-- Результаты автоподбора жилы, экрана и проверок ТКЗ (Стиль №3) -->
+                <!-- Результаты: 1. Жила, 2. Экран, 3. Схема заземления (50 В и транспозиция), 4. Проверки КЗ -->
                 <div id="hv-results-box" class="space-y-3"></div>
             </section>
 
@@ -551,6 +563,30 @@
             }
         };
 
+        // Усреднённые каталожные геометрические параметры кабелей АПвПг/ПвПг 10 кВ:
+        // dOut — базовый наружный диаметр кабеля (мм), dScr — базовый средний диаметр по экрану (мм)
+        const XLPE_GEOM_DB = {
+            50:  { dOut: 29, dScr: 22 },
+            70:  { dOut: 31, dScr: 24 },
+            95:  { dOut: 33, dScr: 26 },
+            120: { dOut: 35, dScr: 28 },
+            150: { dOut: 37, dScr: 30 },
+            185: { dOut: 39, dScr: 31 },
+            240: { dOut: 42, dScr: 33 },
+            500: { dOut: 52, dScr: 43 }
+        };
+
+        // Поправка к диаметрам при увеличении сечения медного экрана (мм)
+        function getCableGeometry(coreSec, screenSec) {
+            const base = XLPE_GEOM_DB[coreSec] || XLPE_GEOM_DB[240];
+            let delta = 0;
+            if (screenSec >= 150) delta = 5;
+            else if (screenSec >= 120) delta = 4;
+            else if (screenSec >= 95) delta = 3;
+            else if (screenSec >= 70) delta = 1;
+            return { dOut: base.dOut + delta, dScr: base.dScr + delta };
+        }
+
         const R_X_DB = {
             1.5: [12.1, 19.5, 0.095, 0.140], 2.5: [7.41, 12.0, 0.090, 0.135], 4: [4.61, 7.41, 0.085, 0.130],
             6: [3.08, 4.61, 0.080, 0.125], 10: [1.83, 3.08, 0.075, 0.120], 16: [1.15, 1.91, 0.070, 0.112],
@@ -585,17 +621,23 @@
             lvSegs: [
                 { id: 1, name: 'ТП-10/0.4 → ВРУ-1', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 }
             ],
-            hv: { ins: 'XLPE', mat: 'Al', lay: 'triangle', par: 1, k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88, mode: 'P', val: 5000, len: 850, cos: 0.93, ikz: 10.0, t: 1.5, limit: 5.0, selectedCore: null, selectedScreen: null }
+            hv: {
+                ins: 'XLPE', mat: 'Al', lay: 'triangle', flatS: 100, par: 1,
+                k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88,
+                mode: 'P', val: 5000, len: 2400, cos: 0.93,
+                ikz: 15.24, t: 1.5, limit: 5.0,
+                selectedCore: null, selectedScreen: null
+            }
         };
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v14'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v15'));
                 if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v14', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v15', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -621,7 +663,7 @@
                 switchLvSubTab(state.lvSub || 'drop');
             } else if (mod === 'hv') {
                 document.getElementById('view-hv').classList.remove('hidden');
-                sub.textContent = 'Модуль 10 кВ • Подбор жилы, экрана и проверка ТКЗ';
+                sub.textContent = 'Модуль 10 кВ • Жила, экран, транспозиция и ТКЗ';
                 nav.innerHTML = `<div class="grid grid-cols-2 gap-2">
                     <button onclick="openModule('hub')" class="py-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 hover:text-white font-bold text-xs">← Назад</button>
                     <div class="flex items-center justify-center py-2.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs">Подбор КЛ 10 кВ</div>
@@ -974,10 +1016,11 @@
             saveState(); renderLvSegments(); updateLvSummary(); switchLvSubTab('drop'); showToast('Добавлено в схему 0,4 кВ');
         }
 
-        // === МОДУЛЬ 10 кВ (В СТИЛЕ №3) ===
+        // === МОДУЛЬ 10 кВ (АВТОПОДБОР ЖИЛЫ, ЭКРАНА, СХЕМЫ ЗАЗЕМЛЕНИЯ И ТРАНСПОЗИЦИИ) ===
         function initHvControls() {
             document.getElementById('hv-insulation').value = state.hv.ins;
             document.getElementById('hv-laying-select').value = state.hv.lay;
+            document.getElementById('hv-flat-spacing').value = state.hv.flatS || 100;
             document.getElementById('hv-parallel').value = state.hv.par;
             document.getElementById('hv-length').value = state.hv.len;
             document.getElementById('hv-load-val').value = state.hv.val;
@@ -1025,6 +1068,10 @@
             const isXlpe = state.hv.ins === 'XLPE';
             const layWrap = document.getElementById('hv-laying-pill-wrap');
             if (layWrap) layWrap.style.opacity = isXlpe ? '1' : '0.45';
+
+            // Показываем капсулу шага S (мм) только для СПЭ в плоскости
+            const flatRow = document.getElementById('hv-flat-spacing-row');
+            if (flatRow) flatRow.classList.toggle('hidden', !(isXlpe && state.hv.lay === 'flat'));
 
             document.getElementById('hv-cable-mark-badge').textContent = isXlpe
                 ? `${state.hv.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'} (${state.hv.lay === 'triangle' ? '△' : '—'})`
@@ -1077,6 +1124,7 @@
         function runHvCalculation() {
             const h = state.hv;
             h.par = +document.getElementById('hv-parallel').value || 1;
+            h.flatS = Math.max(30, +document.getElementById('hv-flat-spacing').value || 100);
             h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
             h.val = Math.max(0.1, +document.getElementById('hv-load-val').value || 100);
             h.cos = Math.min(1, Math.max(0.3, +document.getElementById('hv-cosphi').value || 0.93));
@@ -1085,10 +1133,11 @@
             h.k2 = +document.getElementById('hv-k2').value || 1.00;
             h.k3 = +document.getElementById('hv-k3').value || 1.00;
             h.k4 = +document.getElementById('hv-k4').value || 0.88;
-            h.ikz = Math.max(0.1, +document.getElementById('hv-ikz').value || 10.0);
+            h.ikz = Math.max(0.1, +document.getElementById('hv-ikz').value || 15.24);
             h.t = Math.max(0.05, +document.getElementById('hv-tkz-time').value || 1.5);
             saveState();
 
+            // 1. Автоподбор сечения жилы
             const allCores = HV_SECS.map(s => evalHv(s, h));
             const recCoreIdx = allCores.findIndex(x => x.okAll);
             const recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
@@ -1103,6 +1152,7 @@
             const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
+            // 2. Автоподбор сечения медного экрана
             const ikz2 = activeCore.ikz2;
             const kTime = activeCore.kTime;
             const lnTerm = Math.log((350 + 228) / (70 + 228));
@@ -1121,15 +1171,84 @@
             const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
+            // 3. Расчёт наведённого напряжения на экране и выбор схемы заземления (из чата «Расчет 10кВ»)
+            const geom = getCableGeometry(activeCore.sec, activeScr.sec);
+            const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
+            const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
+            const lg2 = Math.log10(2);
+            const iOneCable = activeCore.cur / h.par; // ток в одной фазной жиле
+            const lenKm = h.len / 1000;
+
+            let xm = 0;
+            let uInduced = 0;
+            if (h.lay === 'triangle') {
+                xm = 0.144 * lgRatio;
+                uInduced = iOneCable * lenKm * xm;
+            } else {
+                const rootTerm = Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
+                xm = 0.144 * rootTerm;
+                uInduced = iOneCable * lenKm * xm;
+            }
+
+            // Логика ветвления Блока 3:
+            // Если U > 50 В -> обязательная транспозиция (делим на циклы по 3 участка так, чтобы U_участка <= 50 В и длина участка <= 1200 м)
+            // Если U <= 50 В, но (U >= 40 В или L > 1200 м) -> по ПУЭ проходит одностороннее, но рекомендуется цикл транспозиции (3 × L/3)
+            // Если U < 40 В и L <= 1200 м -> чистое одностороннее заземление
+            const minCyclesByU = Math.max(1, Math.ceil(uInduced / (50 * 3)));
+            const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600)); // чтобы участок L/(3*N) был <= 1200 м
+            const nCycles = Math.max(minCyclesByU, minCyclesByDrum);
+            const nSections = nCycles * 3;
+            const secLenM = Math.round(h.len / nSections);
+            const uNode = uInduced / nSections;
+
+            let schemeStripe = 'bg-emerald-400';
+            let schemeBadge = 'U ≤ 50 В (Норма)';
+            let schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
+            let schemeTitle = 'Одностороннее заземление экрана';
+            let schemeRecHtml = '';
+
+            if (uInduced > 50) {
+                schemeStripe = 'bg-rose-500';
+                schemeBadge = 'U > 50 В (Транспозиция)';
+                schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
+                schemeTitle = nCycles === 1 ? 'Транспозиция экранов (1 цикл)' : `Транспозиция экранов (${nCycles} цикла)`;
+                schemeRecHtml = `
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 space-y-1">
+                        <div class="text-rose-300 font-semibold">Напряжение на разомкнутом экране (${uInduced.toFixed(1)} В) превышает предел 50 В! Одностороннее заземление недопустимо.</div>
+                        <div>• <strong>Решение:</strong> разбить трассу ${h.len} м на <strong>${nSections} уч. по ~${secLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''} транспозиции).</div>
+                        <div>• Экраны по концам линии (ПС и РП) наглухо заземлить. Напряжение в узлах транспозиции снизится до <strong class="text-emerald-400">${uNode.toFixed(1)} В</strong> (&le; 50 В).</div>
+                    </div>`;
+            } else if (uInduced >= 40 || h.len > 1200) {
+                schemeStripe = 'bg-amber-400';
+                schemeBadge = 'Вблизи предела / Длинная КЛ';
+                schemeBadgeCls = 'bg-amber-500/15 text-amber-300 border-amber-400/35';
+                schemeTitle = 'Одностороннее или Транспозиция (1 цикл)';
+                const l3 = Math.round(h.len / 3);
+                const u3 = uInduced / 3;
+                schemeRecHtml = `
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-amber-400/35 rounded-xl p-2.5 space-y-1">
+                        <div class="text-amber-300 font-semibold">По ПУЭ условие ${uInduced.toFixed(1)} В &le; 50 В выполняется (допустимо одностороннее заземление с ОПН).</div>
+                        <div>• <strong>Практическая рекомендация:</strong> т.к. ${h.len > 1200 ? `длина ${h.len} м превышает строительную длину барабана (~1000 м)` : `запас до порога 50 В мал`}, оптимально применить <strong>1 цикл транспозиции: 3 участка по ~${l3} м</strong>.</div>
+                        <div>• При транспозиции оба конца наглухо заземляются, а напряжение в муфтах упадёт до <strong class="text-emerald-400">${u3.toFixed(1)} В</strong>.</div>
+                    </div>`;
+            } else {
+                schemeRecHtml = `
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
+                        <div class="text-emerald-300 font-semibold">Условие электробезопасности (${uInduced.toFixed(1)} В &le; 50 В) выполняется с запасом.</div>
+                        <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление</strong> на всю длину трассы <strong>L = ${h.len} м</strong>.</div>
+                        <div>• Экран заземляется на питающей ПС, на приёмном конце изолируется и защищается ОПН. Циркулирующих токов и потерь в экране нет.</div>
+                    </div>`;
+            }
+
             const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
 
-            // 1. Карточка расчётного сечения жилы (Стиль №3)
+            // БЛОК 1: Расчётное сечение жилы
             const coreSelectionHtml = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okAll ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Расчётное сечение жилы</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Блок 1 • Расчётное сечение жилы</span>
                             ${recCore
                                 ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${recCore.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${h.mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>`
                                 : `<div class="text-sm font-bold text-rose-400 mt-1">Недостаточно 500 мм² — увеличьте кол-во ниток (n)</div>`
@@ -1179,13 +1298,13 @@
                 </div>
             `;
 
-            // 2. Карточка расчётного сечения медного экрана (Стиль №3)
+            // БЛОК 2: Расчётное сечение медного экрана
             const screenSelectionHtml = h.ins === 'XLPE' ? `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#a855f7] block">Расчётное сечение медного экрана</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#a855f7] block">Блок 2 • Расчётное сечение медного экрана</span>
                             ${recScr
                                 ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${recScr.sec} мм² <span class="text-xs font-sans font-normal text-slate-400">(расч. ${sScreenCalc.toFixed(2)} мм²)</span></div>`
                                 : `<div class="text-sm font-bold text-rose-400 mt-1">Требуется экран &gt; 150 мм² (${sScreenCalc.toFixed(1)} мм²)</div>`
@@ -1229,7 +1348,40 @@
                 </div>
             ` : '';
 
-            // 3. Проверка жилы на ток КЗ (Стиль №3)
+            // БЛОК 3: Рекомендуемая схема заземления сети (наведённое напряжение и транспозиция)
+            const bondingSchemeHtml = h.ins === 'XLPE' ? `
+                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Блок 3 • Рекомендуемая схема заземления</span>
+                            <div class="text-base sm:text-lg font-extrabold text-white mt-0.5 leading-snug">${schemeTitle}</div>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">
+                            ${schemeBadge}
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1.5 text-center">
+                        <div class="pill-control py-1.5 px-2">
+                            <span class="text-[9px] text-slate-400 block">Наведённое U<sub>нав</sub></span>
+                            <strong class="text-xs font-mono ${uInduced <= 50 ? (uInduced >= 40 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong>
+                        </div>
+                        <div class="pill-control py-1.5 px-2">
+                            <span class="text-[9px] text-slate-400 block">Взаимоинд. X<sub>m</sub></span>
+                            <strong class="text-xs font-mono text-white">${xm.toFixed(4)} Ом/км</strong>
+                        </div>
+                        <div class="pill-control py-1.5 px-2">
+                            <span class="text-[9px] text-slate-400 block">Геометрия S / d<sub>э</sub></span>
+                            <strong class="text-xs font-mono text-[#00f2fe]">${sSpacing} / ${geom.dScr} мм</strong>
+                        </div>
+                    </div>
+
+                    ${schemeRecHtml}
+                </div>
+            ` : '';
+
+            // БЛОК 4: Проверка жилы и экрана на ток КЗ
             const coreKzCheckHtml = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
@@ -1258,7 +1410,6 @@
                 </div>
             `;
 
-            // 4. Проверка экрана кабеля на ток КЗ (Стиль №3)
             const screenKzCheckHtml = h.ins === 'XLPE' ? `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
@@ -1287,7 +1438,7 @@
                 </div>
             ` : '';
 
-            document.getElementById('hv-results-box').innerHTML = coreSelectionHtml + screenSelectionHtml + coreKzCheckHtml + screenKzCheckHtml;
+            document.getElementById('hv-results-box').innerHTML = coreSelectionHtml + screenSelectionHtml + bondingSchemeHtml + coreKzCheckHtml + screenKzCheckHtml;
         }
 
         // === СПРАВОЧНИК ===
