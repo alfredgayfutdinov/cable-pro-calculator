@@ -85,26 +85,32 @@
         <div class="pointer-events-none absolute -top-24 -left-20 w-64 h-64 rounded-full bg-[#00f2fe]/10 blur-[80px] z-0"></div>
         <div class="pointer-events-none absolute top-1/3 -right-24 w-72 h-72 rounded-full bg-[#8b5cf6]/15 blur-[90px] z-0"></div>
 
-        <!-- Закреплённая шапка с кнопкой «Назад» слева -->
-        <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-3.5 pt-safe pb-3 z-40 relative flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
-            <button type="button" id="header-back-btn" onclick="openModule('hub')"
-                class="hidden absolute left-3 bottom-3.5 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/8 hover:bg-white/15 active:scale-95 border border-[#8b5cf6]/35 text-xs font-bold text-[#00f2fe] transition shadow-sm">
-                <svg class="w-4 h-4 -ml-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                </svg>
-                <span>Назад</span>
-            </button>
-
-            <div class="flex items-center justify-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#00f2fe] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-violet-600/35">
-                    <svg class="w-4 h-4 text-[#090814]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
+        <!-- Закреплённая шапка без наложения текстов (3-колоночная сетка сверху + отдельная строка подзаголовка) -->
+        <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-3 pt-safe pb-2.5 z-40 flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
+            <div class="w-full grid grid-cols-[80px_1fr_80px] items-center">
+                <div class="flex items-center justify-start">
+                    <button type="button" id="header-back-btn" onclick="openModule('hub')"
+                        class="hidden inline-flex items-center gap-0.5 px-2.5 py-1 rounded-full bg-white/8 hover:bg-white/15 active:scale-95 border border-[#8b5cf6]/35 text-[11px] font-bold text-[#00f2fe] transition shadow-sm whitespace-nowrap">
+                        <svg class="w-3.5 h-3.5 -ml-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>Назад</span>
+                    </button>
                 </div>
-                <h1 class="text-base font-bold tracking-tight text-white leading-none">КабельПро</h1>
-                <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-[#00f2fe] border border-[#00f2fe]/35 tracking-wide">PRO / by ARG</span>
+
+                <div class="flex items-center justify-center gap-1.5 min-w-0">
+                    <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-[#00f2fe] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-violet-600/35 shrink-0">
+                        <svg class="w-3.5 h-3.5 text-[#090814]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-sm sm:text-base font-bold tracking-tight text-white leading-none whitespace-nowrap">КабельПро</h1>
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-[#00f2fe] border border-[#00f2fe]/35 tracking-wide whitespace-nowrap">PRO / by ARG</span>
+                </div>
+
+                <div></div>
             </div>
-            <p id="header-subtitle" class="text-[11px] text-slate-400 mt-1">Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ</p>
+            <p id="header-subtitle" class="text-[11px] text-slate-400 mt-1.5 leading-tight px-2 truncate max-w-full">Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ</p>
         </header>
 
         <!-- Основная прокручиваемая область -->
@@ -478,7 +484,7 @@
                     </div>
                 </div>
 
-                <!-- Результаты: 1. Жила, 2. Экран, 3. Схема заземления по М.В. Дмитриеву (50В, 5кВ при Iкз(3) и Kи), 4. Проверки ТКЗ -->
+                <!-- Результаты: Жила, Экран, Схема заземления, Проверки ТКЗ -->
                 <div id="hv-results-box" class="space-y-3"></div>
             </section>
 
@@ -1171,7 +1177,7 @@
             const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
-            // 2. Автоподбор сечения медного экрана (по току двойного замыкания на землю Iкз(2))
+            // 2. Автоподбор сечения медного экрана
             const ikz2 = activeCore.ikz2;
             const kTime = activeCore.kTime;
             const lnTerm = Math.log((350 + 228) / (70 + 228));
@@ -1190,14 +1196,13 @@
             const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
-            // 3. Расчёт по методике М.В. Дмитриева:
-            // 3.1. Наведённое напряжение в нормальном режиме (≤ 50 В) и при внешнем 3-фазном КЗ Iкз(3) (≤ 5,0 кВ, табл. 4.6 и 4.8 книги)
+            // 3. Расчёт по методике М.В. Дмитриева
             const geom = getCableGeometry(activeCore.sec, activeScr.sec);
             const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
             const lg2 = Math.log10(2);
             const iOneCable = activeCore.cur / h.par;
-            const ikz3OneCableKa = h.ikz / h.par; // полный 3-фазный ток КЗ на одну нитку, кА (по табл. 4.6 М.В. Дмитриева для сетей 6-35 кВ)
+            const ikz3OneCableKa = h.ikz / h.par;
             const lenKm = h.len / 1000;
 
             let xm = 0;
@@ -1211,14 +1216,10 @@
             const uInduced = iOneCable * lenKm * xm;           // Нормальный режим, В (лимит ≤ 50 В)
             const uKzInducedKv = ikz3OneCableKa * lenKm * xm;  // Внешнее 3ф КЗ Iкз(3), кВ (лимит ≤ 5.0 кВ)
 
-            // 3.2. Расчёт коэффициента использования пропускной способности Kи при глухом 2-стороннем заземлении (Глава 6 книги М.В. Дмитриева)
-            // Погонное сопротивление медного экрана Rэ (Ом/км) и жилы Rж (Ом/км) при рабочей температуре (~50°C по п.3.1 книги: ρ_Cu = 2.0e-8, ρ_Al = 3.2e-8 Ом·м)
             const rScreenOhmKm = 20.0 / activeScr.sec;
             const rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / activeCore.sec;
-            // Отношение токов в экране и жиле (формула 5.1) и отношение потерь Dp = Pэ/Pж (формула 6.1)
             const iScreenRatio = 1 / Math.sqrt(1 + Math.pow(rScreenOhmKm / xm, 2));
             const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
-            // Коэффициент использования пропускной способности Kи (формула 6.2)
             const kiFactor = 1 / Math.sqrt(1 + dpLossRatio);
             const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
             const okSolidBonding = iDopSolidBonding >= activeCore.cur;
@@ -1279,7 +1280,6 @@
                     </div>`;
             }
 
-            // Плашка оценки двухстороннего заземления по Гл. 6 книги М.В. Дмитриева
             const solidBondingHtml = `
                 <div class="text-[11px] leading-relaxed bg-[#0b0a17]/75 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-1">
                     <div class="flex items-center justify-between gap-2">
@@ -1297,13 +1297,13 @@
 
             const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
 
-            // БЛОК 1: Расчётное сечение жилы
+            // Карточка 1: Расчётное сечение жилы (без надписи БЛОК 1)
             const coreSelectionHtml = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okAll ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Блок 1 • Расчётное сечение жилы</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Расчётное сечение жилы</span>
                             ${recCore
                                 ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${recCore.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${h.mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>`
                                 : `<div class="text-sm font-bold text-rose-400 mt-1">Недостаточно 500 мм² — увеличьте кол-во ниток (n)</div>`
@@ -1353,13 +1353,13 @@
                 </div>
             `;
 
-            // БЛОК 2: Расчётное сечение медного экрана
+            // Карточка 2: Расчётное сечение медного экрана (без надписи БЛОК 2)
             const screenSelectionHtml = h.ins === 'XLPE' ? `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#a855f7] block">Блок 2 • Расчётное сечение медного экрана</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#a855f7] block">Расчётное сечение медного экрана</span>
                             ${recScr
                                 ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${recScr.sec} мм² <span class="text-xs font-sans font-normal text-slate-400">(расч. ${sScreenCalc.toFixed(2)} мм²)</span></div>`
                                 : `<div class="text-sm font-bold text-rose-400 mt-1">Требуется экран &gt; 150 мм² (${sScreenCalc.toFixed(1)} мм²)</div>`
@@ -1403,13 +1403,13 @@
                 </div>
             ` : '';
 
-            // БЛОК 3: Рекомендуемая схема заземления сети по М.В. Дмитриеву (≤ 50 В, ≤ 5,0 кВ при Iкз(3) и Kи при 2-стор. заземлении)
+            // Карточка 3: Рекомендуемая схема заземления (без надписи БЛОК 3)
             const bondingSchemeHtml = h.ins === 'XLPE' ? `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Блок 3 • Рекомендуемая схема заземления</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Рекомендуемая схема заземления</span>
                             <div class="text-base sm:text-lg font-extrabold text-white mt-0.5 leading-snug">${schemeTitle}</div>
                         </div>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">
@@ -1441,7 +1441,7 @@
                 </div>
             ` : '';
 
-            // БЛОК 4: Проверка жилы и экрана на ток КЗ
+            // Карточка 4: Проверка жилы и экрана на ток КЗ
             const coreKzCheckHtml = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
