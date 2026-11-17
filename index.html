@@ -14,6 +14,7 @@
     <link id="apple-touch-icon-link" rel="apple-touch-icon" sizes="180x180" href="">
     <link id="pwa-manifest-link" rel="manifest" href="">
 
+    <!-- Библиотека для генерации Word-отчета -->
     <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
 
     <script>
@@ -87,6 +88,7 @@
         <div class="pointer-events-none absolute -top-24 -left-20 w-64 h-64 rounded-full bg-[#00f2fe]/10 blur-[80px] z-0"></div>
         <div class="pointer-events-none absolute top-1/3 -right-24 w-72 h-72 rounded-full bg-[#8b5cf6]/15 blur-[90px] z-0"></div>
 
+        <!-- Закреплённая шапка -->
         <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-3 pt-safe pb-2.5 z-40 flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
             <div class="w-full grid grid-cols-[80px_1fr_80px] items-center">
                 <div class="flex items-center justify-start">
@@ -113,8 +115,10 @@
             <p id="header-subtitle" class="text-[11px] text-slate-400 mt-1.5 leading-tight px-2 truncate max-w-full">Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ</p>
         </header>
 
+        <!-- Основная прокручиваемая область -->
         <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-6 px-3.5 pt-3 space-y-3 relative z-10">
 
+            <!-- СТАРТОВЫЙ ЭКРАН-ХАБ -->
             <section id="view-hub" class="space-y-3.5 pt-1">
                 <div class="px-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-[#00f2fe]">Выберите раздел расчёта</span>
@@ -272,6 +276,7 @@
                     </div>
                 </div>
 
+                <!-- ПОДВКЛАДКА 1: КАБЕЛЬ И ЭКРАН 10 кВ -->
                 <div id="hv-subtab-cable" class="space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
@@ -362,7 +367,7 @@
                                 <span class="text-[9px] text-slate-400">L₃ (м):</span><input id="hv-t-l3" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
                             </div>
                         </div>
-                        <div id="hv-transp-manual-hint" class="hidden text-[9px] text-slate-400 leading-tight">Сумма длин L₁+L₂+L₃ формирует 1 цикл. Общая длина L пересчитывается автоматически (N × Lцикла). Разные длины участков вызовут уравнительные токи (Kт > 0).</div>
+                        <div id="hv-transp-manual-hint" class="hidden text-[9px] text-slate-400 leading-tight">Сумма длин L₁+L₂+L₃ формирует 1 цикл. Общая длина L пересчитывается автоматически. Разные длины участков вызовут уравнительные токи (Kт > 0).</div>
                     </div>
 
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
@@ -510,24 +515,21 @@
                 tariff: 9.0, tau: 8760, horizon: 10, transpCost: 2.5,
                 selectedCore: null, selectedScreen: null
             },
-            hv_word_data: null // Данные для экспорта
+            hv_word_data: null
         };
 
-        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v25')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
-        function saveState() { try { localStorage.setItem('kabelpro_v25', JSON.stringify(state)); } catch (e) {} }
+        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v26')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
+        function saveState() { try { localStorage.setItem('kabelpro_v26', JSON.stringify(state)); } catch (e) {} }
 
         // --- word export logic ---
         function generateWordReport() {
             if (!state.hv_word_data) { alert("Сначала выполните расчёт 10 кВ!"); return; }
             const d = state.hv_word_data;
-            const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, WidthType, BorderStyle, ShadingType } = docx;
+            const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, WidthType } = docx;
 
             const doc = new Document({
-                creator: "КабельПро PRO",
-                title: "Отчет по расчету КЛ 10 кВ",
-                styles: {
-                    default: { document: { run: { font: "Times New Roman", size: 24 }, paragraph: { spacing: { line: 276 } } } }
-                },
+                creator: "КабельПро PRO", title: "Отчет по расчету КЛ 10 кВ",
+                styles: { default: { document: { run: { font: "Times New Roman", size: 24 }, paragraph: { spacing: { line: 276 } } } } },
                 sections: [{
                     properties: {},
                     children: [
@@ -553,41 +555,26 @@
                         new Paragraph({ text: "Расчет токовой нагрузки на фазу:" }),
                         new Paragraph({ text: `Ip = P / (√3 · U · cos φ) = ${d.pVal} / (1.732 · 10 · ${d.cos}) = ${d.ip} А`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Коэффициент снижения пропускной способности Кобщ = ${d.kTotal} (включает К1=${d.k1}, К2=${d.k2}, К3=${d.k3}, К4=${d.k4}).` }),
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Принято сечение жилы: ", bold: true }),
-                            new TextRun({ text: `${d.coreMark}\n`, bold: true, color: "009600" })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Принято сечение жилы: ", bold: true }), new TextRun({ text: `${d.coreMark}\n`, bold: true, color: "009600" })]}),
                         new Paragraph({ text: "Проверка по длительно допустимому току:" }),
                         new Paragraph({ text: `Iдоп = Iтабл · Кобщ = ${d.baseIdop} А · ${d.kTotal} = ${d.iDopFact} А`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: Iдоп (${d.iDopFact} А) ≥ Ip (${d.ip} А)`, bullet: { level: 0 } }),
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Вывод: ", bold: true }),
-                            new TextRun({ text: `Допустимый ток нагрузки (${d.iDopFact} А) имеет достаточный запас по сравнению с расчетным током (${d.ip} А). Загрузка жилы составляет ${d.loadPct}%. Условие нагрева выполняется.` })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Допустимый ток нагрузки (${d.iDopFact} А) имеет достаточный запас по сравнению с расчетным током (${d.ip} А). Загрузка жилы составляет ${d.loadPct}%. Условие нагрева выполняется.` })]}),
                         new Paragraph({ text: "Проверка по потере напряжения:" }),
                         new Paragraph({ text: `ΔU = (√3 · Ip · L · (R0·cos φ + X0·sin φ)) / (U · 1000) = ${d.dPct}%`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: ΔU (${d.dPct}%) ≤ ΔUдоп (${d.limit}%)`, bullet: { level: 0 } }),
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Вывод: ", bold: true }),
-                            new TextRun({ text: `Потеря напряжения ${d.dPct}% меньше допустимого значения ${d.limit}%. Условие выполняется.` })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Потеря напряжения ${d.dPct}% меньше допустимого значения ${d.limit}%. Условие выполняется.` })]}),
 
                         new Paragraph({ text: "3. Расчетное сечение медного экрана", heading: HeadingLevel.HEADING_1 }),
                         new Paragraph({ text: "В сетях 10 кВ с изолированной/компенсированной нейтралью наиболее тяжелым режимом для экрана является двойное замыкание на землю. Ток двойного замыкания на землю пересчитывается из трехфазного тока КЗ:" }),
                         new Paragraph({ text: `Iкз⁽²⁾ = Iкз⁽³⁾ · (√3 / 2) = ${d.ikz3} · 0.866 = ${d.ikz2} кА`, bullet: { level: 0 } }),
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Принято сечение медного экрана: ", bold: true }),
-                            new TextRun({ text: `${d.scrSec} мм²\n`, bold: true, color: "009600" })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Принято сечение медного экрана: ", bold: true }), new TextRun({ text: `${d.scrSec} мм²\n`, bold: true, color: "009600" })]}),
                         new Paragraph({ text: "Проверка экрана на термическую стойкость:" }),
                         new Paragraph({ text: `Допустимый односекундный ток КЗ для экрана ${d.scrSec} мм² составляет I1с = ${d.scrI1s} кА.`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Тепловой коэффициент с учетом времени отключения K = 1 / √t = 1 / √${d.tkz} = ${d.kTime}`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Допустимый ток экрана Iдоп.экр = I1с · K = ${d.scrI1s} · ${d.kTime} = ${d.scrIPerm} кА`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: Iдоп.экр (${d.scrIPerm} кА) ≥ Iкз⁽²⁾ (${d.ikz2} кА)`, bullet: { level: 0 } }),
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Вывод: ", bold: true }),
-                            new TextRun({ text: `Допустимый ток КЗ для выбранного экрана ${d.scrSec} мм² (${d.scrIPerm} кА) больше реального тока КЗ (${d.ikz2} кА). Экран выдержит выделяемое тепло за ${d.tkz} секунды аварии. Термическая стойкость обеспечена.` })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Допустимый ток КЗ для выбранного экрана ${d.scrSec} мм² (${d.scrIPerm} кА) больше реального тока КЗ (${d.ikz2} кА). Экран выдержит выделяемое тепло за ${d.tkz} секунды аварии. Термическая стойкость обеспечена.` })]}),
 
                         new Paragraph({ text: "4. Выбор схемы заземления экранов", heading: HeadingLevel.HEADING_1 }),
                         new Paragraph({ text: `Для обоснования схемы заземления необходимо проверить два критерия наведенного напряжения на экране (при условии одностороннего заземления на всю длину L = ${d.len} м).` }),
@@ -604,16 +591,9 @@
                         new Paragraph({ text: `Uкз = Iкз⁽³⁾ · L · Xm = ${d.ikz3 * 1000} · ${d.lenKm} · ${d.xm} = ${d.uKzInduced} кВ`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: Uкз (${d.uKzInduced} кВ) ≤ 5.0 кВ`, bullet: { level: 0 } }),
 
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Промежуточный вывод: ", bold: true }),
-                            new TextRun({ text: d.groundingLogicText })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Промежуточный вывод: ", bold: true }), new TextRun({ text: d.groundingLogicText })]}),
 
-                        new Paragraph({ children: [
-                            new TextRun({ text: "Рекомендуемая схема: ", bold: true }),
-                            new TextRun({ text: `${d.schemeTitle}\n`, bold: true, color: "009600" }),
-                            new TextRun({ text: d.schemeRecHtmlClean })
-                        ]}),
+                        new Paragraph({ children: [new TextRun({ text: "Рекомендуемая схема: ", bold: true }), new TextRun({ text: `${d.schemeTitle}\n`, bold: true, color: "009600" }), new TextRun({ text: d.schemeRecHtmlClean })]}),
                         
                         ...(d.ktMod > 0 ? [
                             new Paragraph({ text: `Проверка узлов неидеальной транспозиции (Kт = ${d.ktMod}):`, bullet: { level: 0 } }),
@@ -672,419 +652,6 @@
                 showToast("Отчет скачан");
             });
         }
-
-        // === МОДУЛЬ 10 кВ ===
-        function initHvControls() {
-            document.getElementById('hv-insulation').value = state.hv.ins; document.getElementById('hv-laying-select').value = state.hv.lay;
-            document.getElementById('hv-flat-spacing').value = state.hv.flatS || 100; document.getElementById('hv-parallel').value = state.hv.par;
-            document.getElementById('hv-length').value = state.hv.len; document.getElementById('hv-load-val').value = state.hv.val;
-            document.getElementById('hv-cosphi').value = state.hv.cos; document.getElementById('hv-maxdrop').value = state.hv.limit;
-            document.getElementById('hv-k1').value = String(state.hv.k1.toFixed(2)); document.getElementById('hv-k2').value = String(state.hv.k2.toFixed(2));
-            document.getElementById('hv-k3').value = String(state.hv.k3.toFixed(2)); document.getElementById('hv-k4').value = String(state.hv.k4.toFixed(2));
-            document.getElementById('hv-ikz').value = state.hv.ikz; document.getElementById('hv-tkz-time').value = state.hv.t;
-            
-            document.getElementById('hv-eco-tariff').value = state.hv.tariff; document.getElementById('hv-eco-tau').value = state.hv.tau;
-            document.getElementById('hv-eco-horizon').value = state.hv.horizon; document.getElementById('hv-eco-cost').value = state.hv.transpCost;
-            
-            document.getElementById('hv-t-n').value = state.hv.nCycles || 1;
-            document.getElementById('hv-t-l1').value = state.hv.l1 || 800;
-            document.getElementById('hv-t-l2').value = state.hv.l2 || 800;
-            document.getElementById('hv-t-l3').value = state.hv.l3 || 800;
-
-            updateHvUI();
-        }
-
-        function onHvLengthInputMain() {
-            if (state.hv.transpMode === 'manual') return; 
-            state.hv.len = Math.max(1, +document.getElementById('hv-length').value || 100);
-            saveState(); runHvCalculation();
-        }
-        function onHvCableTypeChange() { state.hv.ins = document.getElementById('hv-insulation').value; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
-        function toggleHvMaterial() { state.hv.mat = (state.hv.mat === 'Cu') ? 'Al' : 'Cu'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
-        function setHvLaying(l) { state.hv.lay = l; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
-        function toggleHvLoadMode() { state.hv.mode = (state.hv.mode === 'P') ? 'I' : 'P'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
-        function pickHvCore(sec) { state.hv.selectedCore = sec; saveState(); runHvCalculation(); }
-        function pickHvScreen(sec) { state.hv.selectedScreen = sec; saveState(); runHvCalculation(); }
-
-        function toggleTranspMode() {
-            state.hv.transpMode = state.hv.transpMode === 'manual' ? 'auto' : 'manual';
-            saveState(); updateHvUI(); runHvCalculation();
-        }
-
-        function onHvManualTransp() {
-            if (state.hv.transpMode !== 'manual') return;
-            state.hv.nCycles = Math.max(1, +document.getElementById('hv-t-n').value || 1);
-            state.hv.l1 = Math.max(0, +document.getElementById('hv-t-l1').value || 0);
-            state.hv.l2 = Math.max(0, +document.getElementById('hv-t-l2').value || 0);
-            state.hv.l3 = Math.max(0, +document.getElementById('hv-t-l3').value || 0);
-            state.hv.len = state.hv.nCycles * (state.hv.l1 + state.hv.l2 + state.hv.l3) || 1;
-            document.getElementById('hv-length').value = state.hv.len;
-            saveState(); runHvCalculation();
-        }
-
-        function updateHvUI() {
-            const isXlpe = state.hv.ins === 'XLPE', isManual = state.hv.transpMode === 'manual';
-            const layWrap = document.getElementById('hv-laying-pill-wrap'); if (layWrap) layWrap.style.opacity = isXlpe ? '1' : '0.45';
-            const flatRow = document.getElementById('hv-flat-spacing-row'); if (flatRow) flatRow.classList.toggle('hidden', !(isXlpe && state.hv.lay === 'flat'));
-            document.getElementById('hv-cable-mark-badge').textContent = isXlpe ? `${state.hv.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'} (${state.hv.lay === 'triangle' ? '△' : '—'})` : `${state.hv.mat === 'Al' ? 'ААБл-10' : 'СБл-10'} (3ж)`;
-            const matBtn = document.getElementById('hv-mat-pill-btn');
-            if (state.hv.mat === 'Al') { matBtn.textContent = 'Алюм. (Al)'; matBtn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center'; }
-            else { matBtn.textContent = 'Медь (Cu)'; matBtn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-amber-500/30 text-amber-300 text-center'; }
-            const unitBtn = document.getElementById('hv-mode-unit-btn'); if (unitBtn) unitBtn.textContent = state.hv.mode === 'P' ? 'кВт' : 'А';
-
-            const lenInput = document.getElementById('hv-length');
-            if (lenInput) { lenInput.readOnly = isManual; lenInput.style.opacity = isManual ? '0.5' : '1'; }
-            const btnMode = document.getElementById('btn-transp-mode'), boxManual = document.getElementById('hv-transp-manual-box'), hintManual = document.getElementById('hv-transp-manual-hint');
-            if (btnMode) { btnMode.textContent = isManual ? 'Ручной ввод' : 'Автовыбор'; btnMode.className = isManual ? 'px-2 py-1 rounded text-[10px] font-bold border border-amber-400/40 text-amber-400 bg-amber-400/10 transition active:scale-95' : 'px-2 py-1 rounded text-[10px] font-bold border border-[#00f2fe]/40 text-[#00f2fe] bg-[#00f2fe]/10 transition active:scale-95'; }
-            if (boxManual) { if (isManual) { boxManual.classList.remove('hidden'); boxManual.classList.add('grid'); hintManual.classList.remove('hidden'); } else { boxManual.classList.remove('grid'); boxManual.classList.add('hidden'); hintManual.classList.add('hidden'); } }
-        }
-
-        function evalHv(sec, h) {
-            const rx = R_X_DB[sec] || R_X_DB[240];
-            const r0 = h.mat === 'Cu' ? rx[0] : rx[1], x0 = rx[3] * ((h.ins === 'XLPE' && h.lay === 'flat') ? 1.25 : 1.0);
-            const baseIdop = (AMP_DB[h.ins][h.mat][sec] || [200])[0], layFactor = (h.ins === 'XLPE' && h.lay === 'flat') ? 0.92 : 1.0;
-            const kTotal = +(h.k1 * h.k2 * h.k3 * h.k4 * layFactor).toFixed(3), iDopFact = +(baseIdop * kTotal * h.par).toFixed(1);
-            const sin = Math.sqrt(Math.max(0, 1 - h.cos * h.cos)), cur = h.mode === 'I' ? h.val : (h.val / (Math.sqrt(3) * 10 * h.cos));
-            const dV = Math.sqrt(3) * cur * (h.len / 1000) * ((r0 * h.cos + x0 * sin) / h.par), dPct = (dV / 10000) * 100;
-            const ikz2 = +(Math.sqrt(3) / 2 * h.ikz).toFixed(3), kTime = +(1 / Math.sqrt(h.t)).toFixed(3);
-            const iCore1s = (CORE_IKZ_1S[h.ins] && CORE_IKZ_1S[h.ins][h.mat][sec]) || 15, iCorePerm = +(iCore1s * kTime * h.par).toFixed(3);
-            return { sec, r0, x0, baseIdop, kTotal, iDopFact, cur, dV, dPct, loadPct: (cur / iDopFact) * 100, ikz2, kTime, iCore1s, iCorePerm, okI: iDopFact >= cur, okU: dPct <= h.limit, okCoreKz: iCorePerm > ikz2, okAll: iDopFact >= cur && dPct <= h.limit && iCorePerm > ikz2 };
-        }
-
-        function runHvCalculation() {
-            const h = state.hv;
-            h.par = +document.getElementById('hv-parallel').value || 1;
-            h.flatS = Math.max(30, +document.getElementById('hv-flat-spacing').value || 100);
-            h.val = Math.max(0.1, +document.getElementById('hv-load-val').value || 100);
-            h.cos = Math.min(1, Math.max(0.3, +document.getElementById('hv-cosphi').value || 0.93));
-            h.limit = Math.max(0.5, +document.getElementById('hv-maxdrop').value || 5.0);
-            h.k1 = +document.getElementById('hv-k1').value || 1.09; h.k2 = +document.getElementById('hv-k2').value || 1.00;
-            h.k3 = +document.getElementById('hv-k3').value || 1.00; h.k4 = +document.getElementById('hv-k4').value || 0.88;
-            h.ikz = Math.max(0.1, +document.getElementById('hv-ikz').value || 15.24); h.t = Math.max(0.05, +document.getElementById('hv-tkz-time').value || 1.5);
-            h.tariff = Math.max(0, +document.getElementById('hv-eco-tariff').value || 9.0); h.tau = Math.max(1, +document.getElementById('hv-eco-tau').value || 8760);
-            h.horizon = Math.max(1, +document.getElementById('hv-eco-horizon').value || 10); h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
-            
-            if (h.transpMode !== 'manual') {
-                h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
-            }
-            saveState();
-
-            const allCores = HV_SECS.map(s => evalHv(s, h)), recCoreIdx = allCores.findIndex(x => x.okAll), recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
-            const activeCore = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
-
-            document.getElementById('hv-k-total-badge').textContent = `Kобщ: ${activeCore.kTotal.toFixed(3)}`;
-            document.getElementById('hv-calc-ip-badge').textContent = `Ip: ${activeCore.cur.toFixed(1)} А`;
-
-            const centerCoreIdx = recCoreIdx !== -1 ? recCoreIdx : allCores.length - 2;
-            const coreSlice = allCores.slice(Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1)), Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1)) + 3);
-            const parPrefix = h.par > 1 ? `${h.par} × ` : '';
-
-            const ikz2 = activeCore.ikz2, kTime = activeCore.kTime, lnTerm = Math.log((350 + 228) / (70 + 228));
-            const sScreenCalc = Math.sqrt((Math.pow(ikz2, 2) * h.t) / (Math.pow(1.089, 2) * Math.pow(226, 2) * lnTerm)) * 1000;
-            const allScreens = SCREEN_SECS.map(s => { const iPerm = +(SCREEN_IKZ_1S[s] * kTime).toFixed(3); return { sec: s, i1s: SCREEN_IKZ_1S[s], iPerm, ok: iPerm > ikz2 }; });
-            const recScrIdx = allScreens.findIndex(x => x.ok), recScr = recScrIdx !== -1 ? allScreens[recScrIdx] : null;
-            const activeScr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
-            const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, (recScrIdx !== -1 ? recScrIdx : allScreens.length - 2) - 1));
-            const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
-
-            const geom = getCableGeometry(activeCore.sec, activeScr.sec), sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
-            const lgRatio = Math.log10((2 * sSpacing) / geom.dScr), lg2 = Math.log10(2), iOneCable = activeCore.cur / h.par, ikz3OneCableKa = h.ikz / h.par;
-            let xm = 0; if (h.lay === 'triangle') xm = 0.144 * lgRatio; else xm = 0.144 * Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
-
-            const uInducedAuto = iOneCable * (h.len / 1000) * xm, uKzInducedAutoKv = ikz3OneCableKa * (h.len / 1000) * xm;
-            const minCyclesBy50V = Math.max(1, Math.ceil(uInducedAuto / (50 * 3)));
-            const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedAutoKv / (5.0 * 3)));
-            const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
-            const autoCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
-
-            let nCycles, l1, l2, l3;
-            if (h.transpMode === 'auto') {
-                nCycles = autoCycles; l1 = h.len / (3 * nCycles); l2 = l1; l3 = l1;
-                h.nCycles = nCycles; h.l1 = l1; h.l2 = l2; h.l3 = l3;
-            } else {
-                nCycles = Math.max(1, +document.getElementById('hv-t-n').value || 1);
-                l1 = Math.max(0, +document.getElementById('hv-t-l1').value || 0);
-                l2 = Math.max(0, +document.getElementById('hv-t-l2').value || 0);
-                l3 = Math.max(0, +document.getElementById('hv-t-l3').value || 0);
-            }
-            const cycleLen = l1 + l2 + l3 || 1;
-
-            const reKt = (l1 - 0.5 * (l2 + l3)) / cycleLen;
-            const imKt = (0.5 * Math.sqrt(3) * (l2 - l3)) / cycleLen;
-            const ktMod = Math.sqrt(reKt * reKt + imKt * imKt);
-
-            const reNode1 = 1 - reKt, imNode1 = -imKt, modNode1 = Math.sqrt(reNode1*reNode1 + imNode1*imNode1);
-            const xL1 = xm * (l1 / 1000);
-            const uNode1V = xL1 * iOneCable * modNode1, uKzNode1Kv = xL1 * ikz3OneCableKa * modNode1;
-
-            const reNode2 = -0.5 - reKt, imNode2 = 0.5 * Math.sqrt(3) - imKt, modNode2 = Math.sqrt(reNode2*reNode2 + imNode2*imNode2);
-            const xL3 = xm * (l3 / 1000); 
-            const uNode2V = xL3 * iOneCable * modNode2, uKzNode2Kv = xL3 * ikz3OneCableKa * modNode2;
-
-            const maxNodeV = Math.max(uNode1V, uNode2V), maxNodeKv = Math.max(uKzNode1Kv, uKzNode2Kv);
-            const pass50VNode = maxNodeV <= 50.0, pass5kVNode = maxNodeKv <= 5.0;
-
-            const rScreenOhmKm = 20.0 / activeScr.sec, rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / activeCore.sec;
-            const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
-            const kiFactor = (1 / Math.sqrt(1 + dpLossRatio));
-            const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
-            const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * (h.len / 1000));
-            const pScreenSolidWatts = pCoreTotalWatts * dpLossRatio;
-            const moneyLostSolidYearMln = ((pScreenSolidWatts / 1000) * h.tau * h.tariff) / 1000000;
-            
-            const dpLossTransp = dpLossRatio * (ktMod * ktMod);
-            const pScreenTranspWatts = pCoreTotalWatts * dpLossTransp;
-            const moneyLostTranspYearMln = ((pScreenTranspWatts / 1000) * h.tau * h.tariff) / 1000000;
-            
-            const transpCostTotal = nCycles * h.transpCost;
-            const savingsMlnYear = moneyLostSolidYearMln - moneyLostTranspYearMln;
-            let paybackYears = Infinity;
-            if (savingsMlnYear > 0) paybackYears = transpCostTotal / savingsMlnYear;
-            const isProfitable = paybackYears <= h.horizon;
-
-            let schemeStripe = 'bg-emerald-400', schemeBadge = 'Узлы КТ: В норме', schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
-            let schemeTitle = nCycles === 1 ? 'Транспозиция (1 цикл)' : `Транспозиция (${nCycles} цикла)`;
-            let schemeType = 'transp';
-            if (ktMod === 0) {
-                if (h.transpMode !== 'manual' && uInducedAuto <= 50.0 && uKzInducedAutoKv <= 5.0 && h.len <= 1200) {
-                    schemeTitle = 'Одностороннее заземление';
-                    schemeBadge = 'КЛ не требует КТ';
-                    schemeType = 'single';
-                }
-            } else {
-                schemeTitle = nCycles === 1 ? 'Неидеальная транспозиция (1ц)' : `Неидеальная транспозиция (${nCycles}ц)`;
-            }
-
-            if (schemeType === 'transp' && (!pass50VNode || !pass5kVNode)) {
-                schemeStripe = 'bg-rose-500'; schemeBadge = 'Опасно! Узлы > нормы'; schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
-            }
-            
-            let groundingLogicText = '';
-            let schemeRecHtmlClean = '';
-            
-            if (schemeType === 'single') {
-                groundingLogicText = `Оба критерия для трассы ${h.len} м выполняются с запасом (${uInducedAuto.toFixed(1)} В ≤ 50 В и ${uKzInducedAutoKv.toFixed(2)} кВ ≤ 5.0 кВ). Длина кабеля не превышает строительную длину барабана.`;
-                schemeRecHtmlClean = `Проектное решение: применить одностороннее заземление (КТ-О) на всю трассу. Экран заземляется на питающей ПС, на приёмном конце защищается ОПН. Потерь в экране нет.`;
-            } else {
-                if (uInducedAuto > 50.0 || uKzInducedAutoKv > 5.0) {
-                    groundingLogicText = `Одностороннее заземление на всю длину (${h.len} м) не проходит: Uнав = ${uInducedAuto.toFixed(1)} В и Uкз = ${uKzInducedAutoKv.toFixed(2)} кВ. Необходимо секционирование.`;
-                } else {
-                    groundingLogicText = `Критерии электробезопасности для трассы ${h.len} м выполняются, однако длина трассы превышает стандартную строительную длину барабана (требуются соединительные муфты).`;
-                }
-                schemeRecHtmlClean = `Проектное решение: разбить трассу ${h.len} м на ${nCycles * 3} участков. Установить ${nCycles * 2} транспозиционные муфты с коробками КТ. На концах экраны наглухо заземлить без ОПН.`;
-            }
-
-            // Save data for Word export
-            state.hv_word_data = {
-                cableMark: h.ins === 'XLPE' ? (h.mat === 'Al' ? 'АПвПг-10 (Алюминий, СПЭ)' : 'ПвПг-10 (Медь, СПЭ)') : (h.mat === 'Al' ? 'ААБл-10 (Алюминий, БПИ)' : 'СБл-10 (Медь, БПИ)'),
-                layingText: h.lay === 'triangle' ? 'Треугольник △ (вплотную)' : `В плоскости — (зазор ${h.flatS} мм)`,
-                len: h.len, pVal: h.mode === 'P' ? h.val : (h.val * 1.732 * 10 * h.cos).toFixed(0), cos: h.cos, ip: activeCore.cur.toFixed(1),
-                ikz3: h.ikz, tkz: h.t, coreMark: `${parPrefix}${activeCore.sec} мм² (${h.mat === 'Cu' ? 'Медь' : 'Алюминий'})`,
-                kTotal: activeCore.kTotal.toFixed(3), k1: h.k1, k2: h.k2, k3: h.k3, k4: h.k4, baseIdop: activeCore.baseIdop, iDopFact: activeCore.iDopFact,
-                loadPct: Math.round(activeCore.loadPct), dPct: activeCore.dPct.toFixed(2), limit: h.limit,
-                ikz2: ikz2.toFixed(2), scrSec: activeScr.sec, scrI1s: activeScr.i1s.toFixed(1), kTime: kTime, scrIPerm: activeScr.iPerm.toFixed(2),
-                lenKm: (h.len / 1000).toFixed(3), xm: xm.toFixed(4), layTextGenitive: h.lay === 'triangle' ? 'сомкнутом треугольнике' : 'плоскости',
-                uInduced: uInducedAuto.toFixed(1), uKzInduced: uKzInducedAutoKv.toFixed(2),
-                schemeTitle, groundingLogicText, schemeRecHtmlClean, schemeType,
-                ktMod, passNode: (pass50VNode && pass5kVNode),
-                uNode1V: uNode1V.toFixed(1), uKzNode1Kv: uKzNode1Kv.toFixed(2),
-                uNode2V: uNode2V.toFixed(1), uKzNode2Kv: uKzNode2Kv.toFixed(2),
-                tariff: h.tariff, tau: h.tau, horizon: h.horizon, nCycles,
-                iScreenRatio, dpLossRatio, pScreenSolidWatts, moneyLostSolidYearMln: moneyLostSolidYearMln.toFixed(3),
-                kiFactor: kiFactor.toFixed(2), iDopSolidBonding,
-                pScreenTranspWatts, moneyLostTranspYearMln: moneyLostTranspYearMln.toFixed(3),
-                transpCostTotal: transpCostTotal.toFixed(2), savingsMlnYear: savingsMlnYear.toFixed(3),
-                paybackYearsText: paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1), isProfitable
-            };
-
-            const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
-
-            document.getElementById('hv-cable-results-box').innerHTML = `
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okAll ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Расчётное сечение жилы</span>
-                            ${recCore ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${recCore.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${h.mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>` : `<div class="text-sm font-bold text-rose-400 mt-1">Недостаточно 500 мм² — увеличьте (n)</div>`}
-                        </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border whitespace-nowrap ${activeCore.okAll ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">${activeCore.okAll ? 'Проходит' : 'Не проходит'}</span>
-                    </div>
-                    <div class="grid grid-cols-3 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Ток Ip</span><strong class="text-xs font-mono text-white">${activeCore.cur.toFixed(1)} А</strong></div>
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">I<sub>доп.ф</sub> (Загр.)</span><strong class="text-xs font-mono ${activeCore.okI ? 'text-[#00f2fe]' : 'text-rose-400'}">${activeCore.iDopFact} А (${Math.round(activeCore.loadPct)}%)</strong></div>
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${duCol}">${activeCore.dPct.toFixed(2)}% (${activeCore.dV.toFixed(0)}В)</strong></div>
-                    </div>
-                    <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
-                        <table class="w-full text-left text-xs">
-                            <thead><tr class="bg-[#07060e]/90 text-slate-400 text-[10px] border-b border-[#8b5cf6]/20"><th class="py-2 px-2.5 font-bold">Сечение</th><th class="py-2 px-2 font-bold">I<sub>доп</sub> (Загр)</th><th class="py-2 px-2 font-bold">&Delta;U</th><th class="py-2 px-2 text-right font-bold">Статус</th></tr></thead>
-                            <tbody>
-                                ${coreSlice.map(x => `<tr onclick="pickHvCore(${x.sec})" class="cursor-pointer border-b border-[#8b5cf6]/15 transition ${recCore && x.sec === recCore.sec ? 'bg-emerald-500/15 text-white font-bold' : (x.sec === activeCore.sec ? 'bg-[#8b5cf6]/20 text-white' : 'text-slate-300')}"><td class="py-2 px-2.5 font-mono">${parPrefix}${x.sec} мм² ${recCore && x.sec === recCore.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td><td class="py-2 px-2 font-mono ${x.okI ? '' : 'text-rose-400 font-bold'}">${x.iDopFact} А (${Math.round(x.loadPct)}%)</td><td class="py-2 px-2 font-mono ${x.okU ? '' : 'text-rose-400 font-bold'}">${x.dPct.toFixed(2)}%</td><td class="py-2 px-2 text-right font-semibold ${x.okAll ? 'text-emerald-400' : 'text-rose-400'}">${x.okAll ? 'Подходит' : (!x.okI ? 'Ток > Iдоп' : (!x.okCoreKz ? 'Мало ТКЗ' : 'ΔU > доп'))}</td></tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                ${h.ins === 'XLPE' ? `
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#a855f7] block">Расчётное сечение медного экрана</span>
-                            ${recScr ? `<div class="text-2xl font-extrabold font-mono text-white mt-0.5">${recScr.sec} мм² <span class="text-xs font-sans font-normal text-slate-400">(расч. ${sScreenCalc.toFixed(2)} мм²)</span></div>` : `<div class="text-sm font-bold text-rose-400 mt-1">Требуется экран &gt; 150 мм²</div>`}
-                        </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border whitespace-nowrap ${activeScr.ok ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">${activeScr.ok ? 'Подходит' : 'Мало'}</span>
-                    </div>
-                    <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
-                        <table class="w-full text-left text-xs">
-                            <thead><tr class="bg-[#07060e]/90 text-slate-400 text-[10px] border-b border-[#8b5cf6]/20"><th class="py-2 px-2.5 font-bold">S<sub>экр</sub></th><th class="py-2 px-2 font-bold">I<sub>кз.1с</sub></th><th class="py-2 px-2 font-bold">I<sub>доп</sub>(t=${h.t}с)</th><th class="py-2 px-2 text-right font-bold">Статус</th></tr></thead>
-                            <tbody>
-                                ${scrSlice.map(x => `<tr onclick="pickHvScreen(${x.sec})" class="cursor-pointer border-b border-[#8b5cf6]/15 transition ${recScr && x.sec === recScr.sec ? 'bg-emerald-500/15 text-white font-bold' : (x.sec === activeScr.sec ? 'bg-[#8b5cf6]/20 text-white' : 'text-slate-300')}"><td class="py-2 px-2.5 font-mono">${x.sec} мм² ${recScr && x.sec === recScr.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td><td class="py-2 px-2 font-mono text-slate-400">${x.i1s.toFixed(1)} кА</td><td class="py-2 px-2 font-mono ${x.ok ? 'text-[#00f2fe]' : 'text-rose-400 font-bold'}">${x.iPerm.toFixed(2)} кА</td><td class="py-2 px-2 text-right font-semibold ${x.ok ? 'text-emerald-400' : 'text-rose-400'}">${x.ok ? 'Подходит' : 'Мало'}</td></tr>`).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>` : ''}
-            `;
-
-            document.getElementById('hv-grounding-results-box').innerHTML = h.ins === 'XLPE' ? `
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
-                    <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Рекомендуемая схема заземления</span>
-                            <div class="text-base sm:text-lg font-extrabold text-white mt-0.5 leading-snug">${schemeTitle}</div>
-                        </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">${schemeBadge}</span>
-                    </div>
-                    
-                    ${schemeType === 'single' ? `
-                        <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
-                            <div class="text-emerald-300 font-semibold">Оба критерия для трассы ${h.len} м выполняются с запасом: Uнав = ${uInducedAuto.toFixed(1)} В (≤50В) и Uкз = ${uKzInducedAutoKv.toFixed(2)} кВ (≤5.0кВ).</div>
-                            <div>• <strong>Решение:</strong> применить одностороннее заземление (КТ-О) на всю трассу. Экран заземляется на питающей ПС, на приёмном конце защищается ОПН (потерь в экране нет).</div>
-                        </div>
-                    ` : `
-                        <div class="grid grid-cols-2 gap-1.5 text-center">
-                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 1 (≤50В):</span><strong class="text-xs font-mono ${maxNodeV > 50 ? 'text-rose-400' : 'text-emerald-400'}">${uNode1V.toFixed(1)} В</strong></div>
-                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 1 (≤5кВ):</span><strong class="text-xs font-mono ${maxNodeKv > 5.0 ? 'text-rose-400' : 'text-emerald-400'}">${uKzNode1Kv.toFixed(2)} кВ</strong></div>
-                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 2 (≤50В):</span><strong class="text-xs font-mono ${maxNodeV > 50 ? 'text-rose-400' : 'text-emerald-400'}">${uNode2V.toFixed(1)} В</strong></div>
-                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 2 (≤5кВ):</span><strong class="text-xs font-mono ${maxNodeKv > 5.0 ? 'text-rose-400' : 'text-emerald-400'}">${uKzNode2Kv.toFixed(2)} кВ</strong></div>
-                        </div>
-                        ${!pass50VNode || !pass5kVNode ? `
-                            <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 mt-1.5">
-                                <span class="text-rose-300 font-semibold">Напряжение в муфтах (Kт=${ktMod.toFixed(3)}) превышает допустимые нормы ПУЭ!</span><br>
-                                • Увеличьте число циклов транспозиции, либо сделайте длины участков более равномерными.
-                            </div>
-                        ` : `
-                            <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 mt-1.5">
-                                Напряжения на экранах в узлах КТ находятся в пределах нормы. ${ktMod > 0 ? `Коэффициент неидеальности <strong>Kт = ${ktMod.toFixed(3)}</strong> рождает небольшие уравнительные токи (см. потери ниже).` : `Идеальная транспозиция (участки равны, Kт = 0), уравнительных токов в экранах нет.`}
-                            </div>
-                        `}
-                    `}
-                </div>
-
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (!isProfitable && iDopSolidBonding >= activeCore.cur ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
-                    <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400 block">Экономическое обоснование</span>
-                    
-                    <div class="grid grid-cols-2 gap-1.5 text-center mb-1">
-                        <div class="pill-control py-1.5 px-2.5 relative border border-rose-500/30">
-                            <span class="text-[9px] text-slate-400 block mb-0.5">2-стороннее наглухо</span>
-                            <strong class="text-[11px] font-mono text-white block">Pэ: ${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>
-                            <span class="text-[9px] font-bold text-rose-400">Убыток: ${moneyLostSolidYearMln.toFixed(3)} млн/год</span>
-                        </div>
-                        <div class="pill-control py-1.5 px-2.5 relative border border-emerald-500/30">
-                            <span class="text-[9px] text-slate-400 block mb-0.5">Транспозиция (Kт=${ktMod.toFixed(2)})</span>
-                            <strong class="text-[11px] font-mono text-white block">Pэ: ${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>
-                            <span class="text-[9px] font-bold text-emerald-400">Убыток: ${moneyLostTranspYearMln.toFixed(3)} млн/год</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${isProfitable ? 'border-emerald-500/35' : 'border-amber-500/35'} rounded-xl p-2.5">
-                        Монтаж ${nCycles} цикл. транспозиции: <strong>${transpCostTotal.toFixed(2)} млн ₽</strong>.<br>
-                        ${savingsMlnYear > 0 
-                            ? (isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Срок окупаемости <strong class="text-white">${paybackYears.toFixed(1)} лет</strong> (≤ ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> в пределах ${h.horizon} лет (срок ок. ${paybackYears.toFixed(1)} лет).`)
-                            : `<span class="text-amber-300 font-bold">Транспозиция не дает экономии.</span>`}
-                    </div>
-                    
-                    ${!isProfitable ? `
-                    <div class="text-[11px] leading-relaxed bg-[#0b0a17]/75 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-1">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#d8b4fe]">Справка: Глухое 2-стороннее (без ОПН)</span>
-                            <span class="font-mono text-[10px] font-bold ${iDopSolidBonding >= activeCore.cur ? 'text-emerald-400' : 'text-rose-400'}">K<sub>и</sub> = ${(1 / Math.sqrt(1 + dpLossRatio)).toFixed(2)}</span>
-                        </div>
-                        <div class="text-slate-300">
-                            Допустимый ток жилы падает до <strong class="${iDopSolidBonding >= activeCore.cur ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong>.
-                            ${iDopSolidBonding >= activeCore.cur && h.len <= 1200 ? '<span class="text-emerald-300 block mt-0.5">✓ Если ток позволяет, на короткой трассе можно просто заземлить экраны с 2 сторон без коробок.</span>' : ''}
-                        </div>
-                    </div>` : ''}
-                </div>
-
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
-                    <div class="flex items-center justify-between gap-2">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-200 block">Проверка жилы на ток КЗ</span>
-                            <span class="text-[10px] text-slate-400">Жила ${parPrefix}${activeCore.sec} мм² • K = 1/√t = ${kTime}</span>
-                        </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeCore.okCoreKz ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${activeCore.okCoreKz ? 'Выполняется' : 'Не выполняется'}</span>
-                    </div>
-                    <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${activeCore.okCoreKz ? 'text-emerald-300' : 'text-rose-300'}">
-                        I<sub>доп.кз</sub> (${activeCore.iCorePerm.toFixed(3)} кА) ${activeCore.okCoreKz ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${ikz2.toFixed(3)} кА)
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
-                    <div class="flex items-center justify-between gap-2">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-slate-200 block">Проверка экрана кабеля на ток КЗ</span>
-                            <span class="text-[10px] text-slate-400">Экран ${activeScr.sec} мм² • K = ${kTime}</span>
-                        </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeScr.ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${activeScr.ok ? 'Выполняется' : 'Не выполняется'}</span>
-                    </div>
-                    <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${activeScr.ok ? 'text-emerald-300' : 'text-rose-300'}">
-                        I<sub>доп.экр</sub> (${activeScr.iPerm.toFixed(3)} кА) ${activeScr.ok ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${ikz2.toFixed(3)} кА)
-                    </div>
-                </div>
-            ` : '';
-        }
-
-        // === СПРАВОЧНИК ===
-        function renderReferenceTable() {
-            const mat = document.getElementById('ref-mat-filter').value, ins = document.getElementById('ref-ins-filter').value;
-            const isHv = ins === 'XLPE' || ins === 'PAPER';
-            const listSecs = isHv ? HV_SECS : LV_SECS;
-            document.getElementById('ref-table-body').innerHTML = listSecs.map(s => {
-                const rx = R_X_DB[s], amp = AMP_DB[ins][mat][s] || [100, 90];
-                const ikz1s = isHv && CORE_IKZ_1S[ins][mat][s] ? CORE_IKZ_1S[ins][mat][s].toFixed(1) : '—';
-                return `<tr class="hover:bg-[#8b5cf6]/10">
-                    <td class="py-2 px-2.5 font-bold text-white">${s}</td>
-                    <td class="py-2 px-2 text-[#00f2fe] font-bold">${amp[0]}</td>
-                    <td class="py-2 px-2 text-[#a855f7] font-semibold">${amp[1]}</td>
-                    <td class="py-2 px-2 text-emerald-400 font-semibold">${ikz1s}</td>
-                    <td class="py-2 px-2 text-slate-400">${(mat === 'Cu' ? rx[0] : rx[1]).toFixed(4)}</td>
-                    <td class="py-2 px-2.5 text-slate-400">${(isHv ? rx[3] : rx[2]).toFixed(3)}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        let toastT = null;
-        function showToast(msg) {
-            const t = document.getElementById('toast-notification');
-            document.getElementById('toast-text').textContent = msg;
-            t.classList.remove('opacity-0', 'translate-y-2'); t.classList.add('opacity-100', 'translate-y-0');
-            clearTimeout(toastT);
-            toastT = setTimeout(() => { t.classList.remove('opacity-100', 'translate-y-0'); t.classList.add('opacity-0', 'translate-y-2'); }, 2200);
-        }
-        function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-
-        window.onload = function () {
-            loadState();
-            document.getElementById('lv-custom-limit-input').value = state.lvLimit;
-            updateLvUI();
-            renderLvSegments();
-            updateLvSummary();
-            openModule('hub');
-        };
     </script>
 </body>
 </html>
