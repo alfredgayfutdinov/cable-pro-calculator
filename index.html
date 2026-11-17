@@ -87,7 +87,6 @@
 
         <!-- Закреплённая шапка с кнопкой «Назад» слева -->
         <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-3.5 pt-safe pb-3 z-40 relative flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
-            <!-- Кнопка «Назад» в верхнем баре (скрыта на главном экране) -->
             <button type="button" id="header-back-btn" onclick="openModule('hub')"
                 class="hidden absolute left-3 bottom-3.5 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/8 hover:bg-white/15 active:scale-95 border border-[#8b5cf6]/35 text-xs font-bold text-[#00f2fe] transition shadow-sm">
                 <svg class="w-4 h-4 -ml-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -143,7 +142,7 @@
                             <h2 class="text-base font-bold text-white">Расчёт КЛ 10 кВ</h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8b5cf6]/20 text-[#d8b4fe] border border-[#a855f7]/35">АПвПг / ААБл</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1 leading-snug">Подбор жилы и экрана СПЭ, проверка схемы заземления (50 В и 5 кВ при КЗ), транспозиция.</p>
+                        <p class="text-xs text-slate-400 mt-1 leading-snug">Подбор жилы и экрана СПЭ, выбор заземления по М.В. Дмитриеву (50 В, 5 кВ, K<sub>и</sub>), транспозиция.</p>
                     </div>
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-[#c084fc] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
@@ -417,7 +416,7 @@
                     <!-- Ряд 3 капсул: Ток 3ф КЗ (кА) | Время отключения (с) | Двухфазный ток КЗ -->
                     <div class="grid grid-cols-12 gap-1.5 items-center">
                         <div class="col-span-4 pill-control px-2.5 py-1 flex items-center justify-center gap-0.5">
-                            <span class="text-[10px] text-slate-400 shrink-0">Iкз:</span>
+                            <span class="text-[10px] text-slate-400 shrink-0">Iкз⁽³⁾:</span>
                             <input id="hv-ikz" type="number" step="0.5" min="0.1" value="15.24" oninput="runHvCalculation()"
                                 class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
                             <span class="text-[10px] text-[#a855f7] font-bold shrink-0">кА</span>
@@ -479,7 +478,7 @@
                     </div>
                 </div>
 
-                <!-- Результаты: 1. Жила, 2. Экран, 3. Схема заземления (50 В и 5 кВ при КЗ), 4. Проверки ТКЗ -->
+                <!-- Результаты: 1. Жила, 2. Экран, 3. Схема заземления по М.В. Дмитриеву (50В, 5кВ при Iкз(3) и Kи), 4. Проверки ТКЗ -->
                 <div id="hv-results-box" class="space-y-3"></div>
             </section>
 
@@ -639,12 +638,12 @@
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v16'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v17'));
                 if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v16', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v17', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -666,7 +665,6 @@
                 return;
             }
 
-            // Показываем кнопку «Назад» в верхнем баре во всех внутренних разделах
             backBtn.classList.remove('hidden');
             nav.classList.remove('hidden');
 
@@ -676,11 +674,11 @@
                 switchLvSubTab(state.lvSub || 'drop');
             } else if (mod === 'hv') {
                 document.getElementById('view-hv').classList.remove('hidden');
-                sub.textContent = 'Модуль 10 кВ • Жила, экран, транспозиция (50В / 5кВ)';
+                sub.textContent = 'Модуль 10 кВ • По методике М.В. Дмитриева (50В / 5кВ / Kи)';
                 nav.innerHTML = `<div class="grid grid-cols-1">
                     <div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs shadow-sm">
                         <svg class="w-4 h-4 text-[#00f2fe]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        <span>Подбор КЛ 10 кВ (Жила • Экран • Транспозиция)</span>
+                        <span>Подбор КЛ 10 кВ (Жила • Экран • Заземление)</span>
                     </div>
                 </div>`;
                 initHvControls();
@@ -705,7 +703,6 @@
             document.getElementById('lv-subtab-select').classList.toggle('hidden', isDrop);
             document.getElementById('lv-floating-dock').classList.toggle('hidden', !isDrop);
 
-            // Увеличенные по высоте нижние кнопки тапбара (py-3.5, text-xs с иконками) без кнопки Назад
             document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2">
                 <button onclick="switchLvSubTab('drop')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
                     <svg class="w-4 h-4 ${isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
@@ -1039,7 +1036,7 @@
             saveState(); renderLvSegments(); updateLvSummary(); switchLvSubTab('drop'); showToast('Добавлено в схему 0,4 кВ');
         }
 
-        // === МОДУЛЬ 10 кВ (АВТОПОДБОР ЖИЛЫ, ЭКРАНА, СХЕМЫ ЗАЗЕМЛЕНИЯ ПО 50В И 5кВ) ===
+        // === МОДУЛЬ 10 кВ (ПО МЕТОДИКЕ М.В. ДМИТРИЕВА: 50В, 5кВ ПРИ Iкз(3) И Kи ДВУХСТОРОННЕГО ЗАЗЕМЛЕНИЯ) ===
         function initHvControls() {
             document.getElementById('hv-insulation').value = state.hv.ins;
             document.getElementById('hv-laying-select').value = state.hv.lay;
@@ -1174,7 +1171,7 @@
             const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
-            // 2. Автоподбор сечения медного экрана
+            // 2. Автоподбор сечения медного экрана (по току двойного замыкания на землю Iкз(2))
             const ikz2 = activeCore.ikz2;
             const kTime = activeCore.kTime;
             const lnTerm = Math.log((350 + 228) / (70 + 228));
@@ -1193,13 +1190,14 @@
             const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
-            // 3. Расчёт наведённого напряжения в нормальном режиме (критерий ≤ 50 В) и при КЗ (критерий ≤ 5,0 кВ)
+            // 3. Расчёт по методике М.В. Дмитриева:
+            // 3.1. Наведённое напряжение в нормальном режиме (≤ 50 В) и при внешнем 3-фазном КЗ Iкз(3) (≤ 5,0 кВ, табл. 4.6 и 4.8 книги)
             const geom = getCableGeometry(activeCore.sec, activeScr.sec);
             const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
             const lg2 = Math.log10(2);
             const iOneCable = activeCore.cur / h.par;
-            const ikzOneCableKa = ikz2 / h.par;
+            const ikz3OneCableKa = h.ikz / h.par; // полный 3-фазный ток КЗ на одну нитку, кА (по табл. 4.6 М.В. Дмитриева для сетей 6-35 кВ)
             const lenKm = h.len / 1000;
 
             let xm = 0;
@@ -1210,8 +1208,20 @@
                 xm = 0.144 * rootTerm;
             }
 
-            const uInduced = iOneCable * lenKm * xm;          // Нормальный режим, В (лимит ≤ 50 В)
-            const uKzInducedKv = ikzOneCableKa * lenKm * xm;  // Режим КЗ, кВ (лимит ≤ 5.0 кВ)
+            const uInduced = iOneCable * lenKm * xm;           // Нормальный режим, В (лимит ≤ 50 В)
+            const uKzInducedKv = ikz3OneCableKa * lenKm * xm;  // Внешнее 3ф КЗ Iкз(3), кВ (лимит ≤ 5.0 кВ)
+
+            // 3.2. Расчёт коэффициента использования пропускной способности Kи при глухом 2-стороннем заземлении (Глава 6 книги М.В. Дмитриева)
+            // Погонное сопротивление медного экрана Rэ (Ом/км) и жилы Rж (Ом/км) при рабочей температуре (~50°C по п.3.1 книги: ρ_Cu = 2.0e-8, ρ_Al = 3.2e-8 Ом·м)
+            const rScreenOhmKm = 20.0 / activeScr.sec;
+            const rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / activeCore.sec;
+            // Отношение токов в экране и жиле (формула 5.1) и отношение потерь Dp = Pэ/Pж (формула 6.1)
+            const iScreenRatio = 1 / Math.sqrt(1 + Math.pow(rScreenOhmKm / xm, 2));
+            const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
+            // Коэффициент использования пропускной способности Kи (формула 6.2)
+            const kiFactor = 1 / Math.sqrt(1 + dpLossRatio);
+            const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
+            const okSolidBonding = iDopSolidBonding >= activeCore.cur;
 
             const pass50V = uInduced <= 50.0;
             const pass5kV = uKzInducedKv <= 5.0;
@@ -1235,16 +1245,16 @@
                 schemeStripe = 'bg-rose-500';
                 const failReasons = [];
                 if (!pass50V) failReasons.push(`Uнав = ${uInduced.toFixed(1)} В > 50 В`);
-                if (!pass5kV) failReasons.push(`Uкз = ${uKzInducedKv.toFixed(2)} кВ > 5,0 кВ`);
+                if (!pass5kV) failReasons.push(`Uкз⁽³⁾ = ${uKzInducedKv.toFixed(2)} кВ > 5,0 кВ`);
                 schemeBadge = !pass50V && !pass5kV ? 'Превышены 50 В и 5 кВ!' : (!pass50V ? 'Uнав > 50 В (Трансп.)' : 'Uкз > 5 кВ (Трансп.)');
                 schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
                 schemeTitle = nCycles === 1 ? 'Транспозиция экранов (1 цикл)' : `Транспозиция экранов (${nCycles} цикла)`;
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 space-y-1">
                         <div class="text-rose-300 font-semibold">Одностороннее заземление на всю длину (${h.len} м) не проходит: ${failReasons.join(' и ')}!</div>
-                        <div>• <strong>Проверка критериев на всю длину:</strong> норм. режим <strong>${uInduced.toFixed(1)} В</strong> (норма &le; 50 В) | режим КЗ <strong>${uKzInducedKv.toFixed(2)} кВ</strong> (норма &le; 5,0 кВ).</div>
+                        <div>• <strong>Проверка критериев на всю длину:</strong> норм. режим <strong>${uInduced.toFixed(1)} В</strong> (&le; 50 В) | 3ф КЗ <strong>${uKzInducedKv.toFixed(2)} кВ</strong> (&le; 5,0 кВ).</div>
                         <div>• <strong>Проектное решение:</strong> разбить трассу ${h.len} м на <strong>${nSections} уч. по ~${secLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''} транспозиции).</div>
-                        <div>• На концах каждого участка по ${secLenM} м: <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
+                        <div>• В узлах транспозиции (шаг ${secLenM} м): <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
                     </div>`;
             } else if (uInduced >= 40 || uKzInducedKv >= 4.0 || h.len > 1200) {
                 schemeStripe = 'bg-amber-400';
@@ -1256,18 +1266,34 @@
                 const uKz3 = uKzInducedKv / 3;
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-amber-400/35 rounded-xl p-2.5 space-y-1">
-                        <div class="text-amber-300 font-semibold">Оба критерия на всю длину (${h.len} м) формально выполняются: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
+                        <div class="text-amber-300 font-semibold">Оба критерия на всю длину (${h.len} м) формально выполняются: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
                         <div>• <strong>Рекомендация:</strong> т.к. ${h.len > 1200 ? `длина ${h.len} м превышает строительную длину барабана (~1000 м)` : `значения близки к предельным порогам`}, целесообразно заложить <strong>1 цикл транспозиции: 3 участка по ~${l3} м</strong>.</div>
                         <div>• В узлах транспозиции (шаг ${l3} м): <strong class="text-emerald-400">U<sub>узла</sub> = ${u3.toFixed(1)} В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKz3.toFixed(2)} кВ</strong>.</div>
                     </div>`;
             } else {
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
-                        <div class="text-emerald-300 font-semibold">Оба критерия выполняются с запасом: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
+                        <div class="text-emerald-300 font-semibold">Оба критерия выполняются с запасом: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
                         <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление</strong> на всю длину <strong>L = ${h.len} м</strong>.</div>
                         <div>• Экран заземляется на питающей ПС, на приёмном конце изолируется и защищается ОПН (потерь в экране нет).</div>
                     </div>`;
             }
+
+            // Плашка оценки двухстороннего заземления по Гл. 6 книги М.В. Дмитриева
+            const solidBondingHtml = `
+                <div class="text-[11px] leading-relaxed bg-[#0b0a17]/75 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#d8b4fe]">Справка • Глухое 2-стороннее заземление (без ОПН)</span>
+                        <span class="font-mono text-[10px] font-bold ${okSolidBonding ? 'text-emerald-400' : 'text-rose-400'}">
+                            K<sub>и</sub> = ${kiFactor.toFixed(2)} (${okSolidBonding ? 'Допустимо по току' : 'Перегрев'})
+                        </span>
+                    </div>
+                    <div class="text-slate-300">
+                        Ток в экране <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong>, потери <strong>P<sub>э</sub>/P<sub>ж</sub> = ${(dpLossRatio * 100).toFixed(0)}%</strong> &rarr; допустимый ток кабеля снижается с ${activeCore.iDopFact} А до <strong class="${okSolidBonding ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong>.
+                        ${okSolidBonding && h.len <= 500 ? '<span class="text-emerald-300 block mt-0.5">✓ На короткой трассе можно заземлить экраны с 2 сторон наглухо без ОПН.</span>' : ''}
+                    </div>
+                </div>
+            `;
 
             const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
 
@@ -1377,7 +1403,7 @@
                 </div>
             ` : '';
 
-            // БЛОК 3: Рекомендуемая схема заземления сети (проверка по обоим критериям: ≤ 50 В и ≤ 5,0 кВ при КЗ)
+            // БЛОК 3: Рекомендуемая схема заземления сети по М.В. Дмитриеву (≤ 50 В, ≤ 5,0 кВ при Iкз(3) и Kи при 2-стор. заземлении)
             const bondingSchemeHtml = h.ins === 'XLPE' ? `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
@@ -1397,7 +1423,7 @@
                             <strong class="text-xs font-mono ${pass50V ? (uInduced >= 40 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong>
                         </div>
                         <div class="pill-control py-1.5 px-2.5 flex items-center justify-between">
-                            <span class="text-[9px] text-slate-400">При КЗ (≤5кВ):</span>
+                            <span class="text-[9px] text-slate-400">При Iкз⁽³⁾ (≤5кВ):</span>
                             <strong class="text-xs font-mono ${pass5kV ? (uKzInducedKv >= 4.0 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong>
                         </div>
                         <div class="pill-control py-1 px-2.5 flex items-center justify-between">
@@ -1411,6 +1437,7 @@
                     </div>
 
                     ${schemeRecHtml}
+                    ${solidBondingHtml}
                 </div>
             ` : '';
 
