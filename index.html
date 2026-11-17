@@ -11,51 +11,9 @@
     <title>КабельПро PRO / by ARG — Расчёт КЛ 0,4 и 10 кВ</title>
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300f2fe'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M34.5 14L17 36h15l-2.5 14L47 28H32l2.5-14z' fill='none' stroke='%23090814' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-    <link id="apple-touch-icon-link" rel="apple-touch-icon" sizes="180x180" href="">
-    <link id="pwa-manifest-link" rel="manifest" href="">
-
-    <script>
-        (function () {
-            function drawIconPng(size, rounded) {
-                const c = document.createElement('canvas');
-                c.width = c.height = size;
-                const ctx = c.getContext('2d');
-                const g = ctx.createLinearGradient(0, 0, size, size);
-                g.addColorStop(0, '#00f2fe');
-                g.addColorStop(1, '#8b5cf6');
-                ctx.fillStyle = g;
-                if (rounded) {
-                    const r = size * 0.24;
-                    ctx.beginPath();
-                    ctx.roundRect ? ctx.roundRect(0, 0, size, size, r) : ctx.rect(0, 0, size, size);
-                    ctx.fill();
-                } else {
-                    ctx.fillRect(0, 0, size, size);
-                }
-                ctx.save();
-                ctx.scale(size / 64, size / 64);
-                ctx.beginPath();
-                ctx.moveTo(34.5, 14); ctx.lineTo(17, 36); ctx.lineTo(32, 36);
-                ctx.lineTo(29.5, 50); ctx.lineTo(47, 28); ctx.lineTo(32, 28);
-                ctx.closePath();
-                ctx.strokeStyle = '#090814';
-                ctx.lineWidth = 4.5;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                ctx.stroke();
-                ctx.restore();
-                return c.toDataURL('image/png');
-            }
-            try {
-                const iosUrl = drawIconPng(180, false);
-                const pwaUrl = drawIconPng(512, true);
-                document.getElementById('apple-touch-icon-link').href = iosUrl;
-                const m = { name: 'КабельПро PRO / by ARG', short_name: 'КабельПро', start_url: '.', display: 'standalone', background_color: '#07060e', theme_color: '#07060e', icons: [{ src: pwaUrl, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }] };
-                document.getElementById('pwa-manifest-link').href = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: 'application/json' }));
-            } catch (e) {}
-        })();
-    </script>
-
+    
+    <!-- Библиотека для генерации Word-отчета -->
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -96,7 +54,6 @@
                         <span class="text-[11px]">Назад</span>
                     </button>
                 </div>
-
                 <div class="flex items-center justify-center gap-1.5 min-w-0">
                     <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-[#00f2fe] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-violet-600/35 shrink-0">
                         <svg class="w-3.5 h-3.5 text-[#090814]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -112,7 +69,7 @@
         </header>
 
         <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-6 px-3.5 pt-3 space-y-3 relative z-10">
-
+            <!-- СТАРТОВЫЙ ЭКРАН -->
             <section id="view-hub" class="space-y-3.5 pt-1">
                 <div class="px-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-[#00f2fe]">Выберите раздел расчёта</span>
@@ -140,7 +97,7 @@
                             <h2 class="text-base font-bold text-white">Расчёт КЛ 10 кВ</h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8b5cf6]/20 text-[#d8b4fe] border border-[#a855f7]/35">АПвПг / ААБл</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1 leading-snug">Подбор жилы и экрана СПЭ, выбор заземления по М.В. Дмитриеву (50 В, 5 кВ, K<sub>и</sub>, экономика).</p>
+                        <p class="text-xs text-slate-400 mt-1 leading-snug">Подбор жилы и экрана СПЭ, заземление по М.В. Дмитриеву (50 В, 5 кВ, K<sub>и</sub>, экономика).</p>
                     </div>
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-[#c084fc] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
@@ -159,9 +116,7 @@
                 </button>
             </section>
 
-            <!-- =====================================================
-                 МОДУЛЬ 1: РАСЧЁТ КЛ 0,4 кВ
-                 ===================================================== -->
+            <!-- МОДУЛЬ 1: 0,4 кВ -->
             <section id="view-lv" class="space-y-3 hidden">
                 <div id="lv-subtab-drop" class="space-y-3">
                     <div class="glass-panel rounded-2xl p-2 px-3 flex items-center justify-between gap-2">
@@ -216,7 +171,7 @@
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-xs sm:text-sm font-bold text-white">Параметры подбираемого кабеля</span>
-                            <span id="lv-sel-calc-ip-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-[#00f2fe]/12 text-[#00f2fe] border border-[#00f2fe]/40">Ip: 253.2 А</span>
+                            <span id="lv-sel-calc-ip-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-[#00f2fe]/12 text-[#00f2fe] border border-[#00f2fe]/40">Ip: 0 А</span>
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]">
@@ -249,9 +204,7 @@
                 </div>
             </section>
 
-            <!-- =====================================================
-                 МОДУЛЬ 2: 10 кВ (РАЗДЕЛЕН НА 2 ПОДВКЛАДКИ)
-                 ===================================================== -->
+            <!-- МОДУЛЬ 2: 10 кВ -->
             <section id="view-hv" class="space-y-3 hidden">
                 <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
                     <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
@@ -270,13 +223,12 @@
                     </div>
                 </div>
 
-                <!-- ПОДВКЛАДКА 1: КАБЕЛЬ И ЭКРАН 10 кВ -->
+                <!-- 10кВ Подвкладка 1: Кабель -->
                 <div id="hv-subtab-cable" class="space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
                         <span id="hv-cable-mark-badge" class="text-[10px] font-mono text-[#d8b4fe]">АПвПг-10 (△)</span>
                     </div>
-
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#a855f7]"></div>
                         <div class="flex items-center justify-between gap-2">
@@ -326,21 +278,20 @@
                             <div class="col-span-4 pill-control px-2 py-1 text-center font-mono text-[10px] text-slate-300 truncate">I⁽²⁾: <strong id="hv-ikz2-inline" class="text-[#a855f7]">13.20 кА</strong></div>
                         </div>
                         <div class="grid grid-cols-4 gap-1.5 pt-0.5">
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₁:</span><select id="hv-k1" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.18" class="bg-[#0b0a17]">1.18</option><option value="1.14" class="bg-[#0b0a17]">1.14</option><option value="1.09" selected class="bg-[#0b0a17]">1.09</option><option value="1.05" class="bg-[#0b0a17]">1.05</option><option value="1.00" class="bg-[#0b0a17]">1.00</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₂:</span><select id="hv-k2" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.00" selected class="bg-[#0b0a17]">1.00</option><option value="0.93" class="bg-[#0b0a17]">0.93</option><option value="0.86" class="bg-[#0b0a17]">0.86</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₁:</span><select id="hv-k1" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.18" class="bg-[#0b0a17]">1.18 (+5°)</option><option value="1.14" class="bg-[#0b0a17]">1.14 (+10°)</option><option value="1.09" selected class="bg-[#0b0a17]">1.09</option><option value="1.05" class="bg-[#0b0a17]">1.05 (+20°)</option><option value="1.00" class="bg-[#0b0a17]">1.00 (+25°)</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₂:</span><select id="hv-k2" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.00" selected class="bg-[#0b0a17]">1.00</option><option value="0.93" class="bg-[#0b0a17]">0.93 (сух)</option><option value="0.86" class="bg-[#0b0a17]">0.86</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
                             <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₃:</span><select id="hv-k3" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.05" class="bg-[#0b0a17]">1.05</option><option value="1.00" selected class="bg-[#0b0a17]">1.00</option><option value="0.92" class="bg-[#0b0a17]">0.92</option><option value="0.85" class="bg-[#0b0a17]">0.85</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₄:</span><select id="hv-k4" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="0.88" selected class="bg-[#0b0a17]">0.88</option><option value="1.00" class="bg-[#0b0a17]">1.00</option><option value="0.85" class="bg-[#0b0a17]">0.85</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₄:</span><select id="hv-k4" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="0.88" selected class="bg-[#0b0a17]">0.88</option><option value="1.00" class="bg-[#0b0a17]">1.00 (тр)</option><option value="0.85" class="bg-[#0b0a17]">0.85</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
                         </div>
                     </div>
                     <div id="hv-cable-results-box" class="space-y-3"></div>
                 </div>
 
-                <!-- ПОДВКЛАДКА 2: ЗАЗЕМЛЕНИЕ И ЭКОНОМИКА 10 кВ -->
+                <!-- 10кВ Подвкладка 2: Заземление и Экономика -->
                 <div id="hv-subtab-grounding" class="hidden space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Схема заземления и экономика</span>
                     </div>
-
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 mb-3">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
                         <div class="flex items-center justify-between gap-2 mb-1">
@@ -348,48 +299,30 @@
                             <button id="btn-transp-mode" onclick="toggleTranspMode()" class="px-2 py-1 rounded text-[10px] font-bold border border-[#00f2fe]/40 text-[#00f2fe] bg-[#00f2fe]/10 transition active:scale-95">Автовыбор</button>
                         </div>
                         <div id="hv-transp-manual-box" class="hidden grid-cols-4 gap-1.5 items-end">
-                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
-                                <span class="text-[9px] text-slate-400">N цикл:</span>
-                                <input id="hv-t-n" type="number" min="1" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-white outline-none">
-                            </div>
-                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
-                                <span class="text-[9px] text-slate-400">L₁ (м):</span>
-                                <input id="hv-t-l1" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
-                            </div>
-                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
-                                <span class="text-[9px] text-slate-400">L₂ (м):</span>
-                                <input id="hv-t-l2" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
-                            </div>
-                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
-                                <span class="text-[9px] text-slate-400">L₃ (м):</span>
-                                <input id="hv-t-l3" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
-                            </div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center"><span class="text-[9px] text-slate-400">N цикл:</span><input id="hv-t-n" type="number" min="1" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-white outline-none"></div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center"><span class="text-[9px] text-slate-400">L₁ (м):</span><input id="hv-t-l1" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none"></div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center"><span class="text-[9px] text-slate-400">L₂ (м):</span><input id="hv-t-l2" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none"></div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center"><span class="text-[9px] text-slate-400">L₃ (м):</span><input id="hv-t-l3" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none"></div>
                         </div>
-                        <div id="hv-transp-manual-hint" class="hidden text-[9px] text-slate-400 leading-tight">Сумма длин L₁+L₂+L₃ формирует 1 цикл. Общая длина L пересчитывается автоматически (N × Lцикла). Разные длины участков вызовут уравнительные токи (Kт > 0).</div>
+                        <div id="hv-transp-manual-hint" class="hidden text-[9px] text-slate-400 leading-tight">Сумма длин L₁+L₂+L₃ формирует 1 цикл. Общая длина L пересчитывается автоматически. Разные длины участков вызовут уравнительные токи (Kт > 0).</div>
                     </div>
-
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400"></div>
                         <div class="text-xs sm:text-sm font-bold text-white mb-2">Экономические параметры</div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
-                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Тариф:</span><input id="hv-eco-tariff" type="number" step="0.5" value="9.0" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#00f2fe] font-bold shrink-0">₽/кВтч</span>
-                            </div>
-                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Время &tau;:</span><input id="hv-eco-tau" type="number" step="100" value="8760" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">ч/год</span>
-                            </div>
+                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Тариф:</span><input id="hv-eco-tariff" type="number" step="0.5" value="9.0" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#00f2fe] font-bold shrink-0">₽/кВтч</span></div>
+                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Время &tau;:</span><input id="hv-eco-tau" type="number" step="100" value="8760" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">ч/год</span></div>
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
-                            <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span><input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">лет</span>
-                            </div>
-                            <div class="col-span-7 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span><input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">млн ₽</span>
-                            </div>
+                            <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span><input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">лет</span></div>
+                            <div class="col-span-7 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span><input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">млн ₽</span></div>
                         </div>
                     </div>
-
                     <div id="hv-grounding-results-box" class="space-y-3"></div>
+                    <button type="button" onclick="generateWordReport()" class="w-full mt-4 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-blue-500/20 to-indigo-500/30 text-white border border-blue-400/40 font-bold shadow-[0_0_15px_rgba(59,130,246,0.2)] active:scale-95 transition">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span>Скачать Word отчет</span>
+                    </button>
                 </div>
             </section>
 
@@ -402,32 +335,13 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <select id="ref-mat-filter" onchange="renderReferenceTable()" class="bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none"><option value="Al">Алюминий (Al)</option><option value="Cu">Медь (Cu)</option></select>
-                        <select id="ref-ins-filter" onchange="renderReferenceTable()" class="bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none">
-                            <option value="XLPE">СПЭ (10 кВ — АПвПг / ПвПг △)</option><option value="PAPER">БПИ (10 кВ — ААБл / СБл)</option><option value="PVC">ПВХ (0,4 кВ — АВБбШв / ВВГ)</option>
-                        </select>
+                        <select id="ref-ins-filter" onchange="renderReferenceTable()" class="bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none"><option value="XLPE">СПЭ (10 кВ — АПвПг / ПвПг △)</option><option value="PAPER">БПИ (10 кВ — ААБл / СБл)</option><option value="PVC">ПВХ (0,4 кВ — АВБбШв / ВВГ)</option></select>
                     </div>
                     <div class="overflow-x-auto custom-scroll rounded-xl border border-[#8b5cf6]/25">
                         <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
-                            <thead>
-                                <tr class="bg-[#0b0a17]/90 text-slate-400 border-b border-[#8b5cf6]/25 text-[10px]">
-                                    <th class="py-2 px-2.5 font-bold">S, мм²</th><th class="py-2 px-2 font-bold">I<sub>земля</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>возд</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>кз.1с</sub>, кА</th><th class="py-2 px-2 font-bold">R<sub>0</sub>, Ом/км</th><th class="py-2 px-2.5 font-bold">X<sub>0</sub>, Ом/км</th>
-                                </tr>
-                            </thead>
+                            <thead><tr class="bg-[#0b0a17]/90 text-slate-400 border-b border-[#8b5cf6]/25 text-[10px]"><th class="py-2 px-2.5 font-bold">S, мм²</th><th class="py-2 px-2 font-bold">I<sub>земля</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>возд</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>кз.1с</sub>, кА</th><th class="py-2 px-2 font-bold">R<sub>0</sub>, Ом/км</th><th class="py-2 px-2.5 font-bold">X<sub>0</sub>, Ом/км</th></tr></thead>
                             <tbody id="ref-table-body" class="divide-y divide-[#8b5cf6]/15 font-mono text-[11px] bg-[#121024]/50"></tbody>
                         </table>
-                    </div>
-                    <div class="glass-sub rounded-xl p-3 space-y-2">
-                        <span class="text-xs font-bold text-[#00f2fe] block">Односекундные токи КЗ медных экранов СПЭ (10 кВ):</span>
-                        <div class="grid grid-cols-4 gap-1.5 font-mono text-[11px] text-center">
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">16 мм²</span><strong class="text-white">3.1 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">25 мм²</span><strong class="text-white">4.8 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">35 мм²</span><strong class="text-white">6.7 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">50 мм²</span><strong class="text-white">9.6 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">70 мм²</span><strong class="text-white">13.4 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">95 мм²</span><strong class="text-white">18.1 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">120 мм²</span><strong class="text-white">22.9 кА</strong></div>
-                            <div class="bg-[#07060e]/80 rounded-lg p-1.5 border border-[#8b5cf6]/20"><span class="text-slate-400 block text-[9px]">150 мм²</span><strong class="text-white">28.7 кА</strong></div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -446,10 +360,7 @@
             </div>
         </div>
 
-        <div id="toast-notification" class="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 neon-btn text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-white/20">
-            <span id="toast-text">Скопировано</span>
-        </div>
-
+        <div id="toast-notification" class="fixed bottom-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-2 transition-all duration-300 neon-btn text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2 border border-white/20"><span id="toast-text">Скопировано</span></div>
         <nav id="module-bottom-nav" class="hidden shrink-0 w-full bg-[#090814]/90 backdrop-blur-xl border-t border-[#8b5cf6]/25 px-3 pt-2.5 pb-safe z-40 shadow-[0_-8px_28px_rgba(0,0,0,0.65)]"></nav>
     </div>
 
@@ -507,16 +418,143 @@
                 transpMode: 'auto', nCycles: 1, l1: 800, l2: 800, l3: 800,
                 tariff: 9.0, tau: 8760, horizon: 10, transpCost: 2.5,
                 selectedCore: null, selectedScreen: null
-            }
+            },
+            hv_word_data: null
         };
 
-        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v24')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
-        function saveState() { try { localStorage.setItem('kabelpro_v24', JSON.stringify(state)); } catch (e) {} }
+        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v30')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
+        function saveState() { try { localStorage.setItem('kabelpro_v30', JSON.stringify(state)); } catch (e) {} }
 
+        // --- WORD EXPORT ---
+        function generateWordReport() {
+            if (!state.hv_word_data) { alert("Сначала выполните расчёт 10 кВ!"); return; }
+            const d = state.hv_word_data;
+            const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, AlignmentType, WidthType } = docx;
+
+            const doc = new Document({
+                creator: "КабельПро PRO", title: "Отчет по расчету КЛ 10 кВ",
+                styles: { default: { document: { run: { font: "Times New Roman", size: 24 }, paragraph: { spacing: { line: 276 } } } } },
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({ text: "ОТЧЕТ ПО РАСЧЕТУ КЛ 10 кВ", heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+                        new Paragraph({ text: "Обоснование выбора сечений токоведущей жилы, медного экрана и схемы заземления кабельной линии 10 кВ с изоляцией из сшитого полиэтилена (СПЭ). Расчет выполнен на основе методики М.В. Дмитриева с учетом требований ПУЭ 7 изд. и СТО ПАО «Россети».", spacing: { after: 200 } }),
+                        new Paragraph({ text: "1. Исходные параметры", heading: HeadingLevel.HEADING_1 }),
+                        new Table({
+                            width: { size: 100, type: WidthType.PERCENTAGE },
+                            rows: [
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Марка кабеля", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: d.cableMark })] })] }),
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Способ прокладки", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: d.layingText })] })] }),
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Длина трассы (L)", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: `${d.len} м` })] })] }),
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Расчетная нагрузка", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: d.loadText })] })] }),
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Рабочий ток (Ip)", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: `${d.ip} А` })] })] }),
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Ток 3ф КЗ на шинах (Iкз)", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: `${d.ikz3} кА` })] })] }),
+                                new TableRow({ children: [new TableCell({ children: [new Paragraph({ children: [new TextRun({text: "Время отключения КЗ (tкз)", bold:true})] })] }), new TableCell({ children: [new Paragraph({ text: `${d.tkz} с` })] })] })
+                            ]
+                        }),
+                        new Paragraph({ text: "" }),
+                        new Paragraph({ text: "2. Расчетное сечение жилы", heading: HeadingLevel.HEADING_1 }),
+                        new Paragraph({ text: "Расчет токовой нагрузки на фазу:" }),
+                        new Paragraph({ text: `Ip = P / (√3 · U · cos φ) = ${d.pVal} / (1.732 · 10 · ${d.cos}) = ${d.ip} А`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Коэффициент снижения пропускной способности Кобщ = ${d.kTotal} (включает К1=${d.k1}, К2=${d.k2}, К3=${d.k3}, К4=${d.k4}).` }),
+                        new Paragraph({ children: [new TextRun({ text: "Принято сечение жилы: ", bold: true }), new TextRun({ text: `${d.coreMark}\n`, bold: true, color: "009600" })]}),
+                        new Paragraph({ text: "Проверка по длительно допустимому току:" }),
+                        new Paragraph({ text: `Iдоп = Iтабл · Кобщ = ${d.baseIdop} А · ${d.kTotal} = ${d.iDopFact} А`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Условие: Iдоп (${d.iDopFact} А) ≥ Ip (${d.ip} А)`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Допустимый ток нагрузки (${d.iDopFact} А) имеет достаточный запас по сравнению с расчетным током (${d.ip} А). Загрузка жилы составляет ${d.loadPct}%. Условие нагрева выполняется.` })]}),
+                        new Paragraph({ text: "Проверка по потере напряжения:" }),
+                        new Paragraph({ text: `ΔU = (√3 · Ip · L · (R0·cos φ + X0·sin φ)) / (U · 1000) = ${d.dPct}%`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Условие: ΔU (${d.dPct}%) ≤ ΔUдоп (${d.limit}%)`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Потеря напряжения ${d.dPct}% меньше допустимого значения ${d.limit}%. Условие выполняется.` })]}),
+                        new Paragraph({ text: "3. Расчетное сечение медного экрана", heading: HeadingLevel.HEADING_1 }),
+                        new Paragraph({ text: "В сетях 10 кВ с изолированной/компенсированной нейтралью наиболее тяжелым режимом для экрана является двойное замыкание на землю. Ток двойного замыкания на землю пересчитывается из трехфазного тока КЗ:" }),
+                        new Paragraph({ text: `Iкз⁽²⁾ = Iкз⁽³⁾ · (√3 / 2) = ${d.ikz3} · 0.866 = ${d.ikz2} кА`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Принято сечение медного экрана: ", bold: true }), new TextRun({ text: `${d.scrSec} мм²\n`, bold: true, color: "009600" })]}),
+                        new Paragraph({ text: "Проверка экрана на термическую стойкость:" }),
+                        new Paragraph({ text: `Допустимый односекундный ток КЗ для экрана ${d.scrSec} мм² составляет I1с = ${d.scrI1s} кА.`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Тепловой коэффициент с учетом времени отключения K = 1 / √t = 1 / √${d.tkz} = ${d.kTime}`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Допустимый ток экрана Iдоп.экр = I1с · K = ${d.scrI1s} · ${d.kTime} = ${d.scrIPerm} кА`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Условие: Iдоп.экр (${d.scrIPerm} кА) ≥ Iкз⁽²⁾ (${d.ikz2} кА)`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Допустимый ток КЗ для выбранного экрана ${d.scrSec} мм² (${d.scrIPerm} кА) больше реального тока КЗ (${d.ikz2} кА). Экран выдержит выделяемое тепло за ${d.tkz} секунды аварии. Термическая стойкость обеспечена.` })]}),
+                        new Paragraph({ text: "4. Выбор схемы заземления экранов", heading: HeadingLevel.HEADING_1 }),
+                        new Paragraph({ text: `Для обоснования схемы заземления необходимо проверить два критерия наведенного напряжения на экране (при условии одностороннего заземления на всю длину L = ${d.len} м).` }),
+                        new Paragraph({ text: `Индуктивное сопротивление взаимоиндукции жила-экран в ${d.layTextGenitive}:` }),
+                        new Paragraph({ text: `Xm = 0.144 · lg(2S/dэ) = ${d.xm} Ом/км`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Критерий 1: Электробезопасность в нормальном режиме (≤ 50 В)", bold: true })] }),
+                        new Paragraph({ text: "Согласно требованиям безопасности персонала (ПУЭ, СТО ПАО «Россети»), напряжение прикосновения на разземленном конце экрана не должно превышать 50 В (в нормальном режиме работы)." }),
+                        new Paragraph({ text: `Uнав = Ip · L · Xm = ${d.ip} · ${d.lenKm} · ${d.xm} = ${d.uInduced} В`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Условие: Uнав (${d.uInduced} В) ≤ 50 В`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Критерий 2: Прочность оболочки при КЗ (≤ 5.0 кВ)", bold: true })] }),
+                        new Paragraph({ text: `Согласно стандарту IEEE 575 и СТО Россетей, при внешнем трехфазном КЗ (Iкз⁽³⁾ = ${d.ikz3} кА) напряжение на экране не должно превышать 5.0 кВ для предотвращения теплового взрыва ОПН и пробоя полиэтиленовой оболочки.` }),
+                        new Paragraph({ text: `Uкз = Iкз⁽³⁾ · L · Xm = ${d.ikz3 * 1000} · ${d.lenKm} · ${d.xm} = ${d.uKzInduced} кВ`, bullet: { level: 0 } }),
+                        new Paragraph({ text: `Условие: Uкз (${d.uKzInduced} кВ) ≤ 5.0 кВ`, bullet: { level: 0 } }),
+                        new Paragraph({ children: [new TextRun({ text: "Промежуточный вывод: ", bold: true }), new TextRun({ text: d.groundingLogicText })]}),
+                        new Paragraph({ children: [new TextRun({ text: "Рекомендуемая схема: ", bold: true }), new TextRun({ text: `${d.schemeTitle}\n`, bold: true, color: "009600" }), new TextRun({ text: d.schemeRecHtmlClean })]}),
+                        
+                        ...(parseFloat(d.ktMod) > 0 ? [
+                            new Paragraph({ text: `Проверка узлов неидеальной транспозиции (Kт = ${d.ktMod}):`, bullet: { level: 0 } }),
+                            new Paragraph({ text: `• Узел 1: Uнорм = ${d.uNode1V} В (≤ 50 В) | Uкз = ${d.uKzNode1Kv} кВ (≤ 5.0 кВ)` }),
+                            new Paragraph({ text: `• Узел 2: Uнорм = ${d.uNode2V} В (≤ 50 В) | Uкз = ${d.uKzNode2Kv} кВ (≤ 5.0 кВ)` }),
+                            new Paragraph({ text: `Условия электробезопасности и защиты оболочки в узлах неидеальной транспозиции ${d.passNode ? 'выполняются' : 'НЕ выполняются! Требуется корректировка длин участков.'}.` })
+                        ] : (d.schemeType === 'transp' ? [
+                            new Paragraph({ text: "Проверка узлов транспозиции:", bullet: { level: 0 } }),
+                            new Paragraph({ text: `• Uузла.норм = ${d.uInduced} В / 3 = ${d.uNodeV} В (≤ 50 В)` }),
+                            new Paragraph({ text: `• Uузла.кз = ${d.uKzInduced} кВ / 3 = ${d.uKzNodeKv} кВ (≤ 5.0 кВ)` }),
+                            new Paragraph({ text: "Условия электробезопасности и защиты оболочки в узлах транспозиции выполняются с запасом." })
+                        ] : [])),
+
+                        new Paragraph({ text: "5. Экономическое обоснование", heading: HeadingLevel.HEADING_1 }),
+                        new Paragraph({ text: `Сравнение тепловых потерь в экранах кабеля при различных способах заземления. Оценка выполняется при тарифе ${d.tariff} руб/кВтч, эквивалентном времени потерь τ = ${d.tau} ч/год и расчетном горизонте окупаемости ${d.horizon} лет.` }),
+
+                        new Paragraph({ children: [new TextRun({ text: "Вариант 1. Схема с глухим заземлением (без ОПН и без транспозиции)", bold: true })], bullet: { level: 0 } }),
+                        new Paragraph({ text: "В данном режиме контуры экранов замкнуты с двух сторон. Магнитное поле жил наводит в экранах значительные циркулирующие токи, которые дополнительно нагревают кабель, снижая его пропускную способность." }),
+                        new Paragraph({ text: `• Доля тока в экране (Iэ/Iж): ${(d.iScreenRatio * 100).toFixed(0)}%` }),
+                        new Paragraph({ text: `• Коэффициент тепловых потерь в экране (Pэ/Pж): ${(d.dpLossRatio * 100).toFixed(0)}%` }),
+                        new Paragraph({ text: `• Физические потери мощности в экранах (Pэ): ${(d.pScreenSolidWatts/1000).toFixed(3)} кВт` }),
+                        new Paragraph({ text: `• Убыток от потерь электроэнергии: ${d.moneyLostSolidYearMln} млн руб. / год` }),
+                        new Paragraph({ text: "Влияние на кабель:" }),
+                        new Paragraph({ text: `Из-за дополнительного тепловыделения в экране коэффициент снижения пропускной способности жилы составит Kи = ${d.kiFactor}. Допустимый ток жилы упадет с ${d.iDopFact} А до ${d.iDopSolidBonding} А.` }),
+
+                        new Paragraph({ children: [new TextRun({ text: `Вариант 2. Транспозиция экранов${parseFloat(d.ktMod) > 0 ? ' (неидеальная)' : ''}`, bold: true })], bullet: { level: 0 } }),
+                        new Paragraph({ text: parseFloat(d.ktMod) > 0 ? "Из-за разности строительных длин наведенные продольные ЭДС не компенсируют друг друга полностью. Возникают небольшие уравнительные токи." : "При идеальной транспозиции наведенные продольные ЭДС компенсируют друг друга. Уравнительные токи в экранах практически отсутствуют." }),
+                        new Paragraph({ text: `• Коэффициент неидеальности транспозиции (Kт): ${d.ktMod}` }),
+                        new Paragraph({ text: `• Физические потери мощности в экранах (Pэ): ${(d.pScreenTranspWatts/1000).toFixed(3)} кВт` }),
+                        new Paragraph({ text: `• Убыток от потерь электроэнергии: ${d.moneyLostTranspYearMln} млн руб. / год` }),
+                        new Paragraph({ text: `• Допустимый ток жилы: ${d.iDopFact} А (кабель используется на 100% пропускной способности)` }),
+                        new Paragraph({ text: "Стоимость реализации транспозиции:" }),
+                        new Paragraph({ text: `Для обустройства ${d.nCycles} циклов транспозиции требуются капитальные затраты в размере ${d.transpCostTotal} млн руб.` }),
+
+                        new Paragraph({ text: "Оценка окупаемости Варианта 2 (Транспозиция):" }),
+                        new Paragraph({ text: `Экономия от применения транспозиции составляет ${d.savingsMlnYear} млн руб. в год.` }),
+                        new Paragraph({ text: `Срок окупаемости капитальных затрат: ${d.transpCostTotal} млн руб. / ${d.savingsMlnYear} млн руб. = ${d.paybackYearsText} лет.` }),
+
+                        new Paragraph({ children: [
+                            new TextRun({ text: "Вывод: ", bold: true }),
+                            new TextRun({ text: d.isProfitable ? `Срок окупаемости (${d.paybackYearsText} лет) меньше заданного горизонта (${d.horizon} лет), поэтому экономически транспозиция целесообразна.` : `Срок окупаемости (${d.paybackYearsText} лет) превышает заданный горизонт (${d.horizon} лет), поэтому экономически транспозиция не окупается. ${d.schemeType === 'transp' ? `Тем не менее, техническое решение с транспозицией (раздел 4) принимается к исполнению ввиду требований безопасности (напряжение > 50 В) или большой длины трассы (L > 1200 м).` : `Рекомендуется рассмотреть одностороннее заземление или глухое двустороннее заземление (если Iдоп жилы с учетом Ки удовлетворяет расчетной нагрузке).`}` })
+                        ]})
+                    ]
+                }]
+            });
+
+            Packer.toBlob(doc).then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                document.body.appendChild(a);
+                a.style = "display: none";
+                a.href = url;
+                a.download = `Otchet_KL_10kV_${d.len}m.docx`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showToast("Отчет скачан");
+            });
+        }
+
+        // === МОДУЛЬ НАВИГАЦИИ ===
         function openModule(mod) {
             state.mod = mod;
             ['view-hub', 'view-lv', 'view-hv', 'view-ref'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            const nav = document.getElementById('module-bottom-nav'), dock = document.getElementById('lv-floating-dock'), sub = document.getElementById('header-subtitle'), backBtn = document.getElementById('header-back-btn');
+            const nav = document.getElementById('module-bottom-nav'), dock = document.getElementById('lv-floating-dock');
+            const sub = document.getElementById('header-subtitle'), backBtn = document.getElementById('header-back-btn');
             document.getElementById('app-content').scrollTop = 0;
             dock.classList.add('hidden');
 
@@ -550,116 +588,7 @@
             document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2"><button onclick="switchHvSubTab('cable')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${isCable ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Кабель и Экран</span></button><button onclick="switchHvSubTab('grounding')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${!isCable ? 'text-emerald-400' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Заземление и ₽</span></button></div>`;
         }
 
-        // === МОДУЛЬ 0,4 кВ ===
-        function getLvParams(sec, mat, ins, vStr) {
-            const rx = R_X_DB[sec] || R_X_DB[50]; const r0 = mat === 'Cu' ? rx[0] : rx[1], x0 = rx[2];
-            const base = (AMP_DB[ins] && AMP_DB[ins][mat] && AMP_DB[ins][mat][sec]) ? AMP_DB[ins][mat][sec][0] : 100;
-            const k4 = (vStr !== '0.22' && vStr !== '0.23') ? 0.93 : 1.0;
-            return { r0, x0, base, k4, iDop: Math.round(base * state.ktr * k4) };
-        }
-        function calcLvSeg(seg) {
-            const uKv = parseFloat(state.lvV), is1Ph = (state.lvV === '0.22' || state.lvV === '0.23');
-            const cos = Math.min(1, Math.max(0.1, parseFloat(seg.cos) || 0.9)); const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
-            const lKm = (parseFloat(seg.len) || 0) / 1000, n = Math.max(1, parseInt(seg.par) || 1);
-            const p = getLvParams(seg.sec, seg.mat, seg.ins, state.lvV);
-            const cur = seg.mode === 'I' ? (parseFloat(seg.i) || 0) : ((parseFloat(seg.p) || 0) / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos));
-            const dV = (is1Ph ? 2 : Math.sqrt(3)) * cur * lKm * ((p.r0 * cos + p.x0 * sin) / n);
-            const dPct = (dV / (uKv * 1000)) * 100;
-            const dP = ((is1Ph ? 2 : 3) * cur * cur * (p.r0 / n) * lKm) / 1000;
-            const totIdop = p.iDop * n;
-            return { ...p, totIdop, cur, dV, dPct, dP, loadPct: totIdop > 0 ? (cur / totIdop) * 100 : 0 };
-        }
-        function setLvVoltage(v) { state.lvV = v; saveState(); updateLvUI(); renderLvSegments(); updateLvSummary(); }
-        function onLvCustomLimitInput(v) { const n = parseFloat(v); if (n > 0) { state.lvLimit = n; saveState(); renderLvSegments(); updateLvSummary(); } }
-        function updateLvUI() { const sel = document.getElementById('lv-drop-voltage-select'); if (sel) sel.value = state.lvV; }
-        function getSegVisualClasses(m) {
-            const over = m.loadPct > 100, warn = !over && (m.loadPct > 80 || m.dPct >= 2.0);
-            const stripeColor = over ? 'bg-rose-500' : (warn ? 'bg-amber-400' : 'bg-emerald-400');
-            const badgeClass = over ? 'bg-rose-500/20 text-rose-300 border-rose-400/45' : 'bg-[#00f2fe]/12 text-[#00f2fe] border-[#00f2fe]/40 shadow-[0_0_10px_rgba(0,242,254,0.12)]';
-            return { over, stripeColor, badgeClass };
-        }
-        function renderLvSegments() {
-            document.getElementById('lv-segments-count-badge').textContent = state.lvSegs.length;
-            document.getElementById('lv-segments-container').innerHTML = state.lvSegs.map((seg, i) => {
-                const m = calcLvSeg(seg), v = getSegVisualClasses(m), opts = LV_SECS.map(s => `<option value="${s}" ${seg.sec == s ? 'selected' : ''} class="bg-[#0b0a17] text-white">${s} мм²</option>`).join('');
-                return `<div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 transition-all"><div id="lv-stripe-${seg.id}" class="absolute left-0 top-0 bottom-0 w-1.5 ${v.stripeColor} transition-colors"></div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 min-w-0 flex-1"><span class="w-5 h-5 rounded-full bg-white/10 text-slate-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">${i + 1}</span><input type="text" value="${esc(seg.name)}" oninput="updLvSeg(${seg.id},'name',this.value,false)" placeholder="Участок..." class="w-full bg-transparent text-xs sm:text-sm font-bold text-white outline-none truncate focus:border-b focus:border-[#00f2fe]"></div><div class="flex items-center gap-1.5 shrink-0"><span id="lv-badge-${seg.id}" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${v.badgeClass}">&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)</span><button type="button" onclick="dupLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-[#00f2fe] text-xs">❐</button>${state.lvSegs.length > 1 ? `<button type="button" onclick="delLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-rose-400 text-xs">✕</button>` : ''}</div></div><div class="grid grid-cols-12 gap-1.5 items-center"><div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 pr-1.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]"><button type="button" onclick="updLvSeg(${seg.id},'mat','${seg.mat === 'Al' ? 'Cu' : 'Al'}',true)" class="px-2 py-1 rounded-full text-[11px] font-extrabold transition shrink-0 ${seg.mat === 'Al' ? 'bg-[#00f2fe]/25 text-[#00f2fe]' : 'bg-amber-500/30 text-amber-300'}">${seg.mat}</button><select onchange="updLvSeg(${seg.id},'sec',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pl-0.5">${opts}</select></div><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="5" min="1" value="${seg.len}" oninput="updLvSeg(${seg.id},'len',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">м</span></div><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="1" min="0" value="${seg.mode === 'P' ? seg.p : seg.i}" oninput="updLvSeg(${seg.id},'${seg.mode === 'P' ? 'p' : 'i'}',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><button type="button" onclick="updLvSeg(${seg.id},'mode','${seg.mode === 'P' ? 'I' : 'P'}',true)" class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">${seg.mode === 'P' ? 'кВт' : 'А'}</button></div><div class="col-span-2 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="0.01" min="0.5" max="1" value="${seg.cos}" oninput="updLvSeg(${seg.id},'cos',this.value,false)" title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">&phi;</span></div></div><div class="grid grid-cols-12 gap-1.5 items-center pt-0.5"><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center relative"><select onchange="updLvSeg(${seg.id},'ins',this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2.5"><option value="PVC" ${seg.ins === 'PVC' ? 'selected' : ''} class="bg-[#0b0a17] text-white">ПВХ</option><option value="XLPE" ${seg.ins === 'XLPE' ? 'selected' : ''} class="bg-[#0b0a17] text-white">СПЭ</option></select><span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span></div><div class="col-span-2 pill-control px-1.5 py-1 flex items-center justify-center relative"><select onchange="updLvSeg(${seg.id},'par',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2">${[1,2,3,4].map(n => `<option value="${n}" ${seg.par == n ? 'selected' : ''} class="bg-[#0b0a17] text-white">${n}х</option>`).join('')}</select><span class="pointer-events-none absolute right-1.5 text-[8px] text-slate-400">▼</span></div><div id="lv-submetrics-${seg.id}" class="col-span-7 pill-control px-2.5 py-1 text-right font-mono text-[10px] truncate ${v.over ? 'text-rose-400 font-bold border-rose-500/40' : 'text-slate-400'}">Ip: <strong class="text-white">${m.cur.toFixed(1)}А</strong> / Iд: <strong class="text-[#00f2fe]">${m.totIdop}А</strong> (${Math.round(m.loadPct)}%)</div></div></div>`;
-            }).join('');
-        }
-        function updLvSeg(id, f, v, full) {
-            const s = state.lvSegs.find(x => x.id === id); if (!s) return;
-            s[f] = v; saveState();
-            if (full) renderLvSegments();
-            else {
-                const m = calcLvSeg(s), vis = getSegVisualClasses(m);
-                const stripeEl = document.getElementById(`lv-stripe-${id}`), badgeEl = document.getElementById(`lv-badge-${id}`), subEl = document.getElementById(`lv-submetrics-${id}`);
-                if (stripeEl) stripeEl.className = `absolute left-0 top-0 bottom-0 w-1.5 ${vis.stripeColor} transition-colors`;
-                if (badgeEl) { badgeEl.className = `px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${vis.badgeClass}`; badgeEl.innerHTML = `&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)`; }
-                if (subEl) { subEl.className = `col-span-7 pill-control px-2.5 py-1 text-right font-mono text-[10px] truncate ${vis.over ? 'text-rose-400 font-bold border-rose-500/40' : 'text-slate-400'}`; subEl.innerHTML = `Ip: <strong class="text-white">${m.cur.toFixed(1)}А</strong> / Iд: <strong class="text-[#00f2fe]">${m.totIdop}А</strong> (${Math.round(m.loadPct)}%)`; }
-            }
-            updateLvSummary();
-        }
-        function addLvSegment() { const last = state.lvSegs[state.lvSegs.length - 1]; state.lvSegs.push({ id: Date.now(), name: `Участок ${state.lvSegs.length + 1}`, mat: last ? last.mat : 'Al', ins: 'PVC', sec: last ? last.sec : 95, par: 1, len: 60, mode: 'P', p: 80, i: 135, cos: 0.9 }); saveState(); renderLvSegments(); updateLvSummary(); }
-        function dupLvSeg(id) { const idx = state.lvSegs.findIndex(x => x.id === id); if (idx === -1) return; state.lvSegs.splice(idx + 1, 0, { ...state.lvSegs[idx], id: Date.now(), name: state.lvSegs[idx].name + ' (копия)' }); saveState(); renderLvSegments(); updateLvSummary(); showToast('Участок дублирован'); }
-        function delLvSeg(id) { if (state.lvSegs.length <= 1) return; state.lvSegs = state.lvSegs.filter(x => x.id !== id); saveState(); renderLvSegments(); updateLvSummary(); }
-        function updateLvSummary() {
-            let dV = 0, dPct = 0, len = 0, dP = 0, over = false;
-            state.lvSegs.forEach(s => { const m = calcLvSeg(s); dV += m.dV; dPct += m.dPct; len += (+s.len || 0); dP += m.dP; if (m.loadPct > 100) over = true; });
-            const uV = parseFloat(state.lvV) * 1000;
-            const pEl = document.getElementById('lv-total-du-percent'), vEl = document.getElementById('lv-total-du-volts'), badge = document.getElementById('lv-status-badge');
-            pEl.textContent = `${dPct.toFixed(2)}%`; vEl.textContent = `(${dV.toFixed(1)} В)`;
-            document.getElementById('lv-end-voltage-val').textContent = `${Math.max(0, uV - dV).toFixed(1)} В`; document.getElementById('lv-total-length-val').textContent = `${Math.round(len)} м`; document.getElementById('lv-total-power-loss-val').textContent = `${dP.toFixed(2)} кВт`;
-            const lim = state.lvLimit;
-            if (dPct < 3) { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-emerald-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-emerald-400 font-semibold whitespace-nowrap'; }
-            else if (dPct <= lim) { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-amber-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-amber-400 font-semibold whitespace-nowrap'; }
-            else { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-rose-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-rose-400 font-semibold whitespace-nowrap'; }
-            if (dPct <= lim && !over) { badge.className = dPct < 3 ? 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/35 whitespace-nowrap' : 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35 whitespace-nowrap'; badge.textContent = dPct < 3 ? `В норме (≤ ${lim}%)` : `Близко к пределу (≤ ${lim}%)`; }
-            else { badge.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-400/40 animate-pulse-sub whitespace-nowrap'; badge.textContent = dPct > lim ? `Превышение (> ${lim}%)` : 'Перегруз по току'; }
-        }
-        function toggleLvSelMaterial() {
-            state.lvSelMat = (state.lvSelMat === 'Cu') ? 'Al' : 'Cu'; const btn = document.getElementById('lv-sel-mat-btn');
-            if (state.lvSelMat === 'Al') { btn.textContent = 'Алюминий (Al)'; btn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center'; }
-            else { btn.textContent = 'Медь (Cu)'; btn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-amber-500/30 text-amber-300 text-center'; }
-            saveState(); runLvCableSelection();
-        }
-        function runLvCableSelection() {
-            const vStr = document.getElementById('lv-sel-voltage').value, mat = state.lvSelMat || 'Al', ins = document.getElementById('lv-sel-insulation').value;
-            state.ktr = Math.min(1, Math.max(0.5, +document.getElementById('lv-sel-ktr').value || 0.9));
-            const P = +document.getElementById('lv-sel-power').value || 10, L = +document.getElementById('lv-sel-length').value || 50, cos = +document.getElementById('lv-sel-cosphi').value || 0.9;
-            const lim = +document.getElementById('lv-sel-maxdrop').value || 4.5, par = +document.getElementById('lv-sel-parallel').value || 1;
-            const is1Ph = isLvSinglePhase(vStr), uKv = parseFloat(vStr), sin = Math.sqrt(Math.max(0, 1 - cos * cos)), cur = P / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos);
-            const ipBadge = document.getElementById('lv-sel-calc-ip-badge'); if (ipBadge) ipBadge.textContent = `Ip: ${cur.toFixed(1)} А`;
-            const list = LV_SECS.map(sec => {
-                const p = getLvParams(sec, mat, ins, vStr); const totIdop = p.iDop * par;
-                const dV = (is1Ph ? 2 : Math.sqrt(3)) * cur * (L / 1000) * ((p.r0 * cos + p.x0 * sin) / par), dPct = (dV / (uKv * 1000)) * 100;
-                return { sec, totIdop, dV, dPct, loadPct: (cur / totIdop) * 100, ok: totIdop >= cur && dPct <= lim };
-            });
-            const recIdx = list.findIndex(x => x.ok); const box = document.getElementById('lv-selection-result-box');
-            if (recIdx === -1) { box.innerHTML = `<div class="glass-panel rounded-2xl p-4 pl-5 relative overflow-hidden text-xs text-rose-300"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-500"></div>Недостаточно сечения до 240 мм² (Ip = ${cur.toFixed(1)} А). Увеличьте число параллельных кабелей.</div>`; return; }
-            const rec = list[recIdx], slice = list.slice(Math.max(0, recIdx - 1), recIdx + 2);
-            const duColor = rec.dPct < 3 ? 'text-emerald-400' : (rec.dPct <= lim ? 'text-amber-400' : 'text-rose-400'), parPrefix = par > 1 ? par + ' × ' : '';
-            box.innerHTML = `
-                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-3">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-400"></div>
-                    <div class="flex items-start justify-between gap-2">
-                        <div><span class="text-[10px] font-bold text-[#00f2fe] uppercase tracking-wider block">Рекомендуемое сечение</span><div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${rec.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div></div>
-                        <button onclick="applyLvRec(${rec.sec},'${mat}','${ins}',${par},${P},${L},${cos})" class="px-3 py-1.5 rounded-full neon-btn text-white text-xs font-bold active:scale-95 transition">+ В расчёт &Delta;U</button>
-                    </div>
-                    <div class="grid grid-cols-3 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Ток Ip</span><strong class="text-xs font-mono text-white">${cur.toFixed(1)} А</strong></div>
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Допуст. Iд'</span><strong class="text-xs font-mono text-[#00f2fe]">${rec.totIdop} А (${Math.round(rec.loadPct)}%)</strong></div>
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${duColor}">${rec.dPct.toFixed(2)}% (${rec.dV.toFixed(1)}В)</strong></div>
-                    </div>
-                    <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
-                        <table class="w-full text-left text-xs">
-                            <thead><tr class="text-slate-400 text-[10px] border-b border-[#8b5cf6]/20 bg-[#07060e]/90"><th class="py-2 px-2.5">Сечение</th><th class="py-2 px-2">Iдоп' (Загр.)</th><th class="py-2 px-2">&Delta;U</th><th class="py-2 px-2 text-right">Статус</th></tr></thead>
-                            <tbody>${slice.map(x => `<tr class="border-b border-[#8b5cf6]/15 ${x.sec === rec.sec ? 'bg-emerald-500/15 text-white font-bold' : 'text-slate-300'}"><td class="py-2 px-2.5 font-mono">${parPrefix}${x.sec} мм² ${x.sec === rec.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td><td class="py-2 px-2 font-mono ${x.ok ? '' : 'text-rose-400 font-bold'}">${x.totIdop} А (${Math.round(x.loadPct)}%)</td><td class="py-2 px-2 font-mono ${x.dPct <= lim ? '' : 'text-rose-400 font-bold'}">${x.dPct.toFixed(2)}%</td><td class="py-2 px-2 text-right font-semibold ${x.ok ? 'text-emerald-400' : 'text-rose-400'}">${x.ok ? 'Подходит' : 'Мало'}</td></tr>`).join('')}</tbody>
-                        </table>
-                    </div>
-                </div>`;
-        }
-        function applyLvRec(sec, mat, ins, par, p, len, cos) { state.lvSegs.push({ id: Date.now(), name: `Подобранный ${sec} мм²`, mat, ins, sec, par, len, mode: 'P', p, i: 50, cos }); saveState(); renderLvSegments(); updateLvSummary(); switchLvSubTab('drop'); showToast('Добавлено в схему 0,4 кВ'); }
-
-        // === МОДУЛЬ 10 кВ ===
+        // === МОДУЛЬ 10 кВ UI и РАСЧЁТ ===
         function initHvControls() {
             document.getElementById('hv-insulation').value = state.hv.ins; document.getElementById('hv-laying-select').value = state.hv.lay;
             document.getElementById('hv-flat-spacing').value = state.hv.flatS || 100; document.getElementById('hv-parallel').value = state.hv.par;
@@ -681,7 +610,7 @@
         }
 
         function onHvLengthInputMain() {
-            if (state.hv.transpMode === 'manual') return; // Don't change L if in manual mode
+            if (state.hv.transpMode === 'manual') return; 
             state.hv.len = Math.max(1, +document.getElementById('hv-length').value || 100);
             saveState(); runHvCalculation();
         }
@@ -750,9 +679,7 @@
             h.tariff = Math.max(0, +document.getElementById('hv-eco-tariff').value || 9.0); h.tau = Math.max(1, +document.getElementById('hv-eco-tau').value || 8760);
             h.horizon = Math.max(1, +document.getElementById('hv-eco-horizon').value || 10); h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
             
-            if (h.transpMode !== 'manual') {
-                h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
-            }
+            if (h.transpMode !== 'manual') { h.len = Math.max(1, +document.getElementById('hv-length').value || 100); }
             saveState();
 
             const allCores = HV_SECS.map(s => evalHv(s, h)), recCoreIdx = allCores.findIndex(x => x.okAll), recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
@@ -760,9 +687,11 @@
 
             document.getElementById('hv-k-total-badge').textContent = `Kобщ: ${activeCore.kTotal.toFixed(3)}`;
             document.getElementById('hv-calc-ip-badge').textContent = `Ip: ${activeCore.cur.toFixed(1)} А`;
+            document.getElementById('hv-ikz2-inline').textContent = `${activeCore.ikz2.toFixed(2)} кА`;
 
             const centerCoreIdx = recCoreIdx !== -1 ? recCoreIdx : allCores.length - 2;
-            const coreSlice = allCores.slice(Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1)), Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1)) + 3);
+            const coreSliceStart = Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1));
+            const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
             const ikz2 = activeCore.ikz2, kTime = activeCore.kTime, lnTerm = Math.log((350 + 228) / (70 + 228));
@@ -770,24 +699,21 @@
             const allScreens = SCREEN_SECS.map(s => { const iPerm = +(SCREEN_IKZ_1S[s] * kTime).toFixed(3); return { sec: s, i1s: SCREEN_IKZ_1S[s], iPerm, ok: iPerm > ikz2 }; });
             const recScrIdx = allScreens.findIndex(x => x.ok), recScr = recScrIdx !== -1 ? allScreens[recScrIdx] : null;
             const activeScr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
-            const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, (recScrIdx !== -1 ? recScrIdx : allScreens.length - 2) - 1));
+            const centerScrIdx = recScrIdx !== -1 ? recScrIdx : allScreens.length - 2;
+            const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
             const geom = getCableGeometry(activeCore.sec, activeScr.sec), sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr), lg2 = Math.log10(2), iOneCable = activeCore.cur / h.par, ikz3OneCableKa = h.ikz / h.par;
             let xm = 0; if (h.lay === 'triangle') xm = 0.144 * lgRatio; else xm = 0.144 * Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
 
-            // Auto cycles based on full length
             const uInducedAuto = iOneCable * (h.len / 1000) * xm, uKzInducedAutoKv = ikz3OneCableKa * (h.len / 1000) * xm;
-            const minCyclesBy50V = Math.max(1, Math.ceil(uInducedAuto / (50 * 3)));
-            const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedAutoKv / (5.0 * 3)));
-            const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
+            const minCyclesBy50V = Math.max(1, Math.ceil(uInducedAuto / (50 * 3))), minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedAutoKv / (5.0 * 3))), minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
             const autoCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
 
             let nCycles, l1, l2, l3;
             if (h.transpMode === 'auto') {
                 nCycles = autoCycles; l1 = h.len / (3 * nCycles); l2 = l1; l3 = l1;
-                // keep state in sync just for info
                 h.nCycles = nCycles; h.l1 = l1; h.l2 = l2; h.l3 = l3;
             } else {
                 nCycles = Math.max(1, +document.getElementById('hv-t-n').value || 1);
@@ -797,37 +723,30 @@
             }
             const cycleLen = l1 + l2 + l3 || 1;
 
-            // Kt calculation
-            const reKt = (l1 - 0.5 * (l2 + l3)) / cycleLen;
-            const imKt = (0.5 * Math.sqrt(3) * (l2 - l3)) / cycleLen;
+            const reKt = (l1 - 0.5 * (l2 + l3)) / cycleLen, imKt = (0.5 * Math.sqrt(3) * (l2 - l3)) / cycleLen;
             const ktMod = Math.sqrt(reKt * reKt + imKt * imKt);
 
-            // Node Voltages for 1 cycle
             const reNode1 = 1 - reKt, imNode1 = -imKt, modNode1 = Math.sqrt(reNode1*reNode1 + imNode1*imNode1);
-            const xL1 = xm * (l1 / 1000);
-            const uNode1V = xL1 * iOneCable * modNode1, uKzNode1Kv = xL1 * ikz3OneCableKa * modNode1;
-
+            const xL1 = xm * (l1 / 1000), uNode1V = xL1 * iOneCable * modNode1, uKzNode1Kv = xL1 * ikz3OneCableKa * modNode1;
             const reNode2 = -0.5 - reKt, imNode2 = 0.5 * Math.sqrt(3) - imKt, modNode2 = Math.sqrt(reNode2*reNode2 + imNode2*imNode2);
-            const xL3 = xm * (l3 / 1000); // L3 because node 2 is from the end
-            const uNode2V = xL3 * iOneCable * modNode2, uKzNode2Kv = xL3 * ikz3OneCableKa * modNode2;
+            const xL3 = xm * (l3 / 1000), uNode2V = xL3 * iOneCable * modNode2, uKzNode2Kv = xL3 * ikz3OneCableKa * modNode2;
 
             const maxNodeV = Math.max(uNode1V, uNode2V), maxNodeKv = Math.max(uKzNode1Kv, uKzNode2Kv);
             const pass50VNode = maxNodeV <= 50.0, pass5kVNode = maxNodeKv <= 5.0;
 
-            // Solid bonding baseline
             const rScreenOhmKm = 20.0 / activeScr.sec, rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / activeCore.sec;
             const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
-            const iDopSolidBonding = +(activeCore.iDopFact * (1 / Math.sqrt(1 + dpLossRatio))).toFixed(1);
+            const kiFactor = (1 / Math.sqrt(1 + dpLossRatio));
+            const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
+            
             const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * (h.len / 1000));
             const pScreenSolidWatts = pCoreTotalWatts * dpLossRatio;
             const moneyLostSolidYearMln = ((pScreenSolidWatts / 1000) * h.tau * h.tariff) / 1000000;
             
-            // Non-ideal transp losses
             const dpLossTransp = dpLossRatio * (ktMod * ktMod);
             const pScreenTranspWatts = pCoreTotalWatts * dpLossTransp;
             const moneyLostTranspYearMln = ((pScreenTranspWatts / 1000) * h.tau * h.tariff) / 1000000;
             
-            // Payback for transposition
             const transpCostTotal = nCycles * h.transpCost;
             const savingsMlnYear = moneyLostSolidYearMln - moneyLostTranspYearMln;
             let paybackYears = Infinity;
@@ -836,20 +755,48 @@
 
             let schemeStripe = 'bg-emerald-400', schemeBadge = 'Узлы КТ: В норме', schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
             let schemeTitle = nCycles === 1 ? 'Транспозиция (1 цикл)' : `Транспозиция (${nCycles} цикла)`;
+            let schemeType = 'transp';
             if (ktMod === 0) {
                 if (h.transpMode !== 'manual' && uInducedAuto <= 50.0 && uKzInducedAutoKv <= 5.0 && h.len <= 1200) {
-                    schemeTitle = 'Одностороннее заземление';
-                    schemeBadge = 'КЛ не требует КТ';
+                    schemeTitle = 'Одностороннее заземление'; schemeBadge = 'КЛ не требует КТ'; schemeType = 'single';
                 }
+            } else { schemeTitle = nCycles === 1 ? 'Неидеальная транспозиция (1ц)' : `Неидеальная транспозиция (${nCycles}ц)`; }
+
+            if (schemeType === 'transp' && (!pass50VNode || !pass5kVNode)) { schemeStripe = 'bg-rose-500'; schemeBadge = 'Опасно! Узлы > нормы'; schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub'; }
+            
+            let groundingLogicText = '', schemeRecHtmlClean = '';
+            if (schemeType === 'single') {
+                groundingLogicText = `Оба критерия для трассы ${h.len} м выполняются с запасом (${uInducedAuto.toFixed(1)} В ≤ 50 В и ${uKzInducedAutoKv.toFixed(2)} кВ ≤ 5.0 кВ). Длина кабеля не превышает строительную длину барабана.`;
+                schemeRecHtmlClean = `Проектное решение: применить одностороннее заземление (КТ-О) на всю трассу. Экран заземляется на питающей ПС, на приёмном конце защищается ОПН. Потерь в экране нет.`;
             } else {
-                schemeTitle = nCycles === 1 ? 'Неидеальная транспозиция (1ц)' : `Неидеальная транспозиция (${nCycles}ц)`;
+                if (uInducedAuto > 50.0 || uKzInducedAutoKv > 5.0) { groundingLogicText = `Одностороннее заземление на всю длину (${h.len} м) не проходит: Uнав = ${uInducedAuto.toFixed(1)} В и Uкз = ${uKzInducedAutoKv.toFixed(2)} кВ. Необходимо секционирование.`; } 
+                else { groundingLogicText = `Критерии электробезопасности для трассы ${h.len} м выполняются, однако длина трассы превышает стандартную строительную длину барабана (требуются соединительные муфты).`; }
+                schemeRecHtmlClean = `Проектное решение: разбить трассу ${h.len} м на ${nCycles * 3} участков. Установить ${nCycles * 2} транспозиционные муфты с коробками КТ. На концах экраны наглухо заземлить без ОПН.`;
             }
 
-            if (!pass50VNode || !pass5kVNode) {
-                schemeStripe = 'bg-rose-500'; schemeBadge = 'Опасно! Узлы > нормы'; schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
-            }
+            state.hv_word_data = {
+                cableMark: h.ins === 'XLPE' ? (h.mat === 'Al' ? 'АПвПг-10 (Алюминий, СПЭ)' : 'ПвПг-10 (Медь, СПЭ)') : (h.mat === 'Al' ? 'ААБл-10 (Алюминий, БПИ)' : 'СБл-10 (Медь, БПИ)'),
+                layingText: h.lay === 'triangle' ? 'Треугольник △ (вплотную)' : `В плоскости — (зазор ${h.flatS} мм)`,
+                len: h.len, pVal: h.mode === 'P' ? h.val : (h.val * 1.732 * 10 * h.cos).toFixed(0), cos: h.cos, ip: activeCore.cur.toFixed(1),
+                ikz3: h.ikz, tkz: h.t, coreMark: `${parPrefix}${activeCore.sec} мм² (${h.mat === 'Cu' ? 'Медь' : 'Алюминий'})`,
+                kTotal: activeCore.kTotal.toFixed(3), k1: h.k1, k2: h.k2, k3: h.k3, k4: h.k4, baseIdop: activeCore.baseIdop, iDopFact: activeCore.iDopFact,
+                loadPct: Math.round(activeCore.loadPct), dPct: activeCore.dPct.toFixed(2), limit: h.limit,
+                ikz2: ikz2.toFixed(2), scrSec: activeScr.sec, scrI1s: activeScr.i1s.toFixed(1), kTime: kTime, scrIPerm: activeScr.iPerm.toFixed(2),
+                lenKm: (h.len / 1000).toFixed(3), xm: xm.toFixed(4), layTextGenitive: h.lay === 'triangle' ? 'сомкнутом треугольнике' : 'плоскости',
+                uInduced: uInducedAuto.toFixed(1), uKzInduced: uKzInducedAutoKv.toFixed(2),
+                schemeTitle, groundingLogicText, schemeRecHtmlClean, schemeType,
+                ktMod: ktMod.toFixed(3), passNode: (pass50VNode && pass5kVNode),
+                uNode1V: uNode1V.toFixed(1), uKzNode1Kv: uKzNode1Kv.toFixed(2),
+                uNode2V: uNode2V.toFixed(1), uKzNode2Kv: uKzNode2Kv.toFixed(2),
+                uNodeV: (uInducedAuto/3).toFixed(1), uKzNodeKv: (uKzInducedAutoKv/3).toFixed(2),
+                tariff: h.tariff, tau: h.tau, horizon: h.horizon, nCycles,
+                iScreenRatio, dpLossRatio, pScreenSolidWatts, moneyLostSolidYearMln: moneyLostSolidYearMln.toFixed(3),
+                kiFactor: kiFactor.toFixed(2), iDopSolidBonding,
+                pScreenTranspWatts, moneyLostTranspYearMln: moneyLostTranspYearMln.toFixed(3),
+                transpCostTotal: transpCostTotal.toFixed(2), savingsMlnYear: savingsMlnYear.toFixed(3),
+                paybackYearsText: paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1), isProfitable
+            };
 
-            // --- HTML GENERATION ---
             const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
 
             document.getElementById('hv-cable-results-box').innerHTML = `
@@ -899,7 +846,6 @@
             `;
 
             document.getElementById('hv-grounding-results-box').innerHTML = h.ins === 'XLPE' ? `
-                <!-- Схема заземления -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
                     <div class="flex items-start justify-between gap-2">
@@ -910,9 +856,9 @@
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">${schemeBadge}</span>
                     </div>
                     
-                    ${ktMod === 0 && h.transpMode !== 'manual' && uInducedAuto <= 50.0 && uKzInducedAutoKv <= 5.0 && h.len <= 1200 ? `
+                    ${schemeType === 'single' ? `
                         <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
-                            <div class="text-emerald-300 font-semibold">Оба критерия на всю длину L=${h.len}м выполняются с запасом: Uнав = ${uInducedAuto.toFixed(1)} В (≤50В) и Uкз = ${uKzInducedAutoKv.toFixed(2)} кВ (≤5.0кВ).</div>
+                            <div class="text-emerald-300 font-semibold">Оба критерия для трассы ${h.len} м выполняются с запасом: Uнав = ${uInducedAuto.toFixed(1)} В (≤50В) и Uкз = ${uKzInducedAutoKv.toFixed(2)} кВ (≤5.0кВ).</div>
                             <div>• <strong>Решение:</strong> применить одностороннее заземление (КТ-О) на всю трассу. Экран заземляется на питающей ПС, на приёмном конце защищается ОПН (потерь в экране нет).</div>
                         </div>
                     ` : `
@@ -935,14 +881,13 @@
                     `}
                 </div>
 
-                <!-- Экономика (Срок окупаемости) -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (!isProfitable && iDopSolidBonding >= activeCore.cur ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
                     <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400 block">Экономическое обоснование</span>
                     
                     <div class="grid grid-cols-2 gap-1.5 text-center mb-1">
                         <div class="pill-control py-1.5 px-2.5 relative border border-rose-500/30">
-                            <span class="text-[9px] text-slate-400 block mb-0.5">2-стороннее наглухо</span>
+                            <span class="text-[9px] text-slate-400 block mb-0.5">2-стор. (без ОПН)</span>
                             <strong class="text-[11px] font-mono text-white block">Pэ: ${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>
                             <span class="text-[9px] font-bold text-rose-400">Убыток: ${moneyLostSolidYearMln.toFixed(3)} млн/год</span>
                         </div>
@@ -973,7 +918,6 @@
                     </div>` : ''}
                 </div>
 
-                <!-- Проверки ТКЗ -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-center justify-between gap-2">
