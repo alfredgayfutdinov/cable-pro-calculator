@@ -106,7 +106,6 @@
                     <h1 class="text-sm sm:text-base font-bold tracking-tight text-white leading-none whitespace-nowrap">КабельПро</h1>
                     <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-[#00f2fe] border border-[#00f2fe]/35 tracking-wide whitespace-nowrap">PRO / by ARG</span>
                 </div>
-
                 <div></div>
             </div>
             <p id="header-subtitle" class="text-[11px] text-slate-400 mt-1.5 leading-tight px-2 truncate max-w-full">Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ</p>
@@ -114,13 +113,11 @@
 
         <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-6 px-3.5 pt-3 space-y-3 relative z-10">
 
-            <!-- СТАРТОВЫЙ ЭКРАН-ХАБ -->
             <section id="view-hub" class="space-y-3.5 pt-1">
                 <div class="px-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-[#00f2fe]">Выберите раздел расчёта</span>
                     <p class="text-xs text-slate-400 mt-0.5">ГОСТ 31996-2012 • ГОСТ Р 55025-2012 • ПУЭ 7 изд.</p>
                 </div>
-
                 <button type="button" onclick="openModule('lv')" class="w-full text-left glass-panel hover:border-[#00f2fe]/55 active:scale-[0.99] rounded-2xl p-4 transition-all group flex items-center gap-3.5">
                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00f2fe]/20 to-[#0ea5e9]/20 border border-[#00f2fe]/40 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6 text-[#00f2fe]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
@@ -134,7 +131,6 @@
                     </div>
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-[#00f2fe] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
-
                 <button type="button" onclick="openModule('hv')" class="w-full text-left glass-panel hover:border-[#a855f7]/65 active:scale-[0.99] rounded-2xl p-4 transition-all group flex items-center gap-3.5">
                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#8b5cf6]/25 to-[#d946ef]/20 border border-[#a855f7]/45 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6 text-[#c084fc]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -148,7 +144,6 @@
                     </div>
                     <svg class="w-5 h-5 text-slate-500 group-hover:text-[#c084fc] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 </button>
-
                 <button type="button" onclick="openModule('ref')" class="w-full text-left glass-panel hover:border-emerald-400/55 active:scale-[0.99] rounded-2xl p-4 transition-all group flex items-center gap-3.5">
                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/40 flex items-center justify-center shrink-0">
                         <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -168,66 +163,47 @@
                  МОДУЛЬ 1: РАСЧЁТ КЛ 0,4 кВ
                  ===================================================== -->
             <section id="view-lv" class="space-y-3 hidden">
-                
                 <div id="lv-subtab-drop" class="space-y-3">
                     <div class="glass-panel rounded-2xl p-2 px-3 flex items-center justify-between gap-2">
                         <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-3 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
                             <span class="text-[10px] text-slate-300 font-semibold mr-1.5 whitespace-nowrap">Сеть:</span>
-                            <select id="lv-drop-voltage-select" onchange="setLvVoltage(this.value)"
-                                class="bg-transparent text-[#00f2fe] font-mono text-xs font-extrabold outline-none appearance-none cursor-pointer pr-3.5">
-                                <option value="0.38" class="bg-[#0b0a17] text-white">380В (4ж)</option>
-                                <option value="0.40" class="bg-[#0b0a17] text-white">400В (4ж)</option>
-                                <option value="0.22" class="bg-[#0b0a17] text-white">220В (1-ф)</option>
-                                <option value="0.23" class="bg-[#0b0a17] text-white">230В (1-ф)</option>
+                            <select id="lv-drop-voltage-select" onchange="setLvVoltage(this.value)" class="bg-transparent text-[#00f2fe] font-mono text-xs font-extrabold outline-none appearance-none cursor-pointer pr-3.5">
+                                <option value="0.38" class="bg-[#0b0a17] text-white">380В (4ж)</option><option value="0.40" class="bg-[#0b0a17] text-white">400В (4ж)</option>
+                                <option value="0.22" class="bg-[#0b0a17] text-white">220В (1-ф)</option><option value="0.23" class="bg-[#0b0a17] text-white">230В (1-ф)</option>
                             </select>
                             <span class="pointer-events-none absolute right-2.5 text-[9px] text-[#00f2fe]">▼</span>
                         </div>
                         <div class="w-px h-5 bg-[#8b5cf6]/30 shrink-0"></div>
                         <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-3 py-1.5 shadow-[0_0_12px_rgba(168,85,247,0.2)]">
                             <span class="text-[11px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
-                            <input id="lv-custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onLvCustomLimitInput(this.value)"
-                                class="w-9 bg-transparent text-right font-mono text-xs font-extrabold text-white outline-none">
+                            <input id="lv-custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onLvCustomLimitInput(this.value)" class="w-9 bg-transparent text-right font-mono text-xs font-extrabold text-white outline-none">
                             <span class="text-[11px] text-[#00f2fe] font-mono font-bold ml-0.5">%</span>
                         </div>
                     </div>
-
                     <div class="flex items-center justify-between px-1 pt-0.5">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Участки кабельной сети</span>
-                            <span id="lv-segments-count-badge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#121024] text-[#00f2fe] border border-[#8b5cf6]/35">1</span>
-                        </div>
-                        <button type="button" onclick="addLvSegment()" class="text-xs font-bold text-[#00f2fe] hover:text-white active:scale-95 flex items-center gap-1 transition">
-                            <span class="text-base leading-none">+</span> Участок
-                        </button>
+                        <div class="flex items-center gap-2"><span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Участки кабельной сети</span><span id="lv-segments-count-badge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#121024] text-[#00f2fe] border border-[#8b5cf6]/35">1</span></div>
+                        <button type="button" onclick="addLvSegment()" class="text-xs font-bold text-[#00f2fe] hover:text-white active:scale-95 flex items-center gap-1 transition"><span class="text-base leading-none">+</span> Участок</button>
                     </div>
-
                     <div id="lv-segments-container" class="space-y-2.5"></div>
                 </div>
 
                 <div id="lv-subtab-select" class="space-y-3 hidden">
                     <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
                         <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
-                            <select id="lv-sel-voltage" onchange="runLvCableSelection()"
-                                class="bg-transparent text-[#00f2fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3">
-                                <option value="0.38" class="bg-[#0b0a17] text-white">380В (4ж)</option>
-                                <option value="0.40" class="bg-[#0b0a17] text-white">400В (4ж)</option>
-                                <option value="0.22" class="bg-[#0b0a17] text-white">220В (1-ф)</option>
-                                <option value="0.23" class="bg-[#0b0a17] text-white">230В (1-ф)</option>
+                            <select id="lv-sel-voltage" onchange="runLvCableSelection()" class="bg-transparent text-[#00f2fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3">
+                                <option value="0.38" class="bg-[#0b0a17] text-white">380В (4ж)</option><option value="0.40" class="bg-[#0b0a17] text-white">400В (4ж)</option>
+                                <option value="0.22" class="bg-[#0b0a17] text-white">220В (1-ф)</option><option value="0.23" class="bg-[#0b0a17] text-white">230В (1-ф)</option>
                             </select>
                             <span class="pointer-events-none absolute right-2 text-[8px] text-[#00f2fe]">▼</span>
                         </div>
-
                         <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-2.5 py-1.5">
                             <span class="text-[10px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
-                            <input id="lv-sel-maxdrop" type="number" step="0.5" min="0.5" max="20" value="4.5" oninput="runLvCableSelection()"
-                                class="w-8 bg-transparent text-right font-mono text-[11px] font-extrabold text-white outline-none">
+                            <input id="lv-sel-maxdrop" type="number" step="0.5" min="0.5" max="20" value="4.5" oninput="runLvCableSelection()" class="w-8 bg-transparent text-right font-mono text-[11px] font-extrabold text-white outline-none">
                             <span class="text-[10px] text-[#00f2fe] font-mono font-bold ml-0.5">%</span>
                         </div>
-
                         <div class="pill-control px-2.5 py-1.5 flex items-center">
                             <span class="text-[10px] text-slate-400 font-semibold mr-1 whitespace-nowrap">Kтр:</span>
-                            <input id="lv-sel-ktr" type="number" step="0.05" min="0.5" max="1" value="0.9" oninput="runLvCableSelection()"
-                                class="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
+                            <input id="lv-sel-ktr" type="number" step="0.05" min="0.5" max="1" value="0.9" oninput="runLvCableSelection()" class="w-8 bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
                         </div>
                     </div>
 
@@ -238,97 +214,63 @@
 
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2.5">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
-
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-xs sm:text-sm font-bold text-white">Параметры подбираемого кабеля</span>
-                            <span id="lv-sel-calc-ip-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-[#00f2fe]/12 text-[#00f2fe] border border-[#00f2fe]/40">
-                                Ip: 253.2 А
-                            </span>
+                            <span id="lv-sel-calc-ip-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-[#00f2fe]/12 text-[#00f2fe] border border-[#00f2fe]/40">Ip: 253.2 А</span>
                         </div>
-
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]">
-                                <button type="button" id="lv-sel-mat-btn" onclick="toggleLvSelMaterial()"
-                                    class="w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center">
-                                    Алюминий (Al)
-                                </button>
+                                <button type="button" id="lv-sel-mat-btn" onclick="toggleLvSelMaterial()" class="w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center">Алюминий (Al)</button>
                             </div>
-
                             <div class="col-span-5 pill-control px-2.5 py-1 flex items-center justify-center relative">
-                                <select id="lv-sel-insulation" onchange="runLvCableSelection()"
-                                    class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-3">
-                                    <option value="PVC" class="bg-[#0b0a17] text-white">ПВХ (АВБбШв)</option>
-                                    <option value="XLPE" class="bg-[#0b0a17] text-white">СПЭ (АПвБбШп)</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-2.5 text-[8px] text-slate-400">▼</span>
+                                <select id="lv-sel-insulation" onchange="runLvCableSelection()" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-3">
+                                    <option value="PVC" class="bg-[#0b0a17] text-white">ПВХ (АВБбШв)</option><option value="XLPE" class="bg-[#0b0a17] text-white">СПЭ (АПвБбШп)</option>
+                                </select><span class="pointer-events-none absolute right-2.5 text-[8px] text-slate-400">▼</span>
                             </div>
-
                             <div class="col-span-3 pill-control px-2.5 py-1 flex items-center justify-center relative">
-                                <select id="lv-sel-parallel" onchange="runLvCableSelection()"
-                                    class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-3">
-                                    <option value="1" class="bg-[#0b0a17] text-white">1х кабель</option>
-                                    <option value="2" class="bg-[#0b0a17] text-white">2х кабеля</option>
-                                    <option value="3" class="bg-[#0b0a17] text-white">3х кабеля</option>
-                                    <option value="4" class="bg-[#0b0a17] text-white">4х кабеля</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span>
+                                <select id="lv-sel-parallel" onchange="runLvCableSelection()" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-3">
+                                    <option value="1" class="bg-[#0b0a17] text-white">1х кабель</option><option value="2" class="bg-[#0b0a17] text-white">2х кабеля</option><option value="3" class="bg-[#0b0a17] text-white">3х кабеля</option><option value="4" class="bg-[#0b0a17] text-white">4х кабеля</option>
+                                </select><span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-4 pill-control px-3 py-1 flex items-center justify-center gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">L:</span>
-                                <input id="lv-sel-length" type="number" step="5" min="1" value="100" oninput="runLvCableSelection()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">м</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">L:</span><input id="lv-sel-length" type="number" step="5" min="1" value="100" oninput="runLvCableSelection()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">м</span>
                             </div>
-
                             <div class="col-span-5 pill-control px-3 py-1 flex items-center justify-center gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">P:</span>
-                                <input id="lv-sel-power" type="number" step="1" min="0.1" value="150" oninput="runLvCableSelection()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-[#00f2fe] font-bold shrink-0">кВт</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">P:</span><input id="lv-sel-power" type="number" step="1" min="0.1" value="150" oninput="runLvCableSelection()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#00f2fe] font-bold shrink-0">кВт</span>
                             </div>
-
                             <div class="col-span-3 pill-control px-2.5 py-1 flex items-center justify-center gap-1">
-                                <input id="lv-sel-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.9" oninput="runLvCableSelection()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">&phi;</span>
+                                <input id="lv-sel-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.9" oninput="runLvCableSelection()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">&phi;</span>
                             </div>
                         </div>
                     </div>
-
                     <div id="lv-selection-result-box" class="space-y-3"></div>
                 </div>
             </section>
 
             <!-- =====================================================
-                 МОДУЛЬ 2: 10 кВ
+                 МОДУЛЬ 2: 10 кВ (РАЗДЕЛЕН НА 2 ПОДВКЛАДКИ)
                  ===================================================== -->
             <section id="view-hv" class="space-y-3 hidden">
-                
                 <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
                     <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
-                        <select id="hv-insulation" onchange="onHvCableTypeChange()"
-                            class="bg-transparent text-[#00f2fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3">
-                            <option value="XLPE" selected class="bg-[#0b0a17] text-white">АПвПг (СПЭ)</option>
-                            <option value="PAPER" class="bg-[#0b0a17] text-white">ААБл (БПИ)</option>
+                        <select id="hv-insulation" onchange="onHvCableTypeChange()" class="bg-transparent text-[#00f2fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3">
+                            <option value="XLPE" selected class="bg-[#0b0a17] text-white">АПвПг (СПЭ)</option><option value="PAPER" class="bg-[#0b0a17] text-white">ААБл (БПИ)</option>
                         </select>
                         <span class="pointer-events-none absolute right-2 text-[8px] text-[#00f2fe]">▼</span>
                     </div>
-
                     <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-2.5 py-1.5">
                         <span class="text-[10px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
-                        <input id="hv-maxdrop" type="number" step="0.5" min="0.5" max="15" value="5.0" oninput="runHvCalculation()"
-                            class="w-8 bg-transparent text-right font-mono text-[11px] font-extrabold text-white outline-none">
+                        <input id="hv-maxdrop" type="number" step="0.5" min="0.5" max="15" value="5.0" oninput="runHvCalculation()" class="w-8 bg-transparent text-right font-mono text-[11px] font-extrabold text-white outline-none">
                         <span class="text-[10px] text-[#00f2fe] font-mono font-bold ml-0.5">%</span>
                     </div>
-
                     <div class="pill-control px-2.5 py-1.5 flex items-center">
                         <span id="hv-k-total-badge" class="text-[10px] font-mono font-bold text-[#00f2fe] whitespace-nowrap">Kобщ: 0.959</span>
                     </div>
                 </div>
 
+                <!-- ПОДВКЛАДКА 1: КАБЕЛЬ И ЭКРАН 10 кВ -->
                 <div id="hv-subtab-cable" class="space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
@@ -337,172 +279,112 @@
 
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#a855f7]"></div>
-
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-xs sm:text-sm font-bold text-white">Параметры линии и ТКЗ</span>
-                            <span id="hv-calc-ip-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-[#00f2fe]/12 text-[#00f2fe] border border-[#00f2fe]/40">
-                                Ip: 310.4 А
-                            </span>
+                            <span id="hv-calc-ip-badge" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold bg-[#00f2fe]/12 text-[#00f2fe] border border-[#00f2fe]/40">Ip: 310.4 А</span>
                         </div>
-
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]">
-                                <button type="button" id="hv-mat-pill-btn" onclick="toggleHvMaterial()"
-                                    class="w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center">
-                                    Алюм. (Al)
-                                </button>
+                                <button type="button" id="hv-mat-pill-btn" onclick="toggleHvMaterial()" class="w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center">Алюм. (Al)</button>
                             </div>
-
                             <div id="hv-laying-pill-wrap" class="col-span-5 pill-control px-2.5 py-1 flex items-center justify-center relative">
-                                <select id="hv-laying-select" onchange="setHvLaying(this.value)"
-                                    class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-3">
-                                    <option value="triangle" selected class="bg-[#0b0a17] text-white">Треугольник △</option>
-                                    <option value="flat" class="bg-[#0b0a17] text-white">В плоскости —</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span>
+                                <select id="hv-laying-select" onchange="setHvLaying(this.value)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-3">
+                                    <option value="triangle" selected class="bg-[#0b0a17] text-white">Треугольник △</option><option value="flat" class="bg-[#0b0a17] text-white">В плоскости —</option>
+                                </select><span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span>
                             </div>
-
                             <div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center relative">
-                                <select id="hv-parallel" onchange="runHvCalculation()"
-                                    class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2.5">
-                                    <option value="1" class="bg-[#0b0a17] text-white">1х нитка</option>
-                                    <option value="2" class="bg-[#0b0a17] text-white">2х нитки</option>
-                                    <option value="3" class="bg-[#0b0a17] text-white">3х нитки</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-1.5 text-[8px] text-slate-400">▼</span>
+                                <select id="hv-parallel" onchange="runHvCalculation()" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2.5">
+                                    <option value="1" class="bg-[#0b0a17] text-white">1х нитка</option><option value="2" class="bg-[#0b0a17] text-white">2х нитки</option><option value="3" class="bg-[#0b0a17] text-white">3х нитки</option>
+                                </select><span class="pointer-events-none absolute right-1.5 text-[8px] text-slate-400">▼</span>
                             </div>
                         </div>
-
                         <div id="hv-flat-spacing-row" class="hidden pt-0.5">
                             <div class="pill-control px-3 py-1 flex items-center justify-between">
                                 <span class="text-[10px] text-slate-300">Шаг между осями фаз в плоскости (S):</span>
-                                <div class="flex items-center gap-1">
-                                    <input id="hv-flat-spacing" type="number" step="10" min="40" max="500" value="100" oninput="runHvCalculation()"
-                                        class="w-14 bg-transparent text-right font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
-                                    <span class="text-[10px] text-slate-400">мм</span>
-                                </div>
+                                <div class="flex items-center gap-1"><input id="hv-flat-spacing" type="number" step="10" min="40" max="500" value="100" oninput="runHvCalculation()" class="w-14 bg-transparent text-right font-mono text-[11px] font-bold text-[#00f2fe] outline-none"><span class="text-[10px] text-slate-400">мм</span></div>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-4 pill-control px-2.5 py-1 flex items-center justify-center gap-0.5">
-                                <span class="text-[10px] text-slate-400 shrink-0">L:</span>
-                                <input id="hv-length" type="number" step="50" min="1" value="2400" oninput="runHvCalculation()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">м</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">L:</span><input id="hv-length" type="number" step="50" min="1" value="2400" oninput="onHvLengthInputMain()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">м</span>
                             </div>
-
                             <div class="col-span-5 pill-control px-2.5 py-1 flex items-center justify-center gap-1">
-                                <input id="hv-load-val" type="number" step="50" min="0.1" value="5000" oninput="runHvCalculation()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <button type="button" id="hv-mode-unit-btn" onclick="toggleHvLoadMode()"
-                                    class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">кВт</button>
+                                <input id="hv-load-val" type="number" step="50" min="0.1" value="5000" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
+                                <button type="button" id="hv-mode-unit-btn" onclick="toggleHvLoadMode()" class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">кВт</button>
                             </div>
-
                             <div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5">
-                                <input id="hv-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.93" oninput="runHvCalculation()"
-                                    title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">&phi;</span>
+                                <input id="hv-cosphi" type="number" step="0.01" min="0.5" max="1" value="0.93" oninput="runHvCalculation()" title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">&phi;</span>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-4 pill-control px-2.5 py-1 flex items-center justify-center gap-0.5">
-                                <span class="text-[10px] text-slate-400 shrink-0">Iкз⁽³⁾:</span>
-                                <input id="hv-ikz" type="number" step="0.5" min="0.1" value="15.24" oninput="runHvCalculation()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-[#a855f7] font-bold shrink-0">кА</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">Iкз⁽³⁾:</span><input id="hv-ikz" type="number" step="0.5" min="0.1" value="15.24" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#a855f7] font-bold shrink-0">кА</span>
                             </div>
-
                             <div class="col-span-4 pill-control px-2.5 py-1 flex items-center justify-center gap-0.5">
-                                <span class="text-[10px] text-slate-400 shrink-0">tкз:</span>
-                                <input id="hv-tkz-time" type="number" step="0.1" min="0.05" value="1.5" oninput="runHvCalculation()"
-                                    class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">с</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">tкз:</span><input id="hv-tkz-time" type="number" step="0.1" min="0.05" value="1.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">с</span>
                             </div>
-
-                            <div class="col-span-4 pill-control px-2 py-1 text-center font-mono text-[10px] text-slate-300 truncate">
-                                I⁽²⁾: <strong id="hv-ikz2-inline" class="text-[#a855f7]">13.20 кА</strong>
-                            </div>
+                            <div class="col-span-4 pill-control px-2 py-1 text-center font-mono text-[10px] text-slate-300 truncate">I⁽²⁾: <strong id="hv-ikz2-inline" class="text-[#a855f7]">13.20 кА</strong></div>
                         </div>
-
                         <div class="grid grid-cols-4 gap-1.5 pt-0.5">
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative">
-                                <span class="text-[9px] text-slate-400">K₁:</span>
-                                <select id="hv-k1" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2">
-                                    <option value="1.18" class="bg-[#0b0a17]">1.18 (+5°)</option>
-                                    <option value="1.14" class="bg-[#0b0a17]">1.14 (+10°)</option>
-                                    <option value="1.09" selected class="bg-[#0b0a17]">1.09</option>
-                                    <option value="1.05" class="bg-[#0b0a17]">1.05 (+20°)</option>
-                                    <option value="1.00" class="bg-[#0b0a17]">1.00 (+25°)</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span>
-                            </div>
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative">
-                                <span class="text-[9px] text-slate-400">K₂:</span>
-                                <select id="hv-k2" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2">
-                                    <option value="1.00" selected class="bg-[#0b0a17]">1.00</option>
-                                    <option value="0.93" class="bg-[#0b0a17]">0.93 (сух)</option>
-                                    <option value="0.86" class="bg-[#0b0a17]">0.86</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span>
-                            </div>
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative">
-                                <span class="text-[9px] text-slate-400">K₃:</span>
-                                <select id="hv-k3" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2">
-                                    <option value="1.05" class="bg-[#0b0a17]">1.05</option>
-                                    <option value="1.00" selected class="bg-[#0b0a17]">1.00</option>
-                                    <option value="0.92" class="bg-[#0b0a17]">0.92</option>
-                                    <option value="0.85" class="bg-[#0b0a17]">0.85</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span>
-                            </div>
-                            <div class="pill-control px-2 py-1 flex items-center justify-between relative">
-                                <span class="text-[9px] text-slate-400">K₄:</span>
-                                <select id="hv-k4" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2">
-                                    <option value="0.88" selected class="bg-[#0b0a17]">0.88</option>
-                                    <option value="1.00" class="bg-[#0b0a17]">1.00 (тр)</option>
-                                    <option value="0.85" class="bg-[#0b0a17]">0.85</option>
-                                </select>
-                                <span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span>
-                            </div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₁:</span><select id="hv-k1" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.18" class="bg-[#0b0a17]">1.18</option><option value="1.14" class="bg-[#0b0a17]">1.14</option><option value="1.09" selected class="bg-[#0b0a17]">1.09</option><option value="1.05" class="bg-[#0b0a17]">1.05</option><option value="1.00" class="bg-[#0b0a17]">1.00</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₂:</span><select id="hv-k2" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.00" selected class="bg-[#0b0a17]">1.00</option><option value="0.93" class="bg-[#0b0a17]">0.93</option><option value="0.86" class="bg-[#0b0a17]">0.86</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₃:</span><select id="hv-k3" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="1.05" class="bg-[#0b0a17]">1.05</option><option value="1.00" selected class="bg-[#0b0a17]">1.00</option><option value="0.92" class="bg-[#0b0a17]">0.92</option><option value="0.85" class="bg-[#0b0a17]">0.85</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
+                            <div class="pill-control px-2 py-1 flex items-center justify-between relative"><span class="text-[9px] text-slate-400">K₄:</span><select id="hv-k4" onchange="runHvCalculation()" class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-2"><option value="0.88" selected class="bg-[#0b0a17]">0.88</option><option value="1.00" class="bg-[#0b0a17]">1.00</option><option value="0.85" class="bg-[#0b0a17]">0.85</option></select><span class="pointer-events-none absolute right-1.5 text-[7px] text-slate-400">▼</span></div>
                         </div>
                     </div>
-
                     <div id="hv-cable-results-box" class="space-y-3"></div>
                 </div>
 
+                <!-- ПОДВКЛАДКА 2: ЗАЗЕМЛЕНИЕ И ЭКОНОМИКА 10 кВ -->
                 <div id="hv-subtab-grounding" class="hidden space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Оценка окупаемости транспозиции</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Схема заземления и экономика</span>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 mb-3">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="text-xs sm:text-sm font-bold text-white">Режим транспозиции</span>
+                            <button id="btn-transp-mode" onclick="toggleTranspMode()" class="px-2 py-1 rounded text-[10px] font-bold border border-[#00f2fe]/40 text-[#00f2fe] bg-[#00f2fe]/10 transition active:scale-95">Автовыбор</button>
+                        </div>
+                        <div id="hv-transp-manual-box" class="hidden grid-cols-4 gap-1.5 items-end">
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
+                                <span class="text-[9px] text-slate-400">N цикл:</span>
+                                <input id="hv-t-n" type="number" min="1" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-white outline-none">
+                            </div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
+                                <span class="text-[9px] text-slate-400">L₁ (м):</span>
+                                <input id="hv-t-l1" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
+                            </div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
+                                <span class="text-[9px] text-slate-400">L₂ (м):</span>
+                                <input id="hv-t-l2" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
+                            </div>
+                            <div class="pill-control px-2 py-1 flex flex-col justify-center">
+                                <span class="text-[9px] text-slate-400">L₃ (м):</span>
+                                <input id="hv-t-l3" type="number" oninput="onHvManualTransp()" class="w-full bg-transparent font-mono text-[11px] font-bold text-[#00f2fe] outline-none">
+                            </div>
+                        </div>
+                        <div id="hv-transp-manual-hint" class="hidden text-[9px] text-slate-400 leading-tight">Сумма длин L₁+L₂+L₃ формирует 1 цикл. Общая длина L пересчитывается автоматически (N × Lцикла). Разные длины участков вызовут уравнительные токи (Kт > 0).</div>
                     </div>
 
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
-                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400"></div>
                         <div class="text-xs sm:text-sm font-bold text-white mb-2">Экономические параметры</div>
-                        
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Тариф:</span>
-                                <input id="hv-eco-tariff" type="number" step="0.5" value="9.0" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-[#00f2fe] font-bold shrink-0">₽/кВтч</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">Тариф:</span><input id="hv-eco-tariff" type="number" step="0.5" value="9.0" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#00f2fe] font-bold shrink-0">₽/кВтч</span>
                             </div>
                             <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Время &tau;:</span>
-                                <input id="hv-eco-tau" type="number" step="100" value="8760" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">ч/год</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">Время &tau;:</span><input id="hv-eco-tau" type="number" step="100" value="8760" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">ч/год</span>
                             </div>
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span>
-                                <input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">лет</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span><input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">лет</span>
                             </div>
                             <div class="col-span-7 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span>
-                                <input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">млн ₽</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span><input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">млн ₽</span>
                             </div>
                         </div>
                     </div>
@@ -551,26 +433,15 @@
             </section>
         </main>
 
-        <!-- НИЖНИЙ ПЛАВАЮЩИЙ ДОК «ИТОГО ПО ЛИНИИ» (ДЛЯ 0,4 кВ) -->
         <div id="lv-floating-dock" class="hidden shrink-0 px-3.5 pb-2.5 pt-1 relative z-30">
             <div class="glass-panel rounded-2xl p-3.5 px-4 border border-[#00f2fe]/35 shadow-[0_-4px_25px_rgba(0,0,0,0.65)] flex items-center justify-between gap-3">
                 <div class="min-w-0">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Итого по линии</span>
-                        <span id="lv-status-badge" class="px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap"></span>
-                    </div>
-                    <div class="flex items-baseline gap-1.5 mt-0.5 flex-nowrap">
-                        <span id="lv-total-du-percent" class="text-[26px] leading-tight font-extrabold font-mono text-emerald-400 whitespace-nowrap">0.00%</span>
-                        <span id="lv-total-du-volts" class="text-xs font-mono text-emerald-400 font-semibold whitespace-nowrap">(0.0 В)</span>
-                    </div>
-                    <div class="text-xs sm:text-sm font-bold text-white mt-0.5 font-mono">
-                        U<span class="text-[10px] font-sans font-normal text-slate-300">кон</span>: <span id="lv-end-voltage-val">371.0 В</span>
-                    </div>
+                    <div class="flex items-center gap-2"><span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Итого по линии</span><span id="lv-status-badge" class="px-2 py-0.5 rounded-full text-[9px] font-bold border whitespace-nowrap"></span></div>
+                    <div class="flex items-baseline gap-1.5 mt-0.5 flex-nowrap"><span id="lv-total-du-percent" class="text-[26px] leading-tight font-extrabold font-mono text-emerald-400 whitespace-nowrap">0.00%</span><span id="lv-total-du-volts" class="text-xs font-mono text-emerald-400 font-semibold whitespace-nowrap">(0.0 В)</span></div>
+                    <div class="text-xs sm:text-sm font-bold text-white mt-0.5 font-mono">U<span class="text-[10px] font-sans font-normal text-slate-300">кон</span>: <span id="lv-end-voltage-val">371.0 В</span></div>
                 </div>
-
                 <div class="text-right font-mono text-xs text-slate-300 space-y-1.5 shrink-0 ml-auto">
-                    <div>L = <strong id="lv-total-length-val" class="text-white">0 м</strong></div>
-                    <div>&Delta;P = <strong id="lv-total-power-loss-val" class="text-white">0.00 кВт</strong></div>
+                    <div>L = <strong id="lv-total-length-val" class="text-white">0 м</strong></div><div>&Delta;P = <strong id="lv-total-power-loss-val" class="text-white">0.00 кВт</strong></div>
                 </div>
             </div>
         </div>
@@ -579,7 +450,6 @@
             <span id="toast-text">Скопировано</span>
         </div>
 
-        <!-- Увеличенный нижний тапбар -->
         <nav id="module-bottom-nav" class="hidden shrink-0 w-full bg-[#090814]/90 backdrop-blur-xl border-t border-[#8b5cf6]/25 px-3 pt-2.5 pb-safe z-40 shadow-[0_-8px_28px_rgba(0,0,0,0.65)]"></nav>
     </div>
 
@@ -588,37 +458,20 @@
         const LV_SECS = [1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240];
         const HV_SECS = [50, 70, 95, 120, 150, 185, 240, 500];
         const SCREEN_SECS = [16, 25, 35, 50, 70, 95, 120, 150];
-
         const SCREEN_IKZ_1S = { 16: 3.1, 25: 4.8, 35: 6.7, 50: 9.6, 70: 13.4, 95: 18.1, 120: 22.9, 150: 28.7 };
         const CORE_IKZ_1S = {
-            XLPE: {
-                Al: { 50: 4.7, 70: 6.6, 95: 8.9, 120: 11.3, 150: 14.2, 185: 17.5, 240: 22.7, 500: 47.0 },
-                Cu: { 50: 7.2, 70: 10.0, 95: 13.6, 120: 17.2, 150: 21.5, 185: 26.5, 240: 34.3, 500: 71.5 }
-            },
-            PAPER: {
-                Al: { 50: 4.5, 70: 6.3, 95: 8.6, 120: 10.8, 150: 13.5, 185: 16.7, 240: 21.6, 500: 45.0 },
-                Cu: { 50: 7.1, 70: 9.9, 95: 13.4, 120: 16.9, 150: 21.2, 185: 26.1, 240: 33.8, 500: 70.5 }
-            }
+            XLPE: { Al: { 50: 4.7, 70: 6.6, 95: 8.9, 120: 11.3, 150: 14.2, 185: 17.5, 240: 22.7, 500: 47.0 }, Cu: { 50: 7.2, 70: 10.0, 95: 13.6, 120: 17.2, 150: 21.5, 185: 26.5, 240: 34.3, 500: 71.5 } },
+            PAPER: { Al: { 50: 4.5, 70: 6.3, 95: 8.6, 120: 10.8, 150: 13.5, 185: 16.7, 240: 21.6, 500: 45.0 }, Cu: { 50: 7.1, 70: 9.9, 95: 13.4, 120: 16.9, 150: 21.2, 185: 26.1, 240: 33.8, 500: 70.5 } }
         };
-
         const XLPE_GEOM_DB = {
-            50:  { dOut: 29, dScr: 22 },
-            70:  { dOut: 31, dScr: 24 },
-            95:  { dOut: 33, dScr: 26 },
-            120: { dOut: 35, dScr: 28 },
-            150: { dOut: 37, dScr: 30 },
-            185: { dOut: 39, dScr: 31 },
-            240: { dOut: 42, dScr: 33 },
-            500: { dOut: 52, dScr: 43 }
+            50: {dOut:29, dScr:22}, 70: {dOut:31, dScr:24}, 95: {dOut:33, dScr:26}, 120: {dOut:35, dScr:28},
+            150: {dOut:37, dScr:30}, 185: {dOut:39, dScr:31}, 240: {dOut:42, dScr:33}, 500: {dOut:52, dScr:43}
         };
 
         function getCableGeometry(coreSec, screenSec) {
             const base = XLPE_GEOM_DB[coreSec] || XLPE_GEOM_DB[240];
             let delta = 0;
-            if (screenSec >= 150) delta = 5;
-            else if (screenSec >= 120) delta = 4;
-            else if (screenSec >= 95) delta = 3;
-            else if (screenSec >= 70) delta = 1;
+            if (screenSec >= 150) delta = 5; else if (screenSec >= 120) delta = 4; else if (screenSec >= 95) delta = 3; else if (screenSec >= 70) delta = 1;
             return { dOut: base.dOut + delta, dScr: base.dScr + delta };
         }
 
@@ -627,8 +480,7 @@
             6: [3.08, 4.61, 0.080, 0.125], 10: [1.83, 3.08, 0.075, 0.120], 16: [1.15, 1.91, 0.070, 0.112],
             25: [0.727, 1.20, 0.068, 0.105], 35: [0.524, 0.868, 0.066, 0.099], 50: [0.387, 0.641, 0.064, 0.126],
             70: [0.268, 0.443, 0.062, 0.118], 95: [0.193, 0.320, 0.060, 0.111], 120: [0.153, 0.253, 0.059, 0.106],
-            150: [0.124, 0.206, 0.058, 0.101], 185: [0.0991, 0.164, 0.057, 0.098], 240: [0.0754, 0.125, 0.056, 0.094],
-            500: [0.0366, 0.0464, 0.052, 0.084]
+            150: [0.124, 0.206, 0.058, 0.101], 185: [0.0991, 0.164, 0.057, 0.098], 240: [0.0754, 0.125, 0.056, 0.094], 500: [0.0366, 0.0464, 0.052, 0.084]
         };
 
         const AMP_DB = {
@@ -647,137 +499,67 @@
         };
 
         let state = {
-            mod: 'hub',
-            lvSub: 'drop',
-            hvSub: 'cable',
-            lvV: '0.38',
-            lvLimit: 4.5,
-            ktr: 0.9,
-            lvSelMat: 'Al',
-            lvSegs: [
-                { id: 1, name: 'ТП-10/0.4 → ВРУ-1', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 }
-            ],
+            mod: 'hub', lvSub: 'drop', hvSub: 'cable', lvV: '0.38', lvLimit: 4.5, ktr: 0.9, lvSelMat: 'Al',
+            lvSegs: [{ id: 1, name: 'ТП-10/0.4 → ВРУ-1', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 }],
             hv: {
-                ins: 'XLPE', mat: 'Al', lay: 'triangle', flatS: 100, par: 1,
-                k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88,
-                mode: 'P', val: 5000, len: 2400, cos: 0.93,
-                ikz: 15.24, t: 1.5, limit: 5.0,
+                ins: 'XLPE', mat: 'Al', lay: 'triangle', flatS: 100, par: 1, k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88,
+                mode: 'P', val: 5000, len: 2400, cos: 0.93, ikz: 15.24, t: 1.5, limit: 5.0,
+                transpMode: 'auto', nCycles: 1, l1: 800, l2: 800, l3: 800,
                 tariff: 9.0, tau: 8760, horizon: 10, transpCost: 2.5,
                 selectedCore: null, selectedScreen: null
             }
         };
 
-        function loadState() {
-            try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v23'));
-                if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
-            } catch (e) {}
-        }
-        function saveState() {
-            try { localStorage.setItem('kabelpro_v23', JSON.stringify(state)); } catch (e) {}
-        }
+        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v24')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
+        function saveState() { try { localStorage.setItem('kabelpro_v24', JSON.stringify(state)); } catch (e) {} }
 
         function openModule(mod) {
             state.mod = mod;
             ['view-hub', 'view-lv', 'view-hv', 'view-ref'].forEach(id => document.getElementById(id).classList.add('hidden'));
-            const nav = document.getElementById('module-bottom-nav');
-            const dock = document.getElementById('lv-floating-dock');
-            const sub = document.getElementById('header-subtitle');
-            const backBtn = document.getElementById('header-back-btn');
+            const nav = document.getElementById('module-bottom-nav'), dock = document.getElementById('lv-floating-dock'), sub = document.getElementById('header-subtitle'), backBtn = document.getElementById('header-back-btn');
             document.getElementById('app-content').scrollTop = 0;
-
             dock.classList.add('hidden');
 
             if (mod === 'hub') {
-                document.getElementById('view-hub').classList.remove('hidden');
-                nav.classList.add('hidden');
-                backBtn.classList.add('hidden');
-                sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ';
+                document.getElementById('view-hub').classList.remove('hidden'); nav.classList.add('hidden'); backBtn.classList.add('hidden'); sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ';
                 return;
             }
-
-            backBtn.classList.remove('hidden');
-            nav.classList.remove('hidden');
+            backBtn.classList.remove('hidden'); nav.classList.remove('hidden');
 
             if (mod === 'lv') {
-                document.getElementById('view-lv').classList.remove('hidden');
-                sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ';
-                switchLvSubTab(state.lvSub || 'drop');
+                document.getElementById('view-lv').classList.remove('hidden'); sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ'; switchLvSubTab(state.lvSub || 'drop');
             } else if (mod === 'hv') {
-                document.getElementById('view-hv').classList.remove('hidden');
-                sub.textContent = 'Модуль 10 кВ • По методике М.В. Дмитриева';
-                switchHvSubTab(state.hvSub || 'cable');
-                initHvControls();
-                runHvCalculation();
+                document.getElementById('view-hv').classList.remove('hidden'); sub.textContent = 'Модуль 10 кВ • По методике М.В. Дмитриева'; switchHvSubTab(state.hvSub || 'cable'); initHvControls(); runHvCalculation();
             } else if (mod === 'ref') {
-                document.getElementById('view-ref').classList.remove('hidden');
-                sub.textContent = 'Справочные таблицы ПУЭ 7 изд. и ГОСТ';
-                nav.innerHTML = `<div class="grid grid-cols-1">
-                    <div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs shadow-sm">
-                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        <span>Справочник ПУЭ и ГОСТ</span>
-                    </div>
-                </div>`;
+                document.getElementById('view-ref').classList.remove('hidden'); sub.textContent = 'Справочные таблицы ПУЭ 7 изд. и ГОСТ';
+                nav.innerHTML = `<div class="grid grid-cols-1"><div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs shadow-sm"><svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg><span>Справочник ПУЭ и ГОСТ</span></div></div>`;
                 renderReferenceTable();
             }
         }
 
         function switchLvSubTab(sub) {
-            state.lvSub = sub;
-            const isDrop = sub === 'drop';
-            document.getElementById('lv-subtab-drop').classList.toggle('hidden', !isDrop);
-            document.getElementById('lv-subtab-select').classList.toggle('hidden', isDrop);
-            document.getElementById('lv-floating-dock').classList.toggle('hidden', !isDrop);
-
-            document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2">
-                <button onclick="switchLvSubTab('drop')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
-                    <svg class="w-4 h-4 ${isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
-                    <span>Потери &Delta;U</span>
-                </button>
-                <button onclick="switchLvSubTab('select')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
-                    <svg class="w-4 h-4 ${!isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Подбор сечения</span>
-                </button>
-            </div>`;
-            if (!isDrop) runLvCableSelection();
-            else updateLvSummary();
+            state.lvSub = sub; const isDrop = sub === 'drop';
+            document.getElementById('lv-subtab-drop').classList.toggle('hidden', !isDrop); document.getElementById('lv-subtab-select').classList.toggle('hidden', isDrop); document.getElementById('lv-floating-dock').classList.toggle('hidden', !isDrop);
+            document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2"><button onclick="switchLvSubTab('drop')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg><span>Потери &Delta;U</span></button><button onclick="switchLvSubTab('select')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${!isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Подбор сечения</span></button></div>`;
+            if (!isDrop) runLvCableSelection(); else updateLvSummary();
         }
 
         function switchHvSubTab(sub) {
-            state.hvSub = sub;
-            const isCable = sub === 'cable';
-            document.getElementById('hv-subtab-cable').classList.toggle('hidden', !isCable);
-            document.getElementById('hv-subtab-grounding').classList.toggle('hidden', isCable);
-
-            document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2">
-                <button onclick="switchHvSubTab('cable')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
-                    <svg class="w-4 h-4 ${isCable ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <span>Кабель и Экран</span>
-                </button>
-                <button onclick="switchHvSubTab('grounding')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
-                    <svg class="w-4 h-4 ${!isCable ? 'text-emerald-400' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <span>Заземление и ₽</span>
-                </button>
-            </div>`;
+            state.hvSub = sub; const isCable = sub === 'cable';
+            document.getElementById('hv-subtab-cable').classList.toggle('hidden', !isCable); document.getElementById('hv-subtab-grounding').classList.toggle('hidden', isCable);
+            document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2"><button onclick="switchHvSubTab('cable')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${isCable ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Кабель и Экран</span></button><button onclick="switchHvSubTab('grounding')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${!isCable ? 'text-emerald-400' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Заземление и ₽</span></button></div>`;
         }
 
         // === МОДУЛЬ 0,4 кВ ===
-        function isLvSinglePhase(vStr) {
-            return vStr === '0.22' || vStr === '0.23';
-        }
-
         function getLvParams(sec, mat, ins, vStr) {
-            const rx = R_X_DB[sec] || R_X_DB[50];
-            const r0 = mat === 'Cu' ? rx[0] : rx[1], x0 = rx[2];
+            const rx = R_X_DB[sec] || R_X_DB[50]; const r0 = mat === 'Cu' ? rx[0] : rx[1], x0 = rx[2];
             const base = (AMP_DB[ins] && AMP_DB[ins][mat] && AMP_DB[ins][mat][sec]) ? AMP_DB[ins][mat][sec][0] : 100;
             const k4 = (vStr !== '0.22' && vStr !== '0.23') ? 0.93 : 1.0;
             return { r0, x0, base, k4, iDop: Math.round(base * state.ktr * k4) };
         }
-
         function calcLvSeg(seg) {
             const uKv = parseFloat(state.lvV), is1Ph = (state.lvV === '0.22' || state.lvV === '0.23');
-            const cos = Math.min(1, Math.max(0.1, parseFloat(seg.cos) || 0.9));
-            const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
+            const cos = Math.min(1, Math.max(0.1, parseFloat(seg.cos) || 0.9)); const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
             const lKm = (parseFloat(seg.len) || 0) / 1000, n = Math.max(1, parseInt(seg.par) || 1);
             const p = getLvParams(seg.sec, seg.mat, seg.ins, state.lvV);
             const cur = seg.mode === 'I' ? (parseFloat(seg.i) || 0) : ((parseFloat(seg.p) || 0) / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos));
@@ -787,81 +569,28 @@
             const totIdop = p.iDop * n;
             return { ...p, totIdop, cur, dV, dPct, dP, loadPct: totIdop > 0 ? (cur / totIdop) * 100 : 0 };
         }
-
         function setLvVoltage(v) { state.lvV = v; saveState(); updateLvUI(); renderLvSegments(); updateLvSummary(); }
         function onLvCustomLimitInput(v) { const n = parseFloat(v); if (n > 0) { state.lvLimit = n; saveState(); renderLvSegments(); updateLvSummary(); } }
         function updateLvUI() { const sel = document.getElementById('lv-drop-voltage-select'); if (sel) sel.value = state.lvV; }
         function getSegVisualClasses(m) {
-            const over = m.loadPct > 100;
-            const warn = !over && (m.loadPct > 80 || m.dPct >= 2.0);
+            const over = m.loadPct > 100, warn = !over && (m.loadPct > 80 || m.dPct >= 2.0);
             const stripeColor = over ? 'bg-rose-500' : (warn ? 'bg-amber-400' : 'bg-emerald-400');
             const badgeClass = over ? 'bg-rose-500/20 text-rose-300 border-rose-400/45' : 'bg-[#00f2fe]/12 text-[#00f2fe] border-[#00f2fe]/40 shadow-[0_0_10px_rgba(0,242,254,0.12)]';
             return { over, stripeColor, badgeClass };
         }
-
         function renderLvSegments() {
             document.getElementById('lv-segments-count-badge').textContent = state.lvSegs.length;
             document.getElementById('lv-segments-container').innerHTML = state.lvSegs.map((seg, i) => {
-                const m = calcLvSeg(seg);
-                const v = getSegVisualClasses(m);
-                const opts = LV_SECS.map(s => `<option value="${s}" ${seg.sec == s ? 'selected' : ''} class="bg-[#0b0a17] text-white">${s} мм²</option>`).join('');
-                return `
-                <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 transition-all">
-                    <div id="lv-stripe-${seg.id}" class="absolute left-0 top-0 bottom-0 w-1.5 ${v.stripeColor} transition-colors"></div>
-                    <div class="flex items-center justify-between gap-2">
-                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                            <span class="w-5 h-5 rounded-full bg-white/10 text-slate-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">${i + 1}</span>
-                            <input type="text" value="${esc(seg.name)}" oninput="updLvSeg(${seg.id},'name',this.value,false)" placeholder="Участок..." class="w-full bg-transparent text-xs sm:text-sm font-bold text-white outline-none truncate focus:border-b focus:border-[#00f2fe]">
-                        </div>
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <span id="lv-badge-${seg.id}" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${v.badgeClass}">&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)</span>
-                            <button type="button" onclick="dupLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-[#00f2fe] text-xs">❐</button>
-                            ${state.lvSegs.length > 1 ? `<button type="button" onclick="delLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-rose-400 text-xs">✕</button>` : ''}
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-12 gap-1.5 items-center">
-                        <div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 pr-1.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]">
-                            <button type="button" onclick="updLvSeg(${seg.id},'mat','${seg.mat === 'Al' ? 'Cu' : 'Al'}',true)" class="px-2 py-1 rounded-full text-[11px] font-extrabold transition shrink-0 ${seg.mat === 'Al' ? 'bg-[#00f2fe]/25 text-[#00f2fe]' : 'bg-amber-500/30 text-amber-300'}">${seg.mat}</button>
-                            <select onchange="updLvSeg(${seg.id},'sec',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pl-0.5">${opts}</select>
-                        </div>
-                        <div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5">
-                            <input type="number" step="5" min="1" value="${seg.len}" oninput="updLvSeg(${seg.id},'len',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                            <span class="text-[10px] text-slate-400 shrink-0">м</span>
-                        </div>
-                        <div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5">
-                            <input type="number" step="1" min="0" value="${seg.mode === 'P' ? seg.p : seg.i}" oninput="updLvSeg(${seg.id},'${seg.mode === 'P' ? 'p' : 'i'}',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                            <button type="button" onclick="updLvSeg(${seg.id},'mode','${seg.mode === 'P' ? 'I' : 'P'}',true)" class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">${seg.mode === 'P' ? 'кВт' : 'А'}</button>
-                        </div>
-                        <div class="col-span-2 pill-control px-2 py-1 flex items-center justify-center gap-0.5">
-                            <input type="number" step="0.01" min="0.5" max="1" value="${seg.cos}" oninput="updLvSeg(${seg.id},'cos',this.value,false)" title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                            <span class="text-[10px] text-slate-400 shrink-0">&phi;</span>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-12 gap-1.5 items-center pt-0.5">
-                        <div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center relative">
-                            <select onchange="updLvSeg(${seg.id},'ins',this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2.5">
-                                <option value="PVC" ${seg.ins === 'PVC' ? 'selected' : ''} class="bg-[#0b0a17] text-white">ПВХ</option><option value="XLPE" ${seg.ins === 'XLPE' ? 'selected' : ''} class="bg-[#0b0a17] text-white">СПЭ</option>
-                            </select><span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span>
-                        </div>
-                        <div class="col-span-2 pill-control px-1.5 py-1 flex items-center justify-center relative">
-                            <select onchange="updLvSeg(${seg.id},'par',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2">
-                                ${[1,2,3,4].map(n => `<option value="${n}" ${seg.par == n ? 'selected' : ''} class="bg-[#0b0a17] text-white">${n}х</option>`).join('')}
-                            </select><span class="pointer-events-none absolute right-1.5 text-[8px] text-slate-400">▼</span>
-                        </div>
-                        <div id="lv-submetrics-${seg.id}" class="col-span-7 pill-control px-2.5 py-1 text-right font-mono text-[10px] truncate ${v.over ? 'text-rose-400 font-bold border-rose-500/40' : 'text-slate-400'}">
-                            Ip: <strong class="text-white">${m.cur.toFixed(1)}А</strong> / Iд: <strong class="text-[#00f2fe]">${m.totIdop}А</strong> (${Math.round(m.loadPct)}%)
-                        </div>
-                    </div>
-                </div>`;
+                const m = calcLvSeg(seg), v = getSegVisualClasses(m), opts = LV_SECS.map(s => `<option value="${s}" ${seg.sec == s ? 'selected' : ''} class="bg-[#0b0a17] text-white">${s} мм²</option>`).join('');
+                return `<div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 transition-all"><div id="lv-stripe-${seg.id}" class="absolute left-0 top-0 bottom-0 w-1.5 ${v.stripeColor} transition-colors"></div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 min-w-0 flex-1"><span class="w-5 h-5 rounded-full bg-white/10 text-slate-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">${i + 1}</span><input type="text" value="${esc(seg.name)}" oninput="updLvSeg(${seg.id},'name',this.value,false)" placeholder="Участок..." class="w-full bg-transparent text-xs sm:text-sm font-bold text-white outline-none truncate focus:border-b focus:border-[#00f2fe]"></div><div class="flex items-center gap-1.5 shrink-0"><span id="lv-badge-${seg.id}" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${v.badgeClass}">&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)</span><button type="button" onclick="dupLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-[#00f2fe] text-xs">❐</button>${state.lvSegs.length > 1 ? `<button type="button" onclick="delLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-rose-400 text-xs">✕</button>` : ''}</div></div><div class="grid grid-cols-12 gap-1.5 items-center"><div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 pr-1.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]"><button type="button" onclick="updLvSeg(${seg.id},'mat','${seg.mat === 'Al' ? 'Cu' : 'Al'}',true)" class="px-2 py-1 rounded-full text-[11px] font-extrabold transition shrink-0 ${seg.mat === 'Al' ? 'bg-[#00f2fe]/25 text-[#00f2fe]' : 'bg-amber-500/30 text-amber-300'}">${seg.mat}</button><select onchange="updLvSeg(${seg.id},'sec',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pl-0.5">${opts}</select></div><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="5" min="1" value="${seg.len}" oninput="updLvSeg(${seg.id},'len',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">м</span></div><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="1" min="0" value="${seg.mode === 'P' ? seg.p : seg.i}" oninput="updLvSeg(${seg.id},'${seg.mode === 'P' ? 'p' : 'i'}',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><button type="button" onclick="updLvSeg(${seg.id},'mode','${seg.mode === 'P' ? 'I' : 'P'}',true)" class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">${seg.mode === 'P' ? 'кВт' : 'А'}</button></div><div class="col-span-2 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="0.01" min="0.5" max="1" value="${seg.cos}" oninput="updLvSeg(${seg.id},'cos',this.value,false)" title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">&phi;</span></div></div><div class="grid grid-cols-12 gap-1.5 items-center pt-0.5"><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center relative"><select onchange="updLvSeg(${seg.id},'ins',this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2.5"><option value="PVC" ${seg.ins === 'PVC' ? 'selected' : ''} class="bg-[#0b0a17] text-white">ПВХ</option><option value="XLPE" ${seg.ins === 'XLPE' ? 'selected' : ''} class="bg-[#0b0a17] text-white">СПЭ</option></select><span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span></div><div class="col-span-2 pill-control px-1.5 py-1 flex items-center justify-center relative"><select onchange="updLvSeg(${seg.id},'par',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2">${[1,2,3,4].map(n => `<option value="${n}" ${seg.par == n ? 'selected' : ''} class="bg-[#0b0a17] text-white">${n}х</option>`).join('')}</select><span class="pointer-events-none absolute right-1.5 text-[8px] text-slate-400">▼</span></div><div id="lv-submetrics-${seg.id}" class="col-span-7 pill-control px-2.5 py-1 text-right font-mono text-[10px] truncate ${v.over ? 'text-rose-400 font-bold border-rose-500/40' : 'text-slate-400'}">Ip: <strong class="text-white">${m.cur.toFixed(1)}А</strong> / Iд: <strong class="text-[#00f2fe]">${m.totIdop}А</strong> (${Math.round(m.loadPct)}%)</div></div></div>`;
             }).join('');
         }
-
         function updLvSeg(id, f, v, full) {
             const s = state.lvSegs.find(x => x.id === id); if (!s) return;
             s[f] = v; saveState();
             if (full) renderLvSegments();
             else {
-                const m = calcLvSeg(s); const vis = getSegVisualClasses(m);
+                const m = calcLvSeg(s), vis = getSegVisualClasses(m);
                 const stripeEl = document.getElementById(`lv-stripe-${id}`), badgeEl = document.getElementById(`lv-badge-${id}`), subEl = document.getElementById(`lv-submetrics-${id}`);
                 if (stripeEl) stripeEl.className = `absolute left-0 top-0 bottom-0 w-1.5 ${vis.stripeColor} transition-colors`;
                 if (badgeEl) { badgeEl.className = `px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${vis.badgeClass}`; badgeEl.innerHTML = `&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)`; }
@@ -869,74 +598,50 @@
             }
             updateLvSummary();
         }
-
         function addLvSegment() { const last = state.lvSegs[state.lvSegs.length - 1]; state.lvSegs.push({ id: Date.now(), name: `Участок ${state.lvSegs.length + 1}`, mat: last ? last.mat : 'Al', ins: 'PVC', sec: last ? last.sec : 95, par: 1, len: 60, mode: 'P', p: 80, i: 135, cos: 0.9 }); saveState(); renderLvSegments(); updateLvSummary(); }
         function dupLvSeg(id) { const idx = state.lvSegs.findIndex(x => x.id === id); if (idx === -1) return; state.lvSegs.splice(idx + 1, 0, { ...state.lvSegs[idx], id: Date.now(), name: state.lvSegs[idx].name + ' (копия)' }); saveState(); renderLvSegments(); updateLvSummary(); showToast('Участок дублирован'); }
         function delLvSeg(id) { if (state.lvSegs.length <= 1) return; state.lvSegs = state.lvSegs.filter(x => x.id !== id); saveState(); renderLvSegments(); updateLvSummary(); }
-
         function updateLvSummary() {
             let dV = 0, dPct = 0, len = 0, dP = 0, over = false;
             state.lvSegs.forEach(s => { const m = calcLvSeg(s); dV += m.dV; dPct += m.dPct; len += (+s.len || 0); dP += m.dP; if (m.loadPct > 100) over = true; });
             const uV = parseFloat(state.lvV) * 1000;
             const pEl = document.getElementById('lv-total-du-percent'), vEl = document.getElementById('lv-total-du-volts'), badge = document.getElementById('lv-status-badge');
             pEl.textContent = `${dPct.toFixed(2)}%`; vEl.textContent = `(${dV.toFixed(1)} В)`;
-            document.getElementById('lv-end-voltage-val').textContent = `${Math.max(0, uV - dV).toFixed(1)} В`;
-            document.getElementById('lv-total-length-val').textContent = `${Math.round(len)} м`;
-            document.getElementById('lv-total-power-loss-val').textContent = `${dP.toFixed(2)} кВт`;
-
+            document.getElementById('lv-end-voltage-val').textContent = `${Math.max(0, uV - dV).toFixed(1)} В`; document.getElementById('lv-total-length-val').textContent = `${Math.round(len)} м`; document.getElementById('lv-total-power-loss-val').textContent = `${dP.toFixed(2)} кВт`;
             const lim = state.lvLimit;
             if (dPct < 3) { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-emerald-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-emerald-400 font-semibold whitespace-nowrap'; }
             else if (dPct <= lim) { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-amber-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-amber-400 font-semibold whitespace-nowrap'; }
             else { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-rose-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-rose-400 font-semibold whitespace-nowrap'; }
-
-            if (dPct <= lim && !over) {
-                badge.className = dPct < 3 ? 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/35 whitespace-nowrap' : 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35 whitespace-nowrap';
-                badge.textContent = dPct < 3 ? `В норме (≤ ${lim}%)` : `Близко к пределу (≤ ${lim}%)`;
-            } else {
-                badge.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-400/40 animate-pulse-sub whitespace-nowrap';
-                badge.textContent = dPct > lim ? `Превышение (> ${lim}%)` : 'Перегруз по току';
-            }
+            if (dPct <= lim && !over) { badge.className = dPct < 3 ? 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/35 whitespace-nowrap' : 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35 whitespace-nowrap'; badge.textContent = dPct < 3 ? `В норме (≤ ${lim}%)` : `Близко к пределу (≤ ${lim}%)`; }
+            else { badge.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-400/40 animate-pulse-sub whitespace-nowrap'; badge.textContent = dPct > lim ? `Превышение (> ${lim}%)` : 'Перегруз по току'; }
         }
-
         function toggleLvSelMaterial() {
-            state.lvSelMat = (state.lvSelMat === 'Cu') ? 'Al' : 'Cu';
-            const btn = document.getElementById('lv-sel-mat-btn');
+            state.lvSelMat = (state.lvSelMat === 'Cu') ? 'Al' : 'Cu'; const btn = document.getElementById('lv-sel-mat-btn');
             if (state.lvSelMat === 'Al') { btn.textContent = 'Алюминий (Al)'; btn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center'; }
             else { btn.textContent = 'Медь (Cu)'; btn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-amber-500/30 text-amber-300 text-center'; }
             saveState(); runLvCableSelection();
         }
-
         function runLvCableSelection() {
             const vStr = document.getElementById('lv-sel-voltage').value, mat = state.lvSelMat || 'Al', ins = document.getElementById('lv-sel-insulation').value;
             state.ktr = Math.min(1, Math.max(0.5, +document.getElementById('lv-sel-ktr').value || 0.9));
             const P = +document.getElementById('lv-sel-power').value || 10, L = +document.getElementById('lv-sel-length').value || 50, cos = +document.getElementById('lv-sel-cosphi').value || 0.9;
             const lim = +document.getElementById('lv-sel-maxdrop').value || 4.5, par = +document.getElementById('lv-sel-parallel').value || 1;
-            const is1Ph = isLvSinglePhase(vStr), uKv = parseFloat(vStr), sin = Math.sqrt(Math.max(0, 1 - cos * cos));
-            const cur = P / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos);
-
+            const is1Ph = isLvSinglePhase(vStr), uKv = parseFloat(vStr), sin = Math.sqrt(Math.max(0, 1 - cos * cos)), cur = P / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos);
             const ipBadge = document.getElementById('lv-sel-calc-ip-badge'); if (ipBadge) ipBadge.textContent = `Ip: ${cur.toFixed(1)} А`;
-
             const list = LV_SECS.map(sec => {
-                const p = getLvParams(sec, mat, ins, vStr);
-                const totIdop = p.iDop * par;
-                const dV = (is1Ph ? 2 : Math.sqrt(3)) * cur * (L / 1000) * ((p.r0 * cos + p.x0 * sin) / par);
-                const dPct = (dV / (uKv * 1000)) * 100;
+                const p = getLvParams(sec, mat, ins, vStr); const totIdop = p.iDop * par;
+                const dV = (is1Ph ? 2 : Math.sqrt(3)) * cur * (L / 1000) * ((p.r0 * cos + p.x0 * sin) / par), dPct = (dV / (uKv * 1000)) * 100;
                 return { sec, totIdop, dV, dPct, loadPct: (cur / totIdop) * 100, ok: totIdop >= cur && dPct <= lim };
             });
             const recIdx = list.findIndex(x => x.ok); const box = document.getElementById('lv-selection-result-box');
             if (recIdx === -1) { box.innerHTML = `<div class="glass-panel rounded-2xl p-4 pl-5 relative overflow-hidden text-xs text-rose-300"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-500"></div>Недостаточно сечения до 240 мм² (Ip = ${cur.toFixed(1)} А). Увеличьте число параллельных кабелей.</div>`; return; }
             const rec = list[recIdx], slice = list.slice(Math.max(0, recIdx - 1), recIdx + 2);
-            const duColor = rec.dPct < 3 ? 'text-emerald-400' : (rec.dPct <= lim ? 'text-amber-400' : 'text-rose-400');
-            const parPrefix = par > 1 ? par + ' × ' : '';
-
+            const duColor = rec.dPct < 3 ? 'text-emerald-400' : (rec.dPct <= lim ? 'text-amber-400' : 'text-rose-400'), parPrefix = par > 1 ? par + ' × ' : '';
             box.innerHTML = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-3">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-400"></div>
                     <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <span class="text-[10px] font-bold text-[#00f2fe] uppercase tracking-wider block">Рекомендуемое сечение</span>
-                            <div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${rec.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>
-                        </div>
+                        <div><span class="text-[10px] font-bold text-[#00f2fe] uppercase tracking-wider block">Рекомендуемое сечение</span><div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${rec.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div></div>
                         <button onclick="applyLvRec(${rec.sec},'${mat}','${ins}',${par},${P},${L},${cos})" class="px-3 py-1.5 rounded-full neon-btn text-white text-xs font-bold active:scale-95 transition">+ В расчёт &Delta;U</button>
                     </div>
                     <div class="grid grid-cols-3 gap-1.5 text-center">
@@ -956,29 +661,30 @@
 
         // === МОДУЛЬ 10 кВ ===
         function initHvControls() {
-            document.getElementById('hv-insulation').value = state.hv.ins;
-            document.getElementById('hv-laying-select').value = state.hv.lay;
-            document.getElementById('hv-flat-spacing').value = state.hv.flatS || 100;
-            document.getElementById('hv-parallel').value = state.hv.par;
-            document.getElementById('hv-length').value = state.hv.len;
-            document.getElementById('hv-load-val').value = state.hv.val;
-            document.getElementById('hv-cosphi').value = state.hv.cos;
-            document.getElementById('hv-maxdrop').value = state.hv.limit;
-            document.getElementById('hv-k1').value = String(state.hv.k1.toFixed(2));
-            document.getElementById('hv-k2').value = String(state.hv.k2.toFixed(2));
-            document.getElementById('hv-k3').value = String(state.hv.k3.toFixed(2));
-            document.getElementById('hv-k4').value = String(state.hv.k4.toFixed(2));
-            document.getElementById('hv-ikz').value = state.hv.ikz;
-            document.getElementById('hv-tkz-time').value = state.hv.t;
+            document.getElementById('hv-insulation').value = state.hv.ins; document.getElementById('hv-laying-select').value = state.hv.lay;
+            document.getElementById('hv-flat-spacing').value = state.hv.flatS || 100; document.getElementById('hv-parallel').value = state.hv.par;
+            document.getElementById('hv-length').value = state.hv.len; document.getElementById('hv-load-val').value = state.hv.val;
+            document.getElementById('hv-cosphi').value = state.hv.cos; document.getElementById('hv-maxdrop').value = state.hv.limit;
+            document.getElementById('hv-k1').value = String(state.hv.k1.toFixed(2)); document.getElementById('hv-k2').value = String(state.hv.k2.toFixed(2));
+            document.getElementById('hv-k3').value = String(state.hv.k3.toFixed(2)); document.getElementById('hv-k4').value = String(state.hv.k4.toFixed(2));
+            document.getElementById('hv-ikz').value = state.hv.ikz; document.getElementById('hv-tkz-time').value = state.hv.t;
             
-            document.getElementById('hv-eco-tariff').value = state.hv.tariff;
-            document.getElementById('hv-eco-tau').value = state.hv.tau;
-            document.getElementById('hv-eco-horizon').value = state.hv.horizon;
-            document.getElementById('hv-eco-cost').value = state.hv.transpCost;
+            document.getElementById('hv-eco-tariff').value = state.hv.tariff; document.getElementById('hv-eco-tau').value = state.hv.tau;
+            document.getElementById('hv-eco-horizon').value = state.hv.horizon; document.getElementById('hv-eco-cost').value = state.hv.transpCost;
+            
+            document.getElementById('hv-t-n').value = state.hv.nCycles || 1;
+            document.getElementById('hv-t-l1').value = state.hv.l1 || 800;
+            document.getElementById('hv-t-l2').value = state.hv.l2 || 800;
+            document.getElementById('hv-t-l3').value = state.hv.l3 || 800;
 
             updateHvUI();
         }
 
+        function onHvLengthInputMain() {
+            if (state.hv.transpMode === 'manual') return; // Don't change L if in manual mode
+            state.hv.len = Math.max(1, +document.getElementById('hv-length').value || 100);
+            saveState(); runHvCalculation();
+        }
         function onHvCableTypeChange() { state.hv.ins = document.getElementById('hv-insulation').value; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function toggleHvMaterial() { state.hv.mat = (state.hv.mat === 'Cu') ? 'Al' : 'Cu'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function setHvLaying(l) { state.hv.lay = l; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
@@ -986,186 +692,166 @@
         function pickHvCore(sec) { state.hv.selectedCore = sec; saveState(); runHvCalculation(); }
         function pickHvScreen(sec) { state.hv.selectedScreen = sec; saveState(); runHvCalculation(); }
 
+        function toggleTranspMode() {
+            state.hv.transpMode = state.hv.transpMode === 'manual' ? 'auto' : 'manual';
+            saveState(); updateHvUI(); runHvCalculation();
+        }
+
+        function onHvManualTransp() {
+            if (state.hv.transpMode !== 'manual') return;
+            state.hv.nCycles = Math.max(1, +document.getElementById('hv-t-n').value || 1);
+            state.hv.l1 = Math.max(0, +document.getElementById('hv-t-l1').value || 0);
+            state.hv.l2 = Math.max(0, +document.getElementById('hv-t-l2').value || 0);
+            state.hv.l3 = Math.max(0, +document.getElementById('hv-t-l3').value || 0);
+            state.hv.len = state.hv.nCycles * (state.hv.l1 + state.hv.l2 + state.hv.l3) || 1;
+            document.getElementById('hv-length').value = state.hv.len;
+            saveState(); runHvCalculation();
+        }
+
         function updateHvUI() {
-            const isXlpe = state.hv.ins === 'XLPE';
-            const layWrap = document.getElementById('hv-laying-pill-wrap');
-            if (layWrap) layWrap.style.opacity = isXlpe ? '1' : '0.45';
-
-            const flatRow = document.getElementById('hv-flat-spacing-row');
-            if (flatRow) flatRow.classList.toggle('hidden', !(isXlpe && state.hv.lay === 'flat'));
-
+            const isXlpe = state.hv.ins === 'XLPE', isManual = state.hv.transpMode === 'manual';
+            const layWrap = document.getElementById('hv-laying-pill-wrap'); if (layWrap) layWrap.style.opacity = isXlpe ? '1' : '0.45';
+            const flatRow = document.getElementById('hv-flat-spacing-row'); if (flatRow) flatRow.classList.toggle('hidden', !(isXlpe && state.hv.lay === 'flat'));
             document.getElementById('hv-cable-mark-badge').textContent = isXlpe ? `${state.hv.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'} (${state.hv.lay === 'triangle' ? '△' : '—'})` : `${state.hv.mat === 'Al' ? 'ААБл-10' : 'СБл-10'} (3ж)`;
-
             const matBtn = document.getElementById('hv-mat-pill-btn');
             if (state.hv.mat === 'Al') { matBtn.textContent = 'Алюм. (Al)'; matBtn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center'; }
             else { matBtn.textContent = 'Медь (Cu)'; matBtn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-amber-500/30 text-amber-300 text-center'; }
+            const unitBtn = document.getElementById('hv-mode-unit-btn'); if (unitBtn) unitBtn.textContent = state.hv.mode === 'P' ? 'кВт' : 'А';
 
-            const unitBtn = document.getElementById('hv-mode-unit-btn');
-            if (unitBtn) unitBtn.textContent = state.hv.mode === 'P' ? 'кВт' : 'А';
+            const lenInput = document.getElementById('hv-length');
+            if (lenInput) { lenInput.readOnly = isManual; lenInput.style.opacity = isManual ? '0.5' : '1'; }
+            const btnMode = document.getElementById('btn-transp-mode'), boxManual = document.getElementById('hv-transp-manual-box'), hintManual = document.getElementById('hv-transp-manual-hint');
+            if (btnMode) { btnMode.textContent = isManual ? 'Ручной ввод' : 'Автовыбор'; btnMode.className = isManual ? 'px-2 py-1 rounded text-[10px] font-bold border border-amber-400/40 text-amber-400 bg-amber-400/10 transition active:scale-95' : 'px-2 py-1 rounded text-[10px] font-bold border border-[#00f2fe]/40 text-[#00f2fe] bg-[#00f2fe]/10 transition active:scale-95'; }
+            if (boxManual) { if (isManual) { boxManual.classList.remove('hidden'); boxManual.classList.add('grid'); hintManual.classList.remove('hidden'); } else { boxManual.classList.remove('grid'); boxManual.classList.add('hidden'); hintManual.classList.add('hidden'); } }
         }
 
         function evalHv(sec, h) {
             const rx = R_X_DB[sec] || R_X_DB[240];
-            const r0 = h.mat === 'Cu' ? rx[0] : rx[1];
-            const x0 = rx[3] * ((h.ins === 'XLPE' && h.lay === 'flat') ? 1.25 : 1.0);
-            const baseIdop = (AMP_DB[h.ins][h.mat][sec] || [200])[0];
-            const layFactor = (h.ins === 'XLPE' && h.lay === 'flat') ? 0.92 : 1.0;
-            const kTotal = +(h.k1 * h.k2 * h.k3 * h.k4 * layFactor).toFixed(3);
-            const iDopFact = +(baseIdop * kTotal * h.par).toFixed(1);
-            const sin = Math.sqrt(Math.max(0, 1 - h.cos * h.cos));
-            const cur = h.mode === 'I' ? h.val : (h.val / (Math.sqrt(3) * 10 * h.cos));
-            const dV = Math.sqrt(3) * cur * (h.len / 1000) * ((r0 * h.cos + x0 * sin) / h.par);
-            const dPct = (dV / 10000) * 100;
-            const dP = (3 * cur * cur * (r0 / h.par) * (h.len / 1000)) / 1000;
-            const ikz2 = +(Math.sqrt(3) / 2 * h.ikz).toFixed(3);
-            const kTime = +(1 / Math.sqrt(h.t)).toFixed(3);
-            const iCore1s = (CORE_IKZ_1S[h.ins] && CORE_IKZ_1S[h.ins][h.mat][sec]) || 15;
-            const iCorePerm = +(iCore1s * kTime * h.par).toFixed(3);
-
-            return { sec, r0, x0, baseIdop, kTotal, iDopFact, cur, dV, dPct, dP, loadPct: (cur / iDopFact) * 100, ikz2, kTime, iCore1s, iCorePerm, okI: iDopFact >= cur, okU: dPct <= h.limit, okCoreKz: iCorePerm > ikz2, okAll: iDopFact >= cur && dPct <= h.limit && iCorePerm > ikz2 };
+            const r0 = h.mat === 'Cu' ? rx[0] : rx[1], x0 = rx[3] * ((h.ins === 'XLPE' && h.lay === 'flat') ? 1.25 : 1.0);
+            const baseIdop = (AMP_DB[h.ins][h.mat][sec] || [200])[0], layFactor = (h.ins === 'XLPE' && h.lay === 'flat') ? 0.92 : 1.0;
+            const kTotal = +(h.k1 * h.k2 * h.k3 * h.k4 * layFactor).toFixed(3), iDopFact = +(baseIdop * kTotal * h.par).toFixed(1);
+            const sin = Math.sqrt(Math.max(0, 1 - h.cos * h.cos)), cur = h.mode === 'I' ? h.val : (h.val / (Math.sqrt(3) * 10 * h.cos));
+            const dV = Math.sqrt(3) * cur * (h.len / 1000) * ((r0 * h.cos + x0 * sin) / h.par), dPct = (dV / 10000) * 100;
+            const ikz2 = +(Math.sqrt(3) / 2 * h.ikz).toFixed(3), kTime = +(1 / Math.sqrt(h.t)).toFixed(3);
+            const iCore1s = (CORE_IKZ_1S[h.ins] && CORE_IKZ_1S[h.ins][h.mat][sec]) || 15, iCorePerm = +(iCore1s * kTime * h.par).toFixed(3);
+            return { sec, r0, x0, baseIdop, kTotal, iDopFact, cur, dV, dPct, loadPct: (cur / iDopFact) * 100, ikz2, kTime, iCore1s, iCorePerm, okI: iDopFact >= cur, okU: dPct <= h.limit, okCoreKz: iCorePerm > ikz2, okAll: iDopFact >= cur && dPct <= h.limit && iCorePerm > ikz2 };
         }
 
         function runHvCalculation() {
             const h = state.hv;
             h.par = +document.getElementById('hv-parallel').value || 1;
             h.flatS = Math.max(30, +document.getElementById('hv-flat-spacing').value || 100);
-            h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
             h.val = Math.max(0.1, +document.getElementById('hv-load-val').value || 100);
             h.cos = Math.min(1, Math.max(0.3, +document.getElementById('hv-cosphi').value || 0.93));
             h.limit = Math.max(0.5, +document.getElementById('hv-maxdrop').value || 5.0);
-            h.k1 = +document.getElementById('hv-k1').value || 1.09;
-            h.k2 = +document.getElementById('hv-k2').value || 1.00;
-            h.k3 = +document.getElementById('hv-k3').value || 1.00;
-            h.k4 = +document.getElementById('hv-k4').value || 0.88;
-            h.ikz = Math.max(0.1, +document.getElementById('hv-ikz').value || 15.24);
-            h.t = Math.max(0.05, +document.getElementById('hv-tkz-time').value || 1.5);
+            h.k1 = +document.getElementById('hv-k1').value || 1.09; h.k2 = +document.getElementById('hv-k2').value || 1.00;
+            h.k3 = +document.getElementById('hv-k3').value || 1.00; h.k4 = +document.getElementById('hv-k4').value || 0.88;
+            h.ikz = Math.max(0.1, +document.getElementById('hv-ikz').value || 15.24); h.t = Math.max(0.05, +document.getElementById('hv-tkz-time').value || 1.5);
+            h.tariff = Math.max(0, +document.getElementById('hv-eco-tariff').value || 9.0); h.tau = Math.max(1, +document.getElementById('hv-eco-tau').value || 8760);
+            h.horizon = Math.max(1, +document.getElementById('hv-eco-horizon').value || 10); h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
             
-            h.tariff = Math.max(0, +document.getElementById('hv-eco-tariff').value || 9.0);
-            h.tau = Math.max(1, +document.getElementById('hv-eco-tau').value || 8760);
-            h.horizon = Math.max(1, +document.getElementById('hv-eco-horizon').value || 10);
-            h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
+            if (h.transpMode !== 'manual') {
+                h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
+            }
             saveState();
 
-            const allCores = HV_SECS.map(s => evalHv(s, h));
-            const recCoreIdx = allCores.findIndex(x => x.okAll);
-            const recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
+            const allCores = HV_SECS.map(s => evalHv(s, h)), recCoreIdx = allCores.findIndex(x => x.okAll), recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
             const activeCore = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
 
             document.getElementById('hv-k-total-badge').textContent = `Kобщ: ${activeCore.kTotal.toFixed(3)}`;
             document.getElementById('hv-calc-ip-badge').textContent = `Ip: ${activeCore.cur.toFixed(1)} А`;
 
             const centerCoreIdx = recCoreIdx !== -1 ? recCoreIdx : allCores.length - 2;
-            const coreSliceStart = Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1));
-            const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
+            const coreSlice = allCores.slice(Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1)), Math.max(0, Math.min(allCores.length - 3, centerCoreIdx - 1)) + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
-            const ikz2 = activeCore.ikz2;
-            const kTime = activeCore.kTime;
-            const lnTerm = Math.log((350 + 228) / (70 + 228));
+            const ikz2 = activeCore.ikz2, kTime = activeCore.kTime, lnTerm = Math.log((350 + 228) / (70 + 228));
             const sScreenCalc = Math.sqrt((Math.pow(ikz2, 2) * h.t) / (Math.pow(1.089, 2) * Math.pow(226, 2) * lnTerm)) * 1000;
-
-            const allScreens = SCREEN_SECS.map(s => {
-                const i1s = SCREEN_IKZ_1S[s];
-                const iPerm = +(i1s * kTime).toFixed(3);
-                return { sec: s, i1s, iPerm, ok: iPerm > ikz2 };
-            });
-            const recScrIdx = allScreens.findIndex(x => x.ok);
-            const recScr = recScrIdx !== -1 ? allScreens[recScrIdx] : null;
+            const allScreens = SCREEN_SECS.map(s => { const iPerm = +(SCREEN_IKZ_1S[s] * kTime).toFixed(3); return { sec: s, i1s: SCREEN_IKZ_1S[s], iPerm, ok: iPerm > ikz2 }; });
+            const recScrIdx = allScreens.findIndex(x => x.ok), recScr = recScrIdx !== -1 ? allScreens[recScrIdx] : null;
             const activeScr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
-
-            const centerScrIdx = recScrIdx !== -1 ? recScrIdx : allScreens.length - 2;
-            const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
+            const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, (recScrIdx !== -1 ? recScrIdx : allScreens.length - 2) - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
-            const geom = getCableGeometry(activeCore.sec, activeScr.sec);
-            const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
-            const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
-            const lg2 = Math.log10(2);
-            const iOneCable = activeCore.cur / h.par;
-            const ikz3OneCableKa = h.ikz / h.par;
-            const lenKm = h.len / 1000;
+            const geom = getCableGeometry(activeCore.sec, activeScr.sec), sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
+            const lgRatio = Math.log10((2 * sSpacing) / geom.dScr), lg2 = Math.log10(2), iOneCable = activeCore.cur / h.par, ikz3OneCableKa = h.ikz / h.par;
+            let xm = 0; if (h.lay === 'triangle') xm = 0.144 * lgRatio; else xm = 0.144 * Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
 
-            let xm = 0;
-            if (h.lay === 'triangle') xm = 0.144 * lgRatio;
-            else xm = 0.144 * Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
-
-            const uInduced = iOneCable * lenKm * xm;
-            const uKzInducedKv = ikz3OneCableKa * lenKm * xm;
-
-            const rScreenOhmKm = 20.0 / activeScr.sec;
-            const rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / activeCore.sec;
-            const iScreenRatio = 1 / Math.sqrt(1 + Math.pow(rScreenOhmKm / xm, 2));
-            const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
-            const kiFactor = 1 / Math.sqrt(1 + dpLossRatio);
-            const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
-            const okSolidBonding = iDopSolidBonding >= activeCore.cur;
-
-            const pass50V = uInduced <= 50.0;
-            const pass5kV = uKzInducedKv <= 5.0;
-
-            const minCyclesBy50V = Math.max(1, Math.ceil(uInduced / (50 * 3)));
-            const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedKv / (5.0 * 3)));
+            // Auto cycles based on full length
+            const uInducedAuto = iOneCable * (h.len / 1000) * xm, uKzInducedAutoKv = ikz3OneCableKa * (h.len / 1000) * xm;
+            const minCyclesBy50V = Math.max(1, Math.ceil(uInducedAuto / (50 * 3)));
+            const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedAutoKv / (5.0 * 3)));
             const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
-            const nCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
-            const nSections = nCycles * 3;
-            const secLenM = Math.round(h.len / nSections);
-            const uNodeV = uInduced / nSections;
-            const uKzNodeKv = uKzInducedKv / nSections;
+            const autoCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
 
-            const transpCostTotal = nCycles * h.transpCost;
-            
-            // Финансовые расчёты для окупаемости
-            const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
-            const pScreenTotalWatts = pCoreTotalWatts * dpLossRatio;
-            const wScreenYearKwh = (pScreenTotalWatts / 1000) * h.tau;
-            const moneyLostYearMln = (wScreenYearKwh * h.tariff) / 1000000;
-            
-            let paybackYears = Infinity;
-            if (moneyLostYearMln > 0) {
-                paybackYears = transpCostTotal / moneyLostYearMln;
+            let nCycles, l1, l2, l3;
+            if (h.transpMode === 'auto') {
+                nCycles = autoCycles; l1 = h.len / (3 * nCycles); l2 = l1; l3 = l1;
+                // keep state in sync just for info
+                h.nCycles = nCycles; h.l1 = l1; h.l2 = l2; h.l3 = l3;
+            } else {
+                nCycles = Math.max(1, +document.getElementById('hv-t-n').value || 1);
+                l1 = Math.max(0, +document.getElementById('hv-t-l1').value || 0);
+                l2 = Math.max(0, +document.getElementById('hv-t-l2').value || 0);
+                l3 = Math.max(0, +document.getElementById('hv-t-l3').value || 0);
             }
+            const cycleLen = l1 + l2 + l3 || 1;
+
+            // Kt calculation
+            const reKt = (l1 - 0.5 * (l2 + l3)) / cycleLen;
+            const imKt = (0.5 * Math.sqrt(3) * (l2 - l3)) / cycleLen;
+            const ktMod = Math.sqrt(reKt * reKt + imKt * imKt);
+
+            // Node Voltages for 1 cycle
+            const reNode1 = 1 - reKt, imNode1 = -imKt, modNode1 = Math.sqrt(reNode1*reNode1 + imNode1*imNode1);
+            const xL1 = xm * (l1 / 1000);
+            const uNode1V = xL1 * iOneCable * modNode1, uKzNode1Kv = xL1 * ikz3OneCableKa * modNode1;
+
+            const reNode2 = -0.5 - reKt, imNode2 = 0.5 * Math.sqrt(3) - imKt, modNode2 = Math.sqrt(reNode2*reNode2 + imNode2*imNode2);
+            const xL3 = xm * (l3 / 1000); // L3 because node 2 is from the end
+            const uNode2V = xL3 * iOneCable * modNode2, uKzNode2Kv = xL3 * ikz3OneCableKa * modNode2;
+
+            const maxNodeV = Math.max(uNode1V, uNode2V), maxNodeKv = Math.max(uKzNode1Kv, uKzNode2Kv);
+            const pass50VNode = maxNodeV <= 50.0, pass5kVNode = maxNodeKv <= 5.0;
+
+            // Solid bonding baseline
+            const rScreenOhmKm = 20.0 / activeScr.sec, rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / activeCore.sec;
+            const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
+            const iDopSolidBonding = +(activeCore.iDopFact * (1 / Math.sqrt(1 + dpLossRatio))).toFixed(1);
+            const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * (h.len / 1000));
+            const pScreenSolidWatts = pCoreTotalWatts * dpLossRatio;
+            const moneyLostSolidYearMln = ((pScreenSolidWatts / 1000) * h.tau * h.tariff) / 1000000;
+            
+            // Non-ideal transp losses
+            const dpLossTransp = dpLossRatio * (ktMod * ktMod);
+            const pScreenTranspWatts = pCoreTotalWatts * dpLossTransp;
+            const moneyLostTranspYearMln = ((pScreenTranspWatts / 1000) * h.tau * h.tariff) / 1000000;
+            
+            // Payback for transposition
+            const transpCostTotal = nCycles * h.transpCost;
+            const savingsMlnYear = moneyLostSolidYearMln - moneyLostTranspYearMln;
+            let paybackYears = Infinity;
+            if (savingsMlnYear > 0) paybackYears = transpCostTotal / savingsMlnYear;
             const isProfitable = paybackYears <= h.horizon;
 
-            let schemeStripe = 'bg-emerald-400';
-            let schemeBadge = '50 В и 5 кВ: В норме';
-            let schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
-            let schemeTitle = 'Одностороннее заземление экрана';
-            let schemeRecHtml = '';
-
-            if (!pass50V || !pass5kV) {
-                schemeStripe = 'bg-rose-500';
-                const failReasons = [];
-                if (!pass50V) failReasons.push(`Uнав = ${uInduced.toFixed(1)} В > 50 В`);
-                if (!pass5kV) failReasons.push(`Uкз⁽³⁾ = ${uKzInducedKv.toFixed(2)} кВ > 5,0 кВ`);
-                schemeBadge = !pass50V && !pass5kV ? 'Превышены 50 В и 5 кВ!' : (!pass50V ? 'Uнав > 50 В (Трансп.)' : 'Uкз > 5 кВ (Трансп.)');
-                schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
-                schemeTitle = nCycles === 1 ? 'Транспозиция (1 цикл)' : `Транспозиция (${nCycles} цикла)`;
-                schemeRecHtml = `
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 space-y-1">
-                        <div class="text-rose-300 font-semibold">Одностороннее заземление на всю длину (${h.len} м) не проходит: ${failReasons.join(' и ')}!</div>
-                        <div>• <strong>Решение:</strong> разбить трассу ${h.len} м на <strong>${nSections} уч. по ~${secLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''} транспозиции).</div>
-                        <div>• В узлах транспозиции (шаг ${secLenM} м): <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
-                    </div>`;
-            } else if (uInduced >= 40 || uKzInducedKv >= 4.0 || h.len > 1200) {
-                schemeStripe = 'bg-amber-400';
-                schemeBadge = 'Вблизи предела / Длинная КЛ';
-                schemeBadgeCls = 'bg-amber-500/15 text-amber-300 border-amber-400/35';
-                schemeTitle = 'Одностор. или Транспозиция (1 цикл)';
-                const l3 = Math.round(h.len / 3), u3 = uInduced / 3, uKz3 = uKzInducedKv / 3;
-                schemeRecHtml = `
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-amber-400/35 rounded-xl p-2.5 space-y-1">
-                        <div class="text-amber-300 font-semibold">Оба критерия на всю длину (${h.len} м) формально выполняются: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
-                        <div>• <strong>Рекомендация:</strong> т.к. ${h.len > 1200 ? `длина ${h.len} м превышает строительную длину барабана (~1000 м)` : `значения близки к предельным порогам`}, целесообразно заложить <strong>1 цикл транспозиции: 3 участка по ~${l3} м</strong>.</div>
-                    </div>`;
+            let schemeStripe = 'bg-emerald-400', schemeBadge = 'Узлы КТ: В норме', schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
+            let schemeTitle = nCycles === 1 ? 'Транспозиция (1 цикл)' : `Транспозиция (${nCycles} цикла)`;
+            if (ktMod === 0) {
+                if (h.transpMode !== 'manual' && uInducedAuto <= 50.0 && uKzInducedAutoKv <= 5.0 && h.len <= 1200) {
+                    schemeTitle = 'Одностороннее заземление';
+                    schemeBadge = 'КЛ не требует КТ';
+                }
             } else {
-                schemeRecHtml = `
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
-                        <div class="text-emerald-300 font-semibold">Оба критерия выполняются с запасом: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
-                        <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление</strong> на всю длину <strong>L = ${h.len} м</strong> (или 2-стороннее наглухо, если проходит по току K<sub>и</sub>).</div>
-                    </div>`;
+                schemeTitle = nCycles === 1 ? 'Неидеальная транспозиция (1ц)' : `Неидеальная транспозиция (${nCycles}ц)`;
             }
 
-            // --- ПОДВКЛАДКА 1: КАБЕЛЬ И ЭКРАН ---
+            if (!pass50VNode || !pass5kVNode) {
+                schemeStripe = 'bg-rose-500'; schemeBadge = 'Опасно! Узлы > нормы'; schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
+            }
+
+            // --- HTML GENERATION ---
+            const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
+
             document.getElementById('hv-cable-results-box').innerHTML = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okAll ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
@@ -1179,7 +865,7 @@
                     <div class="grid grid-cols-3 gap-1.5 text-center">
                         <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Ток Ip</span><strong class="text-xs font-mono text-white">${activeCore.cur.toFixed(1)} А</strong></div>
                         <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">I<sub>доп.ф</sub> (Загр.)</span><strong class="text-xs font-mono ${activeCore.okI ? 'text-[#00f2fe]' : 'text-rose-400'}">${activeCore.iDopFact} А (${Math.round(activeCore.loadPct)}%)</strong></div>
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400')}">${activeCore.dPct.toFixed(2)}% (${activeCore.dV.toFixed(0)}В)</strong></div>
+                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${duCol}">${activeCore.dPct.toFixed(2)}% (${activeCore.dV.toFixed(0)}В)</strong></div>
                     </div>
                     <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
                         <table class="w-full text-left text-xs">
@@ -1212,7 +898,6 @@
                 </div>` : ''}
             `;
 
-            // --- ПОДВКЛАДКА 2: ЗАЗЕМЛЕНИЕ И ЭКОНОМИКА ---
             document.getElementById('hv-grounding-results-box').innerHTML = h.ins === 'XLPE' ? `
                 <!-- Схема заземления -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
@@ -1224,38 +909,66 @@
                         </div>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">${schemeBadge}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Норм. (≤50В):</span><strong class="text-xs font-mono ${pass50V ? (uInduced >= 40 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong></div>
-                        <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">При Iкз⁽³⁾ (≤5кВ):</span><strong class="text-xs font-mono ${pass5kV ? (uKzInducedKv >= 4.0 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong></div>
-                    </div>
-                    ${schemeRecHtml}
+                    
+                    ${ktMod === 0 && h.transpMode !== 'manual' && uInducedAuto <= 50.0 && uKzInducedAutoKv <= 5.0 && h.len <= 1200 ? `
+                        <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
+                            <div class="text-emerald-300 font-semibold">Оба критерия на всю длину L=${h.len}м выполняются с запасом: Uнав = ${uInducedAuto.toFixed(1)} В (≤50В) и Uкз = ${uKzInducedAutoKv.toFixed(2)} кВ (≤5.0кВ).</div>
+                            <div>• <strong>Решение:</strong> применить одностороннее заземление (КТ-О) на всю трассу. Экран заземляется на питающей ПС, на приёмном конце защищается ОПН (потерь в экране нет).</div>
+                        </div>
+                    ` : `
+                        <div class="grid grid-cols-2 gap-1.5 text-center">
+                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 1 (≤50В):</span><strong class="text-xs font-mono ${maxNodeV > 50 ? 'text-rose-400' : 'text-emerald-400'}">${uNode1V.toFixed(1)} В</strong></div>
+                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 1 (≤5кВ):</span><strong class="text-xs font-mono ${maxNodeKv > 5.0 ? 'text-rose-400' : 'text-emerald-400'}">${uKzNode1Kv.toFixed(2)} кВ</strong></div>
+                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 2 (≤50В):</span><strong class="text-xs font-mono ${maxNodeV > 50 ? 'text-rose-400' : 'text-emerald-400'}">${uNode2V.toFixed(1)} В</strong></div>
+                            <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Узел 2 (≤5кВ):</span><strong class="text-xs font-mono ${maxNodeKv > 5.0 ? 'text-rose-400' : 'text-emerald-400'}">${uKzNode2Kv.toFixed(2)} кВ</strong></div>
+                        </div>
+                        ${!pass50VNode || !pass5kVNode ? `
+                            <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 mt-1.5">
+                                <span class="text-rose-300 font-semibold">Напряжение в муфтах (Kт=${ktMod.toFixed(3)}) превышает допустимые нормы ПУЭ!</span><br>
+                                • Увеличьте число циклов транспозиции, либо сделайте длины участков более равномерными.
+                            </div>
+                        ` : `
+                            <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 mt-1.5">
+                                Напряжения на экранах в узлах КТ находятся в пределах нормы. ${ktMod > 0 ? `Коэффициент неидеальности <strong>Kт = ${ktMod.toFixed(3)}</strong> рождает небольшие уравнительные токи (см. потери ниже).` : `Идеальная транспозиция (участки равны, Kт = 0), уравнительных токов в экранах нет.`}
+                            </div>
+                        `}
+                    `}
                 </div>
 
                 <!-- Экономика (Срок окупаемости) -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (okSolidBonding && h.len <= 800 ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (!isProfitable && iDopSolidBonding >= activeCore.cur ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
                     <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400 block">Экономическое обоснование</span>
                     
-                    <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Потери в экранах</span><strong class="text-xs font-mono text-white">${(pScreenTotalWatts/1000).toFixed(2)} кВт</strong></div>
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Срок окупаемости</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1) + ' лет'}</strong></div>
+                    <div class="grid grid-cols-2 gap-1.5 text-center mb-1">
+                        <div class="pill-control py-1.5 px-2.5 relative border border-rose-500/30">
+                            <span class="text-[9px] text-slate-400 block mb-0.5">2-стороннее наглухо</span>
+                            <strong class="text-[11px] font-mono text-white block">Pэ: ${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>
+                            <span class="text-[9px] font-bold text-rose-400">Убыток: ${moneyLostSolidYearMln.toFixed(3)} млн/год</span>
+                        </div>
+                        <div class="pill-control py-1.5 px-2.5 relative border border-emerald-500/30">
+                            <span class="text-[9px] text-slate-400 block mb-0.5">Транспозиция (Kт=${ktMod.toFixed(2)})</span>
+                            <strong class="text-[11px] font-mono text-white block">Pэ: ${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>
+                            <span class="text-[9px] font-bold text-emerald-400">Убыток: ${moneyLostTranspYearMln.toFixed(3)} млн/год</span>
+                        </div>
                     </div>
                     
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${isProfitable ? 'border-emerald-500/35' : 'border-amber-500/35'} rounded-xl p-2.5">
-                        Стоимость ${nCycles} цикл. транспозиции: <strong>${transpCostTotal.toFixed(2)} млн ₽</strong>.<br>
-                        Финансовые убытки от нагрева экранов: <strong>${moneyLostYearMln.toFixed(3)} млн ₽ в год</strong>.<br>
-                        ${isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Окупится за ${paybackYears.toFixed(1)} лет (что меньше предела в ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> за заданный предел в ${h.horizon} лет.`}
+                        Монтаж ${nCycles} цикл. транспозиции: <strong>${transpCostTotal.toFixed(2)} млн ₽</strong>.<br>
+                        ${savingsMlnYear > 0 
+                            ? (isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Срок окупаемости <strong class="text-white">${paybackYears.toFixed(1)} лет</strong> (≤ ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> в пределах ${h.horizon} лет (срок ок. ${paybackYears.toFixed(1)} лет).`)
+                            : `<span class="text-amber-300 font-bold">Транспозиция не дает экономии.</span>`}
                     </div>
                     
                     ${!isProfitable ? `
                     <div class="text-[11px] leading-relaxed bg-[#0b0a17]/75 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-1">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#d8b4fe]">Глухое 2-стороннее заземление (без ОПН)</span>
-                            <span class="font-mono text-[10px] font-bold ${okSolidBonding ? 'text-emerald-400' : 'text-rose-400'}">K<sub>и</sub> = ${kiFactor.toFixed(2)} (${okSolidBonding ? 'Норма' : 'Перегрев'})</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#d8b4fe]">Справка: Глухое 2-стороннее (без ОПН)</span>
+                            <span class="font-mono text-[10px] font-bold ${iDopSolidBonding >= activeCore.cur ? 'text-emerald-400' : 'text-rose-400'}">K<sub>и</sub> = ${(1 / Math.sqrt(1 + dpLossRatio)).toFixed(2)}</span>
                         </div>
                         <div class="text-slate-300">
-                            Ток в экране <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong> &rarr; допустимый ток жилы падает до <strong class="${okSolidBonding ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong>.
-                            ${okSolidBonding && h.len <= 800 ? '<span class="text-emerald-300 block mt-0.5">✓ Если ток позволяет, на короткой трассе заземлите экраны с 2 сторон без коробок ОПН.</span>' : ''}
+                            Допустимый ток жилы падает до <strong class="${iDopSolidBonding >= activeCore.cur ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong>.
+                            ${iDopSolidBonding >= activeCore.cur && h.len <= 1200 ? '<span class="text-emerald-300 block mt-0.5">✓ Если ток позволяет, на короткой трассе можно просто заземлить экраны с 2 сторон без коробок.</span>' : ''}
                         </div>
                     </div>` : ''}
                 </div>
