@@ -85,7 +85,6 @@
         <div class="pointer-events-none absolute -top-24 -left-20 w-64 h-64 rounded-full bg-[#00f2fe]/10 blur-[80px] z-0"></div>
         <div class="pointer-events-none absolute top-1/3 -right-24 w-72 h-72 rounded-full bg-[#8b5cf6]/15 blur-[90px] z-0"></div>
 
-        <!-- Закреплённая шапка без наложения текстов -->
         <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-3 pt-safe pb-2.5 z-40 flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
             <div class="w-full grid grid-cols-[80px_1fr_80px] items-center">
                 <div class="flex items-center justify-start">
@@ -113,10 +112,8 @@
             <p id="header-subtitle" class="text-[11px] text-slate-400 mt-1.5 leading-tight px-2 truncate max-w-full">Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ</p>
         </header>
 
-        <!-- Основная прокручиваемая область -->
         <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-6 px-3.5 pt-3 space-y-3 relative z-10">
 
-            <!-- СТАРТОВЫЙ ЭКРАН-ХАБ -->
             <section id="view-hub" class="space-y-3.5 pt-1">
                 <div class="px-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-[#00f2fe]">Выберите раздел расчёта</span>
@@ -167,11 +164,10 @@
             </section>
 
             <!-- =====================================================
-                 МОДУЛЬ 1: РАСЧЁТ КЛ 0,4 кВ (СТИЛЬ №3)
+                 МОДУЛЬ 1: РАСЧЁТ КЛ 0,4 кВ
                  ===================================================== -->
             <section id="view-lv" class="space-y-3 hidden">
                 
-                <!-- ПОДВКЛАДКА 1: ПОТЕРИ НАПРЯЖЕНИЯ ΔU -->
                 <div id="lv-subtab-drop" class="space-y-3">
                     <div class="glass-panel rounded-2xl p-2 px-3 flex items-center justify-between gap-2">
                         <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-3 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
@@ -185,9 +181,7 @@
                             </select>
                             <span class="pointer-events-none absolute right-2.5 text-[9px] text-[#00f2fe]">▼</span>
                         </div>
-
                         <div class="w-px h-5 bg-[#8b5cf6]/30 shrink-0"></div>
-
                         <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-3 py-1.5 shadow-[0_0_12px_rgba(168,85,247,0.2)]">
                             <span class="text-[11px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
                             <input id="lv-custom-limit-input" type="number" step="0.5" min="0.5" max="30" value="4.5" oninput="onLvCustomLimitInput(this.value)"
@@ -209,7 +203,6 @@
                     <div id="lv-segments-container" class="space-y-2.5"></div>
                 </div>
 
-                <!-- ПОДВКЛАДКА 2: ПОДБОР СЕЧЕНИЯ 0,4 кВ -->
                 <div id="lv-subtab-select" class="space-y-3 hidden">
                     <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
                         <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
@@ -239,7 +232,7 @@
 
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры линии</span>
-                        <span class="text-[10px] text-slate-500">ГОСТ 31996-2012 (K<sub>4ж</sub>=0,93)</span>
+                        <span class="text-[10px] text-slate-500">ГОСТ 31996-2012</span>
                     </div>
 
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2.5">
@@ -309,11 +302,10 @@
             </section>
 
             <!-- =====================================================
-                 МОДУЛЬ 2: 10 кВ (РАЗДЕЛЕН НА 2 ПОДВКЛАДКИ: КАБЕЛЬ И ЭКОНОМИКА)
+                 МОДУЛЬ 2: 10 кВ (РАЗДЕЛЕН НА 2 ПОДВКЛАДКИ)
                  ===================================================== -->
             <section id="view-hv" class="space-y-3 hidden">
                 
-                <!-- ОБЩАЯ ВЕРХНЯЯ ПАНЕЛЬ ДЛЯ ОБЕИХ ПОДВКЛАДОК 10 кВ -->
                 <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
                     <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
                         <select id="hv-insulation" onchange="onHvCableTypeChange()"
@@ -336,7 +328,6 @@
                     </div>
                 </div>
 
-                <!-- ПОДВКЛАДКА 1: КАБЕЛЬ И ЭКРАН 10 кВ -->
                 <div id="hv-subtab-cable" class="space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
@@ -477,11 +468,9 @@
                         </div>
                     </div>
 
-                    <!-- Результаты: Жила и Экран -->
                     <div id="hv-cable-results-box" class="space-y-3"></div>
                 </div>
 
-                <!-- ПОДВКЛАДКА 2: ЗАЗЕМЛЕНИЕ И ЭКОНОМИКА 10 кВ -->
                 <div id="hv-subtab-grounding" class="hidden space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Оценка окупаемости транспозиции</span>
@@ -505,7 +494,7 @@
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
                             <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Оценка:</span>
+                                <span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span>
                                 <input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
                                 <span class="text-[10px] text-slate-400 shrink-0">лет</span>
                             </div>
@@ -517,7 +506,6 @@
                         </div>
                     </div>
 
-                    <!-- Результаты: Схема заземления, Экономика, Проверки ТКЗ -->
                     <div id="hv-grounding-results-box" class="space-y-3"></div>
                 </div>
             </section>
@@ -590,7 +578,6 @@
             <span id="toast-text">Скопировано</span>
         </div>
 
-        <!-- Увеличенный нижний тапбар -->
         <nav id="module-bottom-nav" class="hidden shrink-0 w-full bg-[#090814]/90 backdrop-blur-xl border-t border-[#8b5cf6]/25 px-3 pt-2.5 pb-safe z-40 shadow-[0_-8px_28px_rgba(0,0,0,0.65)]"></nav>
     </div>
 
@@ -680,12 +667,12 @@
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v18'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v22'));
                 if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v18', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v22', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -773,6 +760,10 @@
         }
 
         // === МОДУЛЬ 0,4 кВ ===
+        function isLvSinglePhase(vStr) {
+            return vStr === '0.22' || vStr === '0.23';
+        }
+
         function getLvParams(sec, mat, ins, vStr) {
             const rx = R_X_DB[sec] || R_X_DB[50];
             const r0 = mat === 'Cu' ? rx[0] : rx[1], x0 = rx[2];
@@ -934,6 +925,7 @@
             if (recIdx === -1) { box.innerHTML = `<div class="glass-panel rounded-2xl p-4 pl-5 relative overflow-hidden text-xs text-rose-300"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-500"></div>Недостаточно сечения до 240 мм² (Ip = ${cur.toFixed(1)} А). Увеличьте число параллельных кабелей.</div>`; return; }
             const rec = list[recIdx], slice = list.slice(Math.max(0, recIdx - 1), recIdx + 2);
             const duColor = rec.dPct < 3 ? 'text-emerald-400' : (rec.dPct <= lim ? 'text-amber-400' : 'text-rose-400');
+            const parPrefix = par > 1 ? par + ' × ' : '';
 
             box.innerHTML = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-3">
@@ -941,7 +933,7 @@
                     <div class="flex items-start justify-between gap-2">
                         <div>
                             <span class="text-[10px] font-bold text-[#00f2fe] uppercase tracking-wider block">Рекомендуемое сечение</span>
-                            <div class="text-2xl font-extrabold font-mono text-white mt-0.5">${par > 1 ? par + ' × ' : ''}${rec.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>
+                            <div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${rec.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div>
                         </div>
                         <button onclick="applyLvRec(${rec.sec},'${mat}','${ins}',${par},${P},${L},${cos})" class="px-3 py-1.5 rounded-full neon-btn text-white text-xs font-bold active:scale-95 transition">+ В расчёт &Delta;U</button>
                     </div>
@@ -953,7 +945,7 @@
                     <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
                         <table class="w-full text-left text-xs">
                             <thead><tr class="text-slate-400 text-[10px] border-b border-[#8b5cf6]/20 bg-[#07060e]/90"><th class="py-2 px-2.5">Сечение</th><th class="py-2 px-2">Iдоп' (Загр.)</th><th class="py-2 px-2">&Delta;U</th><th class="py-2 px-2 text-right">Статус</th></tr></thead>
-                            <tbody>${slice.map(x => `<tr class="border-b border-[#8b5cf6]/15 ${x.sec === rec.sec ? 'bg-emerald-500/15 text-white font-bold' : 'text-slate-300'}"><td class="py-2 px-2.5 font-mono">${par > 1 ? par + '×' : ''}${x.sec} мм² ${x.sec === rec.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td><td class="py-2 px-2 font-mono">${x.totIdop} А (${Math.round(x.loadPct)}%)</td><td class="py-2 px-2 font-mono">${x.dPct.toFixed(2)}%</td><td class="py-2 px-2 text-right ${x.ok ? 'text-emerald-400 font-bold' : 'text-rose-400'}">${x.ok ? 'Подходит' : 'Мало'}</td></tr>`).join('')}</tbody>
+                            <tbody>${slice.map(x => `<tr class="border-b border-[#8b5cf6]/15 ${x.sec === rec.sec ? 'bg-emerald-500/15 text-white font-bold' : 'text-slate-300'}"><td class="py-2 px-2.5 font-mono">${parPrefix}${x.sec} мм² ${x.sec === rec.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td><td class="py-2 px-2 font-mono ${x.ok ? '' : 'text-rose-400 font-bold'}">${x.totIdop} А (${Math.round(x.loadPct)}%)</td><td class="py-2 px-2 font-mono ${x.dPct <= lim ? '' : 'text-rose-400 font-bold'}">${x.dPct.toFixed(2)}%</td><td class="py-2 px-2 text-right font-semibold ${x.ok ? 'text-emerald-400' : 'text-rose-400'}">${x.ok ? 'Подходит' : 'Мало'}</td></tr>`).join('')}</tbody>
                         </table>
                     </div>
                 </div>`;
@@ -977,7 +969,6 @@
             document.getElementById('hv-ikz').value = state.hv.ikz;
             document.getElementById('hv-tkz-time').value = state.hv.t;
             
-            // Экономические параметры
             document.getElementById('hv-eco-tariff').value = state.hv.tariff;
             document.getElementById('hv-eco-tau').value = state.hv.tau;
             document.getElementById('hv-eco-horizon').value = state.hv.horizon;
@@ -1053,7 +1044,6 @@
             h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
             saveState();
 
-            // 1. Автоподбор сечения жилы
             const allCores = HV_SECS.map(s => evalHv(s, h));
             const recCoreIdx = allCores.findIndex(x => x.okAll);
             const recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
@@ -1067,7 +1057,6 @@
             const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
-            // 2. Автоподбор сечения медного экрана
             const ikz2 = activeCore.ikz2;
             const kTime = activeCore.kTime;
             const lnTerm = Math.log((350 + 228) / (70 + 228));
@@ -1086,7 +1075,6 @@
             const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
-            // 3. Заземление и Экономика
             const geom = getCableGeometry(activeCore.sec, activeScr.sec);
             const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
@@ -1110,13 +1098,6 @@
             const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
             const okSolidBonding = iDopSolidBonding >= activeCore.cur;
 
-            // Экономический расчёт
-            const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
-            const pScreenTotalWatts = pCoreTotalWatts * dpLossRatio;
-            const wScreenYearKwh = (pScreenTotalWatts / 1000) * h.tau;
-            const moneyLostYear = wScreenYearKwh * h.tariff;
-            const moneyLostHorizon = (moneyLostYear * h.horizon) / 1000000; // в млн руб
-
             const pass50V = uInduced <= 50.0;
             const pass5kV = uKzInducedKv <= 5.0;
 
@@ -1130,7 +1111,18 @@
             const uKzNodeKv = uKzInducedKv / nSections;
 
             const transpCostTotal = nCycles * h.transpCost;
-            const savings = moneyLostHorizon - transpCostTotal;
+            
+            // Финансовые расчёты для окупаемости
+            const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
+            const pScreenTotalWatts = pCoreTotalWatts * dpLossRatio;
+            const wScreenYearKwh = (pScreenTotalWatts / 1000) * h.tau;
+            const moneyLostYearMln = (wScreenYearKwh * h.tariff) / 1000000;
+            
+            let paybackYears = Infinity;
+            if (moneyLostYearMln > 0) {
+                paybackYears = transpCostTotal / moneyLostYearMln;
+            }
+            const isProfitable = paybackYears <= h.horizon;
 
             let schemeStripe = 'bg-emerald-400';
             let schemeBadge = '50 В и 5 кВ: В норме';
@@ -1171,8 +1163,6 @@
                     </div>`;
             }
 
-            const duCol = activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400');
-
             // --- ПОДВКЛАДКА 1: КАБЕЛЬ И ЭКРАН ---
             document.getElementById('hv-cable-results-box').innerHTML = `
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
@@ -1187,7 +1177,7 @@
                     <div class="grid grid-cols-3 gap-1.5 text-center">
                         <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Ток Ip</span><strong class="text-xs font-mono text-white">${activeCore.cur.toFixed(1)} А</strong></div>
                         <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">I<sub>доп.ф</sub> (Загр.)</span><strong class="text-xs font-mono ${activeCore.okI ? 'text-[#00f2fe]' : 'text-rose-400'}">${activeCore.iDopFact} А (${Math.round(activeCore.loadPct)}%)</strong></div>
-                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${duCol}">${activeCore.dPct.toFixed(2)}% (${activeCore.dV.toFixed(0)}В)</strong></div>
+                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${activeCore.dPct < 3 ? 'text-emerald-400' : (activeCore.okU ? 'text-amber-400' : 'text-rose-400')}">${activeCore.dPct.toFixed(2)}% (${activeCore.dV.toFixed(0)}В)</strong></div>
                     </div>
                     <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
                         <table class="w-full text-left text-xs">
@@ -1222,7 +1212,6 @@
 
             // --- ПОДВКЛАДКА 2: ЗАЗЕМЛЕНИЕ И ЭКОНОМИКА ---
             document.getElementById('hv-grounding-results-box').innerHTML = h.ins === 'XLPE' ? `
-                <!-- Схема заземления -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
                     <div class="flex items-start justify-between gap-2">
@@ -1239,19 +1228,22 @@
                     ${schemeRecHtml}
                 </div>
 
-                <!-- Экономика -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${savings > 0 ? 'bg-emerald-400' : (okSolidBonding && h.len <= 800 ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (okSolidBonding && h.len <= 800 ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
                     <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400 block">Экономическое обоснование</span>
+                    
                     <div class="grid grid-cols-2 gap-1.5 text-center">
                         <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Потери в экранах</span><strong class="text-xs font-mono text-white">${(pScreenTotalWatts/1000).toFixed(2)} кВт</strong></div>
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Сжигается за ${h.horizon} лет</span><strong class="text-xs font-mono text-rose-400">${moneyLostHorizon.toFixed(2)} млн ₽</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Срок окупаемости</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1) + ' лет'}</strong></div>
                     </div>
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${savings > 0 ? 'border-emerald-500/35' : 'border-amber-500/35'} rounded-xl p-2.5">
+                    
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${isProfitable ? 'border-emerald-500/35' : 'border-amber-500/35'} rounded-xl p-2.5">
                         Стоимость ${nCycles} цикл. транспозиции: <strong>${transpCostTotal.toFixed(2)} млн ₽</strong>.<br>
-                        ${savings > 0 ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Чистая экономия: ${(savings).toFixed(2)} млн ₽.` : `<span class="text-amber-300 font-bold">Транспозиция не окупается.</span> Экономия отрицательная (${(savings).toFixed(2)} млн ₽).`}
+                        Финансовые убытки от нагрева экранов: <strong>${moneyLostYearMln.toFixed(3)} млн ₽ в год</strong>.<br>
+                        ${isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Окупится за ${paybackYears.toFixed(1)} лет (что меньше предела в ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> за заданный предел в ${h.horizon} лет.`}
                     </div>
-                    ${!savings > 0 ? `
+                    
+                    ${!isProfitable ? `
                     <div class="text-[11px] leading-relaxed bg-[#0b0a17]/75 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-1">
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-[#d8b4fe]">Глухое 2-стороннее заземление (без ОПН)</span>
@@ -1264,7 +1256,6 @@
                     </div>` : ''}
                 </div>
 
-                <!-- Проверки ТКЗ -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-center justify-between gap-2">
