@@ -229,6 +229,7 @@
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
                         <span id="hv-cable-mark-badge" class="text-[10px] font-mono text-[#d8b4fe]">АПвПг-10 (△)</span>
                     </div>
+
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#a855f7]"></div>
                         <div class="flex items-center justify-between gap-2">
@@ -292,6 +293,7 @@
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400">Схема заземления и экономика</span>
                     </div>
+
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 mb-3">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
                         <div class="flex items-center justify-between gap-2 mb-1">
@@ -306,19 +308,30 @@
                         </div>
                         <div id="hv-transp-manual-hint" class="hidden text-[9px] text-slate-400 leading-tight">Сумма длин L₁+L₂+L₃ формирует 1 цикл. Общая длина L пересчитывается автоматически. Разные длины участков вызовут уравнительные токи (Kт > 0).</div>
                     </div>
+
                     <div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400"></div>
                         <div class="text-xs sm:text-sm font-bold text-white mb-2">Экономические параметры</div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
-                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Тариф:</span><input id="hv-eco-tariff" type="number" step="0.5" value="9.0" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#00f2fe] font-bold shrink-0">₽/кВтч</span></div>
-                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Время &tau;:</span><input id="hv-eco-tau" type="number" step="100" value="8760" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">ч/год</span></div>
+                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
+                                <span class="text-[10px] text-slate-400 shrink-0">Тариф:</span><input id="hv-eco-tariff" type="number" step="0.5" value="9.0" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-[#00f2fe] font-bold shrink-0">₽/кВтч</span>
+                            </div>
+                            <div class="col-span-6 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
+                                <span class="text-[10px] text-slate-400 shrink-0">Время &tau;:</span><input id="hv-eco-tau" type="number" step="100" value="8760" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">ч/год</span>
+                            </div>
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
-                            <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span><input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">лет</span></div>
-                            <div class="col-span-7 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1"><span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span><input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">млн ₽</span></div>
+                            <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
+                                <span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span><input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">лет</span>
+                            </div>
+                            <div class="col-span-7 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
+                                <span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span><input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">млн ₽</span>
+                            </div>
                         </div>
                     </div>
+
                     <div id="hv-grounding-results-box" class="space-y-3"></div>
+                    
                     <button type="button" onclick="generateWordReport()" class="w-full mt-4 flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-blue-500/20 to-indigo-500/30 text-white border border-blue-400/40 font-bold shadow-[0_0_15px_rgba(59,130,246,0.2)] active:scale-95 transition">
                         <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         <span>Скачать Word отчет</span>
@@ -339,7 +352,11 @@
                     </div>
                     <div class="overflow-x-auto custom-scroll rounded-xl border border-[#8b5cf6]/25">
                         <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
-                            <thead><tr class="bg-[#0b0a17]/90 text-slate-400 border-b border-[#8b5cf6]/25 text-[10px]"><th class="py-2 px-2.5 font-bold">S, мм²</th><th class="py-2 px-2 font-bold">I<sub>земля</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>возд</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>кз.1с</sub>, кА</th><th class="py-2 px-2 font-bold">R<sub>0</sub>, Ом/км</th><th class="py-2 px-2.5 font-bold">X<sub>0</sub>, Ом/км</th></tr></thead>
+                            <thead>
+                                <tr class="bg-[#0b0a17]/90 text-slate-400 border-b border-[#8b5cf6]/25 text-[10px]">
+                                    <th class="py-2 px-2.5 font-bold">S, мм²</th><th class="py-2 px-2 font-bold">I<sub>земля</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>возд</sub>, А</th><th class="py-2 px-2 font-bold">I<sub>кз.1с</sub>, кА</th><th class="py-2 px-2 font-bold">R<sub>0</sub>, Ом/км</th><th class="py-2 px-2.5 font-bold">X<sub>0</sub>, Ом/км</th>
+                                </tr>
+                            </thead>
                             <tbody id="ref-table-body" class="divide-y divide-[#8b5cf6]/15 font-mono text-[11px] bg-[#121024]/50"></tbody>
                         </table>
                     </div>
@@ -422,8 +439,8 @@
             hv_word_data: null
         };
 
-        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v30')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
-        function saveState() { try { localStorage.setItem('kabelpro_v30', JSON.stringify(state)); } catch (e) {} }
+        function loadState() { try { const s = JSON.parse(localStorage.getItem('kabelpro_v31')); if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s }; } catch (e) {} }
+        function saveState() { try { localStorage.setItem('kabelpro_v31', JSON.stringify(state)); } catch (e) {} }
 
         // --- WORD EXPORT ---
         function generateWordReport() {
@@ -453,6 +470,7 @@
                             ]
                         }),
                         new Paragraph({ text: "" }),
+
                         new Paragraph({ text: "2. Расчетное сечение жилы", heading: HeadingLevel.HEADING_1 }),
                         new Paragraph({ text: "Расчет токовой нагрузки на фазу:" }),
                         new Paragraph({ text: `Ip = P / (√3 · U · cos φ) = ${d.pVal} / (1.732 · 10 · ${d.cos}) = ${d.ip} А`, bullet: { level: 0 } }),
@@ -466,6 +484,7 @@
                         new Paragraph({ text: `ΔU = (√3 · Ip · L · (R0·cos φ + X0·sin φ)) / (U · 1000) = ${d.dPct}%`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: ΔU (${d.dPct}%) ≤ ΔUдоп (${d.limit}%)`, bullet: { level: 0 } }),
                         new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Потеря напряжения ${d.dPct}% меньше допустимого значения ${d.limit}%. Условие выполняется.` })]}),
+
                         new Paragraph({ text: "3. Расчетное сечение медного экрана", heading: HeadingLevel.HEADING_1 }),
                         new Paragraph({ text: "В сетях 10 кВ с изолированной/компенсированной нейтралью наиболее тяжелым режимом для экрана является двойное замыкание на землю. Ток двойного замыкания на землю пересчитывается из трехфазного тока КЗ:" }),
                         new Paragraph({ text: `Iкз⁽²⁾ = Iкз⁽³⁾ · (√3 / 2) = ${d.ikz3} · 0.866 = ${d.ikz2} кА`, bullet: { level: 0 } }),
@@ -476,18 +495,22 @@
                         new Paragraph({ text: `Допустимый ток экрана Iдоп.экр = I1с · K = ${d.scrI1s} · ${d.kTime} = ${d.scrIPerm} кА`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: Iдоп.экр (${d.scrIPerm} кА) ≥ Iкз⁽²⁾ (${d.ikz2} кА)`, bullet: { level: 0 } }),
                         new Paragraph({ children: [new TextRun({ text: "Вывод: ", bold: true }), new TextRun({ text: `Допустимый ток КЗ для выбранного экрана ${d.scrSec} мм² (${d.scrIPerm} кА) больше реального тока КЗ (${d.ikz2} кА). Экран выдержит выделяемое тепло за ${d.tkz} секунды аварии. Термическая стойкость обеспечена.` })]}),
+
                         new Paragraph({ text: "4. Выбор схемы заземления экранов", heading: HeadingLevel.HEADING_1 }),
                         new Paragraph({ text: `Для обоснования схемы заземления необходимо проверить два критерия наведенного напряжения на экране (при условии одностороннего заземления на всю длину L = ${d.len} м).` }),
                         new Paragraph({ text: `Индуктивное сопротивление взаимоиндукции жила-экран в ${d.layTextGenitive}:` }),
                         new Paragraph({ text: `Xm = 0.144 · lg(2S/dэ) = ${d.xm} Ом/км`, bullet: { level: 0 } }),
+
                         new Paragraph({ children: [new TextRun({ text: "Критерий 1: Электробезопасность в нормальном режиме (≤ 50 В)", bold: true })] }),
                         new Paragraph({ text: "Согласно требованиям безопасности персонала (ПУЭ, СТО ПАО «Россети»), напряжение прикосновения на разземленном конце экрана не должно превышать 50 В (в нормальном режиме работы)." }),
                         new Paragraph({ text: `Uнав = Ip · L · Xm = ${d.ip} · ${d.lenKm} · ${d.xm} = ${d.uInduced} В`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: Uнав (${d.uInduced} В) ≤ 50 В`, bullet: { level: 0 } }),
+
                         new Paragraph({ children: [new TextRun({ text: "Критерий 2: Прочность оболочки при КЗ (≤ 5.0 кВ)", bold: true })] }),
                         new Paragraph({ text: `Согласно стандарту IEEE 575 и СТО Россетей, при внешнем трехфазном КЗ (Iкз⁽³⁾ = ${d.ikz3} кА) напряжение на экране не должно превышать 5.0 кВ для предотвращения теплового взрыва ОПН и пробоя полиэтиленовой оболочки.` }),
                         new Paragraph({ text: `Uкз = Iкз⁽³⁾ · L · Xm = ${d.ikz3 * 1000} · ${d.lenKm} · ${d.xm} = ${d.uKzInduced} кВ`, bullet: { level: 0 } }),
                         new Paragraph({ text: `Условие: Uкз (${d.uKzInduced} кВ) ≤ 5.0 кВ`, bullet: { level: 0 } }),
+
                         new Paragraph({ children: [new TextRun({ text: "Промежуточный вывод: ", bold: true }), new TextRun({ text: d.groundingLogicText })]}),
                         new Paragraph({ children: [new TextRun({ text: "Рекомендуемая схема: ", bold: true }), new TextRun({ text: `${d.schemeTitle}\n`, bold: true, color: "009600" }), new TextRun({ text: d.schemeRecHtmlClean })]}),
                         
@@ -588,6 +611,115 @@
             document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2"><button onclick="switchHvSubTab('cable')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${isCable ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Кабель и Экран</span></button><button onclick="switchHvSubTab('grounding')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}"><svg class="w-4 h-4 ${!isCable ? 'text-emerald-400' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Заземление и ₽</span></button></div>`;
         }
 
+        // === МОДУЛЬ 0,4 кВ ===
+        function getLvParams(sec, mat, ins, vStr) {
+            const rx = R_X_DB[sec] || R_X_DB[50]; const r0 = mat === 'Cu' ? rx[0] : rx[1], x0 = rx[2];
+            const base = (AMP_DB[ins] && AMP_DB[ins][mat] && AMP_DB[ins][mat][sec]) ? AMP_DB[ins][mat][sec][0] : 100;
+            const k4 = (vStr !== '0.22' && vStr !== '0.23') ? 0.93 : 1.0;
+            return { r0, x0, base, k4, iDop: Math.round(base * state.ktr * k4) };
+        }
+        function calcLvSeg(seg) {
+            const uKv = parseFloat(state.lvV), is1Ph = (state.lvV === '0.22' || state.lvV === '0.23');
+            const cos = Math.min(1, Math.max(0.1, parseFloat(seg.cos) || 0.9)); const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
+            const lKm = (parseFloat(seg.len) || 0) / 1000, n = Math.max(1, parseInt(seg.par) || 1);
+            const p = getLvParams(seg.sec, seg.mat, seg.ins, state.lvV);
+            const cur = seg.mode === 'I' ? (parseFloat(seg.i) || 0) : ((parseFloat(seg.p) || 0) / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos));
+            const dV = (is1Ph ? 2 : Math.sqrt(3)) * cur * lKm * ((p.r0 * cos + p.x0 * sin) / n);
+            const dPct = (dV / (uKv * 1000)) * 100;
+            const dP = ((is1Ph ? 2 : 3) * cur * cur * (p.r0 / n) * lKm) / 1000;
+            const totIdop = p.iDop * n;
+            return { ...p, totIdop, cur, dV, dPct, dP, loadPct: totIdop > 0 ? (cur / totIdop) * 100 : 0 };
+        }
+        function setLvVoltage(v) { state.lvV = v; saveState(); updateLvUI(); renderLvSegments(); updateLvSummary(); }
+        function onLvCustomLimitInput(v) { const n = parseFloat(v); if (n > 0) { state.lvLimit = n; saveState(); renderLvSegments(); updateLvSummary(); } }
+        function updateLvUI() { const sel = document.getElementById('lv-drop-voltage-select'); if (sel) sel.value = state.lvV; }
+        function getSegVisualClasses(m) {
+            const over = m.loadPct > 100, warn = !over && (m.loadPct > 80 || m.dPct >= 2.0);
+            const stripeColor = over ? 'bg-rose-500' : (warn ? 'bg-amber-400' : 'bg-emerald-400');
+            const badgeClass = over ? 'bg-rose-500/20 text-rose-300 border-rose-400/45' : 'bg-[#00f2fe]/12 text-[#00f2fe] border-[#00f2fe]/40 shadow-[0_0_10px_rgba(0,242,254,0.12)]';
+            return { over, stripeColor, badgeClass };
+        }
+        function renderLvSegments() {
+            document.getElementById('lv-segments-count-badge').textContent = state.lvSegs.length;
+            document.getElementById('lv-segments-container').innerHTML = state.lvSegs.map((seg, i) => {
+                const m = calcLvSeg(seg), v = getSegVisualClasses(m), opts = LV_SECS.map(s => `<option value="${s}" ${seg.sec == s ? 'selected' : ''} class="bg-[#0b0a17] text-white">${s} мм²</option>`).join('');
+                return `<div class="glass-panel rounded-2xl p-3 pl-4 relative overflow-hidden space-y-2 transition-all"><div id="lv-stripe-${seg.id}" class="absolute left-0 top-0 bottom-0 w-1.5 ${v.stripeColor} transition-colors"></div><div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 min-w-0 flex-1"><span class="w-5 h-5 rounded-full bg-white/10 text-slate-300 font-mono text-[10px] font-bold flex items-center justify-center shrink-0">${i + 1}</span><input type="text" value="${esc(seg.name)}" oninput="updLvSeg(${seg.id},'name',this.value,false)" placeholder="Участок..." class="w-full bg-transparent text-xs sm:text-sm font-bold text-white outline-none truncate focus:border-b focus:border-[#00f2fe]"></div><div class="flex items-center gap-1.5 shrink-0"><span id="lv-badge-${seg.id}" class="px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${v.badgeClass}">&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)</span><button type="button" onclick="dupLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-[#00f2fe] text-xs">❐</button>${state.lvSegs.length > 1 ? `<button type="button" onclick="delLvSeg(${seg.id})" class="p-1 text-slate-400 hover:text-rose-400 text-xs">✕</button>` : ''}</div></div><div class="grid grid-cols-12 gap-1.5 items-center"><div class="col-span-4 flex items-center bg-[#00f2fe]/10 border border-[#00f2fe]/45 rounded-full p-0.5 pr-1.5 shadow-[0_0_12px_rgba(0,242,254,0.12)]"><button type="button" onclick="updLvSeg(${seg.id},'mat','${seg.mat === 'Al' ? 'Cu' : 'Al'}',true)" class="px-2 py-1 rounded-full text-[11px] font-extrabold transition shrink-0 ${seg.mat === 'Al' ? 'bg-[#00f2fe]/25 text-[#00f2fe]' : 'bg-amber-500/30 text-amber-300'}">${seg.mat}</button><select onchange="updLvSeg(${seg.id},'sec',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pl-0.5">${opts}</select></div><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="5" min="1" value="${seg.len}" oninput="updLvSeg(${seg.id},'len',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">м</span></div><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="1" min="0" value="${seg.mode === 'P' ? seg.p : seg.i}" oninput="updLvSeg(${seg.id},'${seg.mode === 'P' ? 'p' : 'i'}',this.value,false)" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><button type="button" onclick="updLvSeg(${seg.id},'mode','${seg.mode === 'P' ? 'I' : 'P'}',true)" class="text-[10px] text-[#00f2fe] font-bold shrink-0 hover:underline">${seg.mode === 'P' ? 'кВт' : 'А'}</button></div><div class="col-span-2 pill-control px-2 py-1 flex items-center justify-center gap-0.5"><input type="number" step="0.01" min="0.5" max="1" value="${seg.cos}" oninput="updLvSeg(${seg.id},'cos',this.value,false)" title="cos φ" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none"><span class="text-[10px] text-slate-400 shrink-0">&phi;</span></div></div><div class="grid grid-cols-12 gap-1.5 items-center pt-0.5"><div class="col-span-3 pill-control px-2 py-1 flex items-center justify-center relative"><select onchange="updLvSeg(${seg.id},'ins',this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2.5"><option value="PVC" ${seg.ins === 'PVC' ? 'selected' : ''} class="bg-[#0b0a17] text-white">ПВХ</option><option value="XLPE" ${seg.ins === 'XLPE' ? 'selected' : ''} class="bg-[#0b0a17] text-white">СПЭ</option></select><span class="pointer-events-none absolute right-2 text-[8px] text-slate-400">▼</span></div><div class="col-span-2 pill-control px-1.5 py-1 flex items-center justify-center relative"><select onchange="updLvSeg(${seg.id},'par',+this.value,true)" class="w-full bg-transparent text-white font-mono text-[11px] font-bold outline-none text-center appearance-none cursor-pointer pr-2">${[1,2,3,4].map(n => `<option value="${n}" ${seg.par == n ? 'selected' : ''} class="bg-[#0b0a17] text-white">${n}х</option>`).join('')}</select><span class="pointer-events-none absolute right-1.5 text-[8px] text-slate-400">▼</span></div><div id="lv-submetrics-${seg.id}" class="col-span-7 pill-control px-2.5 py-1 text-right font-mono text-[10px] truncate ${v.over ? 'text-rose-400 font-bold border-rose-500/40' : 'text-slate-400'}">Ip: <strong class="text-white">${m.cur.toFixed(1)}А</strong> / Iд: <strong class="text-[#00f2fe]">${m.totIdop}А</strong> (${Math.round(m.loadPct)}%)</div></div></div>`;
+            }).join('');
+        }
+        function updLvSeg(id, f, v, full) {
+            const s = state.lvSegs.find(x => x.id === id); if (!s) return;
+            s[f] = v; saveState();
+            if (full) renderLvSegments();
+            else {
+                const m = calcLvSeg(s), vis = getSegVisualClasses(m);
+                const stripeEl = document.getElementById(`lv-stripe-${id}`), badgeEl = document.getElementById(`lv-badge-${id}`), subEl = document.getElementById(`lv-submetrics-${id}`);
+                if (stripeEl) stripeEl.className = `absolute left-0 top-0 bottom-0 w-1.5 ${vis.stripeColor} transition-colors`;
+                if (badgeEl) { badgeEl.className = `px-2.5 py-0.5 rounded-full font-mono text-[11px] font-bold border ${vis.badgeClass}`; badgeEl.innerHTML = `&Delta;U: ${m.dPct.toFixed(2)}% (${m.dV.toFixed(1)} В)`; }
+                if (subEl) { subEl.className = `col-span-7 pill-control px-2.5 py-1 text-right font-mono text-[10px] truncate ${vis.over ? 'text-rose-400 font-bold border-rose-500/40' : 'text-slate-400'}`; subEl.innerHTML = `Ip: <strong class="text-white">${m.cur.toFixed(1)}А</strong> / Iд: <strong class="text-[#00f2fe]">${m.totIdop}А</strong> (${Math.round(m.loadPct)}%)`; }
+            }
+            updateLvSummary();
+        }
+        function addLvSegment() { const last = state.lvSegs[state.lvSegs.length - 1]; state.lvSegs.push({ id: Date.now(), name: `Участок ${state.lvSegs.length + 1}`, mat: last ? last.mat : 'Al', ins: 'PVC', sec: last ? last.sec : 95, par: 1, len: 60, mode: 'P', p: 80, i: 135, cos: 0.9 }); saveState(); renderLvSegments(); updateLvSummary(); }
+        function dupLvSeg(id) { const idx = state.lvSegs.findIndex(x => x.id === id); if (idx === -1) return; state.lvSegs.splice(idx + 1, 0, { ...state.lvSegs[idx], id: Date.now(), name: state.lvSegs[idx].name + ' (копия)' }); saveState(); renderLvSegments(); updateLvSummary(); showToast('Участок дублирован'); }
+        function delLvSeg(id) { if (state.lvSegs.length <= 1) return; state.lvSegs = state.lvSegs.filter(x => x.id !== id); saveState(); renderLvSegments(); updateLvSummary(); }
+        function updateLvSummary() {
+            let dV = 0, dPct = 0, len = 0, dP = 0, over = false;
+            state.lvSegs.forEach(s => { const m = calcLvSeg(s); dV += m.dV; dPct += m.dPct; len += (+s.len || 0); dP += m.dP; if (m.loadPct > 100) over = true; });
+            const uV = parseFloat(state.lvV) * 1000;
+            const pEl = document.getElementById('lv-total-du-percent'), vEl = document.getElementById('lv-total-du-volts'), badge = document.getElementById('lv-status-badge');
+            pEl.textContent = `${dPct.toFixed(2)}%`; vEl.textContent = `(${dV.toFixed(1)} В)`;
+            document.getElementById('lv-end-voltage-val').textContent = `${Math.max(0, uV - dV).toFixed(1)} В`; document.getElementById('lv-total-length-val').textContent = `${Math.round(len)} м`; document.getElementById('lv-total-power-loss-val').textContent = `${dP.toFixed(2)} кВт`;
+            const lim = state.lvLimit;
+            if (dPct < 3) { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-emerald-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-emerald-400 font-semibold whitespace-nowrap'; }
+            else if (dPct <= lim) { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-amber-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-amber-400 font-semibold whitespace-nowrap'; }
+            else { pEl.className = 'text-[26px] leading-tight font-extrabold font-mono text-rose-400 whitespace-nowrap'; vEl.className = 'text-xs font-mono text-rose-400 font-semibold whitespace-nowrap'; }
+            if (dPct <= lim && !over) { badge.className = dPct < 3 ? 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-400/35 whitespace-nowrap' : 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-400/35 whitespace-nowrap'; badge.textContent = dPct < 3 ? `В норме (≤ ${lim}%)` : `Близко к пределу (≤ ${lim}%)`; }
+            else { badge.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-300 border border-rose-400/40 animate-pulse-sub whitespace-nowrap'; badge.textContent = dPct > lim ? `Превышение (> ${lim}%)` : 'Перегруз по току'; }
+        }
+        function toggleLvSelMaterial() {
+            state.lvSelMat = (state.lvSelMat === 'Cu') ? 'Al' : 'Cu'; const btn = document.getElementById('lv-sel-mat-btn');
+            if (state.lvSelMat === 'Al') { btn.textContent = 'Алюминий (Al)'; btn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center'; }
+            else { btn.textContent = 'Медь (Cu)'; btn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-amber-500/30 text-amber-300 text-center'; }
+            saveState(); runLvCableSelection();
+        }
+        function runLvCableSelection() {
+            const vStr = document.getElementById('lv-sel-voltage').value, mat = state.lvSelMat || 'Al', ins = document.getElementById('lv-sel-insulation').value;
+            state.ktr = Math.min(1, Math.max(0.5, +document.getElementById('lv-sel-ktr').value || 0.9));
+            const P = +document.getElementById('lv-sel-power').value || 10, L = +document.getElementById('lv-sel-length').value || 50, cos = +document.getElementById('lv-sel-cosphi').value || 0.9;
+            const lim = +document.getElementById('lv-sel-maxdrop').value || 4.5, par = +document.getElementById('lv-sel-parallel').value || 1;
+            const is1Ph = isLvSinglePhase(vStr), uKv = parseFloat(vStr), sin = Math.sqrt(Math.max(0, 1 - cos * cos)), cur = P / ((is1Ph ? uKv : Math.sqrt(3) * uKv) * cos);
+            const ipBadge = document.getElementById('lv-sel-calc-ip-badge'); if (ipBadge) ipBadge.textContent = `Ip: ${cur.toFixed(1)} А`;
+            const list = LV_SECS.map(sec => {
+                const p = getLvParams(sec, mat, ins, vStr); const totIdop = p.iDop * par;
+                const dV = (is1Ph ? 2 : Math.sqrt(3)) * cur * (L / 1000) * ((p.r0 * cos + p.x0 * sin) / par), dPct = (dV / (uKv * 1000)) * 100;
+                return { sec, totIdop, dV, dPct, loadPct: (cur / totIdop) * 100, ok: totIdop >= cur && dPct <= lim };
+            });
+            const recIdx = list.findIndex(x => x.ok); const box = document.getElementById('lv-selection-result-box');
+            if (recIdx === -1) { box.innerHTML = `<div class="glass-panel rounded-2xl p-4 pl-5 relative overflow-hidden text-xs text-rose-300"><div class="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-500"></div>Недостаточно сечения до 240 мм² (Ip = ${cur.toFixed(1)} А). Увеличьте число параллельных кабелей.</div>`; return; }
+            const rec = list[recIdx], slice = list.slice(Math.max(0, recIdx - 1), recIdx + 2);
+            const duColor = rec.dPct < 3 ? 'text-emerald-400' : (rec.dPct <= lim ? 'text-amber-400' : 'text-rose-400'), parPrefix = par > 1 ? par + ' × ' : '';
+            box.innerHTML = `
+                <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-3">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-400"></div>
+                    <div class="flex items-start justify-between gap-2">
+                        <div><span class="text-[10px] font-bold text-[#00f2fe] uppercase tracking-wider block">Рекомендуемое сечение</span><div class="text-2xl font-extrabold font-mono text-white mt-0.5">${parPrefix}${rec.sec} мм² <span class="text-sm font-sans font-semibold text-slate-400">(${mat === 'Cu' ? 'Медь' : 'Алюминий'})</span></div></div>
+                        <button onclick="applyLvRec(${rec.sec},'${mat}','${ins}',${par},${P},${L},${cos})" class="px-3 py-1.5 rounded-full neon-btn text-white text-xs font-bold active:scale-95 transition">+ В расчёт &Delta;U</button>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1.5 text-center">
+                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Ток Ip</span><strong class="text-xs font-mono text-white">${cur.toFixed(1)} А</strong></div>
+                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Допуст. Iд'</span><strong class="text-xs font-mono text-[#00f2fe]">${rec.totIdop} А (${Math.round(rec.loadPct)}%)</strong></div>
+                        <div class="pill-control py-1.5 px-2"><span class="text-[9px] text-slate-400 block">Потеря &Delta;U</span><strong class="text-xs font-mono ${duColor}">${rec.dPct.toFixed(2)}% (${rec.dV.toFixed(1)}В)</strong></div>
+                    </div>
+                    <div class="overflow-hidden rounded-xl border border-[#8b5cf6]/25 bg-[#0b0a17]/70">
+                        <table class="w-full text-left text-xs">
+                            <thead><tr class="text-slate-400 text-[10px] border-b border-[#8b5cf6]/20 bg-[#07060e]/90"><th class="py-2 px-2.5">Сечение</th><th class="py-2 px-2">Iдоп' (Загр.)</th><th class="py-2 px-2">&Delta;U</th><th class="py-2 px-2 text-right">Статус</th></tr></thead>
+                            <tbody>${slice.map(x => `<tr class="border-b border-[#8b5cf6]/15 ${x.sec === rec.sec ? 'bg-emerald-500/15 text-white font-bold' : 'text-slate-300'}"><td class="py-2 px-2.5 font-mono">${parPrefix}${x.sec} мм² ${x.sec === rec.sec ? '<span class="ml-1 text-[9px] px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold">РЕК.</span>' : ''}</td><td class="py-2 px-2 font-mono ${x.ok ? '' : 'text-rose-400 font-bold'}">${x.totIdop} А (${Math.round(x.loadPct)}%)</td><td class="py-2 px-2 font-mono ${x.dPct <= lim ? '' : 'text-rose-400 font-bold'}">${x.dPct.toFixed(2)}%</td><td class="py-2 px-2 text-right font-semibold ${x.ok ? 'text-emerald-400' : 'text-rose-400'}">${x.ok ? 'Подходит' : 'Мало'}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                </div>`;
+        }
+        function applyLvRec(sec, mat, ins, par, p, len, cos) { state.lvSegs.push({ id: Date.now(), name: `Подобранный ${sec} мм²`, mat, ins, sec, par, len, mode: 'P', p, i: 50, cos }); saveState(); renderLvSegments(); updateLvSummary(); switchLvSubTab('drop'); showToast('Добавлено в схему 0,4 кВ'); }
+
         // === МОДУЛЬ 10 кВ UI и РАСЧЁТ ===
         function initHvControls() {
             document.getElementById('hv-insulation').value = state.hv.ins; document.getElementById('hv-laying-select').value = state.hv.lay;
@@ -597,35 +729,21 @@
             document.getElementById('hv-k1').value = String(state.hv.k1.toFixed(2)); document.getElementById('hv-k2').value = String(state.hv.k2.toFixed(2));
             document.getElementById('hv-k3').value = String(state.hv.k3.toFixed(2)); document.getElementById('hv-k4').value = String(state.hv.k4.toFixed(2));
             document.getElementById('hv-ikz').value = state.hv.ikz; document.getElementById('hv-tkz-time').value = state.hv.t;
-            
             document.getElementById('hv-eco-tariff').value = state.hv.tariff; document.getElementById('hv-eco-tau').value = state.hv.tau;
             document.getElementById('hv-eco-horizon').value = state.hv.horizon; document.getElementById('hv-eco-cost').value = state.hv.transpCost;
-            
-            document.getElementById('hv-t-n').value = state.hv.nCycles || 1;
-            document.getElementById('hv-t-l1').value = state.hv.l1 || 800;
-            document.getElementById('hv-t-l2').value = state.hv.l2 || 800;
-            document.getElementById('hv-t-l3').value = state.hv.l3 || 800;
-
+            document.getElementById('hv-t-n').value = state.hv.nCycles || 1; document.getElementById('hv-t-l1').value = state.hv.l1 || 800;
+            document.getElementById('hv-t-l2').value = state.hv.l2 || 800; document.getElementById('hv-t-l3').value = state.hv.l3 || 800;
             updateHvUI();
         }
 
-        function onHvLengthInputMain() {
-            if (state.hv.transpMode === 'manual') return; 
-            state.hv.len = Math.max(1, +document.getElementById('hv-length').value || 100);
-            saveState(); runHvCalculation();
-        }
+        function onHvLengthInputMain() { if (state.hv.transpMode === 'manual') return; state.hv.len = Math.max(1, +document.getElementById('hv-length').value || 100); saveState(); runHvCalculation(); }
         function onHvCableTypeChange() { state.hv.ins = document.getElementById('hv-insulation').value; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function toggleHvMaterial() { state.hv.mat = (state.hv.mat === 'Cu') ? 'Al' : 'Cu'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function setHvLaying(l) { state.hv.lay = l; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function toggleHvLoadMode() { state.hv.mode = (state.hv.mode === 'P') ? 'I' : 'P'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function pickHvCore(sec) { state.hv.selectedCore = sec; saveState(); runHvCalculation(); }
         function pickHvScreen(sec) { state.hv.selectedScreen = sec; saveState(); runHvCalculation(); }
-
-        function toggleTranspMode() {
-            state.hv.transpMode = state.hv.transpMode === 'manual' ? 'auto' : 'manual';
-            saveState(); updateHvUI(); runHvCalculation();
-        }
-
+        function toggleTranspMode() { state.hv.transpMode = state.hv.transpMode === 'manual' ? 'auto' : 'manual'; saveState(); updateHvUI(); runHvCalculation(); }
         function onHvManualTransp() {
             if (state.hv.transpMode !== 'manual') return;
             state.hv.nCycles = Math.max(1, +document.getElementById('hv-t-n').value || 1);
