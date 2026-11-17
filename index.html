@@ -85,8 +85,17 @@
         <div class="pointer-events-none absolute -top-24 -left-20 w-64 h-64 rounded-full bg-[#00f2fe]/10 blur-[80px] z-0"></div>
         <div class="pointer-events-none absolute top-1/3 -right-24 w-72 h-72 rounded-full bg-[#8b5cf6]/15 blur-[90px] z-0"></div>
 
-        <!-- Закреплённая шапка -->
-        <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-4 pt-safe pb-3 z-40 flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
+        <!-- Закреплённая шапка с кнопкой «Назад» слева -->
+        <header class="shrink-0 bg-[#090814]/85 backdrop-blur-xl border-b border-[#8b5cf6]/25 px-3.5 pt-safe pb-3 z-40 relative flex flex-col items-center justify-center text-center shadow-[0_6px_24px_rgba(0,0,0,0.5)]">
+            <!-- Кнопка «Назад» в верхнем баре (скрыта на главном экране) -->
+            <button type="button" id="header-back-btn" onclick="openModule('hub')"
+                class="hidden absolute left-3 bottom-3.5 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/8 hover:bg-white/15 active:scale-95 border border-[#8b5cf6]/35 text-xs font-bold text-[#00f2fe] transition shadow-sm">
+                <svg class="w-4 h-4 -ml-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+                <span>Назад</span>
+            </button>
+
             <div class="flex items-center justify-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#00f2fe] to-[#8b5cf6] flex items-center justify-center shadow-lg shadow-violet-600/35">
                     <svg class="w-4 h-4 text-[#090814]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -542,7 +551,8 @@
             <span id="toast-text">Скопировано</span>
         </div>
 
-        <nav id="module-bottom-nav" class="hidden shrink-0 w-full bg-[#090814]/90 backdrop-blur-xl border-t border-[#8b5cf6]/25 px-2.5 pt-2 pb-safe z-40 shadow-[0_-8px_28px_rgba(0,0,0,0.65)]"></nav>
+        <!-- Увеличенный нижний тапбар (без кнопки Назад) -->
+        <nav id="module-bottom-nav" class="hidden shrink-0 w-full bg-[#090814]/90 backdrop-blur-xl border-t border-[#8b5cf6]/25 px-3 pt-2.5 pb-safe z-40 shadow-[0_-8px_28px_rgba(0,0,0,0.65)]"></nav>
     </div>
 
     <script>
@@ -563,8 +573,6 @@
             }
         };
 
-        // Усреднённые каталожные геометрические параметры кабелей АПвПг/ПвПг 10 кВ:
-        // dOut — базовый наружный диаметр кабеля (мм), dScr — базовый средний диаметр по экрану (мм)
         const XLPE_GEOM_DB = {
             50:  { dOut: 29, dScr: 22 },
             70:  { dOut: 31, dScr: 24 },
@@ -645,6 +653,7 @@
             const nav = document.getElementById('module-bottom-nav');
             const dock = document.getElementById('lv-floating-dock');
             const sub = document.getElementById('header-subtitle');
+            const backBtn = document.getElementById('header-back-btn');
             document.getElementById('app-content').scrollTop = 0;
 
             dock.classList.add('hidden');
@@ -652,10 +661,15 @@
             if (mod === 'hub') {
                 document.getElementById('view-hub').classList.remove('hidden');
                 nav.classList.add('hidden');
+                backBtn.classList.add('hidden');
                 sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ';
                 return;
             }
+
+            // Показываем кнопку «Назад» в верхнем баре во всех внутренних разделах
+            backBtn.classList.remove('hidden');
             nav.classList.remove('hidden');
+
             if (mod === 'lv') {
                 document.getElementById('view-lv').classList.remove('hidden');
                 sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ';
@@ -663,18 +677,22 @@
             } else if (mod === 'hv') {
                 document.getElementById('view-hv').classList.remove('hidden');
                 sub.textContent = 'Модуль 10 кВ • Жила, экран, транспозиция (50В / 5кВ)';
-                nav.innerHTML = `<div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModule('hub')" class="py-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 hover:text-white font-bold text-xs">← Назад</button>
-                    <div class="flex items-center justify-center py-2.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs">Подбор КЛ 10 кВ</div>
+                nav.innerHTML = `<div class="grid grid-cols-1">
+                    <div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs shadow-sm">
+                        <svg class="w-4 h-4 text-[#00f2fe]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span>Подбор КЛ 10 кВ (Жила • Экран • Транспозиция)</span>
+                    </div>
                 </div>`;
                 initHvControls();
                 runHvCalculation();
             } else if (mod === 'ref') {
                 document.getElementById('view-ref').classList.remove('hidden');
                 sub.textContent = 'Справочные таблицы ПУЭ 7 изд. и ГОСТ';
-                nav.innerHTML = `<div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModule('hub')" class="py-2.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 hover:text-white font-bold text-xs">← Назад</button>
-                    <div class="flex items-center justify-center py-2.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs">Справочник ПУЭ</div>
+                nav.innerHTML = `<div class="grid grid-cols-1">
+                    <div class="flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold text-xs shadow-sm">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        <span>Справочник ПУЭ и ГОСТ</span>
+                    </div>
                 </div>`;
                 renderReferenceTable();
             }
@@ -687,10 +705,16 @@
             document.getElementById('lv-subtab-select').classList.toggle('hidden', isDrop);
             document.getElementById('lv-floating-dock').classList.toggle('hidden', !isDrop);
 
-            document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-3 gap-1.5">
-                <button onclick="openModule('hub')" class="flex flex-col items-center justify-center py-2 rounded-2xl bg-white/5 border border-white/10 text-slate-300 font-semibold text-[11px]">← Назад</button>
-                <button onclick="switchLvSubTab('drop')" class="flex flex-col items-center justify-center py-2 rounded-2xl text-[11px] ${isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold' : 'text-slate-400'}">Потери &Delta;U</button>
-                <button onclick="switchLvSubTab('select')" class="flex flex-col items-center justify-center py-2 rounded-2xl text-[11px] ${!isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/35 font-bold' : 'text-slate-400'}">Подбор сечения</button>
+            // Увеличенные по высоте нижние кнопки тапбара (py-3.5, text-xs с иконками) без кнопки Назад
+            document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2">
+                <button onclick="switchLvSubTab('drop')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
+                    <svg class="w-4 h-4 ${isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+                    <span>Потери &Delta;U</span>
+                </button>
+                <button onclick="switchLvSubTab('select')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${!isDrop ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
+                    <svg class="w-4 h-4 ${!isDrop ? 'text-[#00f2fe]' : 'text-slate-400'}" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Подбор сечения</span>
+                </button>
             </div>`;
             if (!isDrop) runLvCableSelection();
             else updateLvSummary();
@@ -1175,7 +1199,7 @@
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
             const lg2 = Math.log10(2);
             const iOneCable = activeCore.cur / h.par;
-            const ikzOneCableKa = ikz2 / h.par; // сквозной двухфазный ток КЗ на одну нитку, кА
+            const ikzOneCableKa = ikz2 / h.par;
             const lenKm = h.len / 1000;
 
             let xm = 0;
@@ -1186,14 +1210,12 @@
                 xm = 0.144 * rootTerm;
             }
 
-            // Наведённое напряжение на всей длине L (при одностороннем заземлении):
             const uInduced = iOneCable * lenKm * xm;          // Нормальный режим, В (лимит ≤ 50 В)
             const uKzInducedKv = ikzOneCableKa * lenKm * xm;  // Режим КЗ, кВ (лимит ≤ 5.0 кВ)
 
             const pass50V = uInduced <= 50.0;
             const pass5kV = uKzInducedKv <= 5.0;
 
-            // Определение необходимого числа циклов транспозиции с учётом ОБОИХ критериев (50 В и 5 кВ) и длины барабана (~1200 м)
             const minCyclesBy50V = Math.max(1, Math.ceil(uInduced / (50 * 3)));
             const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedKv / (5.0 * 3)));
             const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
@@ -1369,7 +1391,6 @@
                         </span>
                     </div>
 
-                    <!-- Четыре капсулы с обоими критериями (50 В и 5 кВ), Xm и геометрией -->
                     <div class="grid grid-cols-2 gap-1.5 text-center">
                         <div class="pill-control py-1.5 px-2.5 flex items-center justify-between">
                             <span class="text-[9px] text-slate-400">Норм. (≤50В):</span>
