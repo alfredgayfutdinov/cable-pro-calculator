@@ -1228,7 +1228,7 @@
 
         function renderGroundingSchemeSvg(schemeType, p, theme = 'dark') {
             const isPrint = theme === 'print';
-            const font = isPrint ? 'Times New Roman, serif' : 'JetBrains Mono, monospace';
+            const font = isPrint ? '"ISOCPEUR", "GOST type A", "GOST Common", sans-serif' : 'JetBrains Mono, monospace';
             const cA = isPrint ? '#000' : '#00f2fe';
             const cB = isPrint ? '#000' : '#a855f7';
             const cC = isPrint ? '#000' : '#38bdf8';
@@ -1391,7 +1391,7 @@
                         <span>${headerLeft}</span>
                         <span style="font-weight: normal;">${headerRight}</span>
                     </div>
-                    <svg viewBox="0 0 440 146" width="100%" style="max-width: 520px; display: block; margin: 0 auto;">
+                    <svg viewBox="0 0 440 146" width="100%" style="max-width: 520px; display: block; margin: 0 auto; font-family: 'ISOCPEUR', 'GOST type A', sans-serif; font-style: italic;">
                         ${svgInner}
                     </svg>
                 </div>`;
@@ -1590,9 +1590,9 @@
             const paybackStr = paybackYears === Infinity ? '∞' : `${paybackYears.toFixed(1)} лет`;
 
             let schemeStripe = 'bg-emerald-400';
-            let schemeBadge = '50 В и 5 кВ: В норме';
+            let schemeBadge = 'L < 600 м • Малая длина';
             let schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
-            let schemeTitle = 'Одностороннее заземление экрана';
+            let schemeTitle = 'Одностороннее с ОПН или Двухстороннее глухое';
             let schemeRecHtml = '';
 
             if (isManualTransp) {
@@ -1609,37 +1609,45 @@
                         <div>• Остаточный ток в экране: <strong>I<sub>э.ост</sub>/I<sub>ж</sub> = ${(iScreenTranspRatio * 100).toFixed(1)}%</strong> &rarr; <strong class="text-[#00f2fe]">K<sub>и</sub> = ${kiTranspFactor.toFixed(3)}</strong> (I<sub>доп</sub> = ${iDopTransp} А).</div>
                         ${!passTranspNodes ? `<div class="text-rose-300 font-semibold pt-0.5">⚠ Длинный участок превышает допустимое напряжение в узле! Уменьшите длину макс. участка или добавьте цикл транспозиции.</div>` : ''}
                     </div>`;
-            } else if (!pass50V || !pass5kV) {
-                schemeStripe = 'bg-rose-500';
-                const failReasons = [];
-                if (!pass50V) failReasons.push(`Uнав = ${uInduced.toFixed(1)} В > 50 В`);
-                if (!pass5kV) failReasons.push(`Uкз⁽³⁾ = ${uKzInducedKv.toFixed(2)} кВ > 5,0 кВ`);
-                schemeBadge = !pass50V && !pass5kV ? 'Превышены 50 В и 5 кВ!' : (!pass50V ? 'Uнав > 50 В (Трансп.)' : 'Uкз > 5 кВ (Трансп.)');
-                schemeBadgeCls = 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
-                schemeTitle = nCycles === 1 ? 'Транспозиция (1 цикл)' : `Транспозиция (${nCycles} цикла)`;
+            } else if (h.len > 1500 || !passSingleEnded) {
+                const isOverLimit = !passSingleEnded;
+                schemeStripe = isOverLimit ? 'bg-rose-500' : 'bg-[#00f2fe]';
+                schemeBadge = isOverLimit ? 'Превышение 50 В / 5 кВ' : 'L > 1500 м • Большая длина';
+                schemeBadgeCls = isOverLimit
+                    ? 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub'
+                    : 'bg-[#00f2fe]/15 text-[#00f2fe] border-[#00f2fe]/35';
+                schemeTitle = nCycles === 1 ? 'Транспозиция экранов (1 цикл)' : `Транспозиция экранов (${nCycles} цикла)`;
                 schemeRecHtml = `
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 space-y-1">
-                        <div class="text-rose-300 font-semibold">Одностороннее заземление на всю длину (${h.len} м) не проходит: ${failReasons.join(' и ')}!</div>
-                        <div>• <strong>Решение:</strong> разбить трассу ${h.len} м на <strong>${nSections} уч. по ~${maxSecLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''} транспозиции).</div>
-                        <div>• В узлах транспозиции (шаг ${maxSecLenM} м): <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${isOverLimit ? 'border-rose-500/35' : 'border-[#00f2fe]/35'} rounded-xl p-2.5 space-y-1">
+                        <div class="${isOverLimit ? 'text-rose-300' : 'text-[#00f2fe]'} font-semibold">
+                            ${h.len > 1500
+                                ? `Длина трассы L = ${h.len} м > 1500 м (кабель большой длины по М.В. Дмитриеву)${isOverLimit ? ' и превышены пороги 50 В / 5 кВ' : ''}.`
+                                : `На длину L = ${h.len} м превышен допустимый порог (U<sub>нав</sub> = ${uInduced.toFixed(1)} В / U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ).`}
+                        </div>
+                        <div>• <strong>Решение:</strong> применить <strong>транспозицию экранов</strong> — разбить трассу на <strong>${nSections} уч. по ~${maxSecLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''}).</div>
+                        <div>• В узлах транспозиции: <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
                     </div>`;
-            } else if (uInduced >= 40 || uKzInducedKv >= 4.0 || h.len > 1200) {
-                schemeStripe = 'bg-amber-400';
-                schemeBadge = `Запас по 50 В: ${margin50VPct.toFixed(0)}%`;
-                schemeBadgeCls = 'bg-amber-500/15 text-amber-300 border-amber-400/35';
-                schemeTitle = 'Одностор. (близко к 50 В) или Трансп.';
-                const l3 = Math.round(h.len / 3);
-                schemeRecHtml = `
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-amber-400/35 rounded-xl p-2.5 space-y-1">
-                        <div class="text-amber-300 font-semibold">Формально проходят оба критерия: U<sub>нав</sub> = ${uInduced.toFixed(1)} В (${used50VPct.toFixed(0)}% от 50 В, запас ${margin50VPct.toFixed(0)}%) и U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ ≤ 5,0 кВ.</div>
-                        <div>• При росте тока до предельного I<sub>доп</sub> = ${iDopOneCable.toFixed(0)} А наведённое напряжение вырастет до <strong>${uInducedAtIdop.toFixed(1)} В</strong>.</div>
-                        <div>• <strong>Рекомендация:</strong> если нужен запас на рост нагрузки или трасса &gt; 1200 м (${h.len} м), заложите <strong>1 цикл транспозиции (3 уч. по ~${l3} м, U<sub>узла</sub> = ${uNodeV.toFixed(1)} В)</strong>; иначе — <strong>одностороннее с ОПН</strong>.</div>
-                    </div>`;
-            } else {
+            } else if (h.len >= 600) {
+                schemeStripe = uInduced >= 40 ? 'bg-amber-400' : 'bg-emerald-400';
+                schemeBadge = '600–1500 м • Средняя длина';
+                schemeBadgeCls = uInduced >= 40
+                    ? 'bg-amber-500/15 text-amber-300 border-amber-400/35'
+                    : 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
+                schemeTitle = 'Одностороннее заземление с ОПН';
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
-                        <div class="text-emerald-300 font-semibold">Оба критерия выполняются с запасом (${margin50VPct.toFixed(0)}%): U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
-                        <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление с ОПН</strong> на всю длину <strong>L = ${h.len} м</strong> (потерь в экране нет, затрат минимум).</div>
+                        <div class="text-emerald-300 font-semibold">Длина линии L = ${h.len} м (диапазон 600–1500 м — средняя длина), U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В (запас ${margin50VPct.toFixed(0)}%), U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
+                        <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление экранов с установкой ОПН</strong> на разземлённом конце (потерь в экране нет, затрат минимум).</div>
+                    </div>`;
+            } else {
+                schemeStripe = 'bg-emerald-400';
+                schemeBadge = 'L < 600 м • Малая длина';
+                schemeBadgeCls = 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35';
+                schemeTitle = okSolidBonding ? 'Одностороннее с ОПН или Двухстороннее глухое' : 'Одностороннее заземление с ОПН';
+                schemeRecHtml = `
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
+                        <div class="text-emerald-300 font-semibold">Длина линии L = ${h.len} м &lt; 600 м (малая длина по М.В. Дмитриеву): U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В, U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
+                        <div>• <strong>Решение:</strong> допускается <strong>одностороннее заземление с ОПН</strong> (потерь в экране 0 кВт) ${okSolidBonding ? `либо <strong>двухстороннее глухое заземление</strong> без ОПН, так как проходит по пропускной способности жилы (I<sub>доп.гл</sub> = ${iDopSolidBonding} А &ge; I<sub>p</sub> = ${gndCore.cur.toFixed(1)} А)` : `(двухстороннее глухое не проходит по току: I<sub>доп.гл</sub> = ${iDopSolidBonding} А &lt; I<sub>p</sub> = ${gndCore.cur.toFixed(1)} А)`}.</div>
                     </div>`;
             }
 
@@ -2021,18 +2029,20 @@
             const paybackYears = moneySavedYearMln > 0 ? transpCostOneChain / moneySavedYearMln : Infinity;
             const paybackStr = paybackYears === Infinity ? '∞' : `${paybackYears.toFixed(1)} лет`;
 
-            const needTransp = isManualTransp || !passSingleEnded || uInduced >= 40 || h.len > 1200;
+            const needTransp = isManualTransp || h.len > 1500 || !passSingleEnded;
 
-            // Явная формулировка итогового выбора схемы
+            // Явная формулировка итогового выбора схемы по классификации длин М.В. Дмитриева (<600 м, 600-1500 м, >1500 м)
             let explicitChoiceText = '';
-            if (!passSingleEnded) {
-                explicitChoiceText = `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — необходима по условиям безопасности (на всю длину U<sub>нав</sub> = ${uInduced.toFixed(1)} В / U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ превышает допустимый порог), расчётный срок окупаемости составляет <b>${paybackStr}</b>.`;
-            } else if (isManualTransp) {
-                explicitChoiceText = `<b>неидеальная транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м)</b> — задана проектом; наведённое напряжение в узлах не превышает ${uNodeV.toFixed(1)} В (≤ 50 В), небаланс длин ${unbalPct.toFixed(1)}%, расчётный срок окупаемости <b>${paybackStr}</b>.`;
-            } else if (uInduced >= 40 || h.len > 1200) {
-                explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — проходит по критериям безопасности без потерь в экранах и при минимальных затратах. <i>Альтернатива:</i> <b>транспозиция из-за запаса по напряжению</b> (при росте тока до I<sub>доп</sub> напряжение достигнет ${uInducedAtIdop.toFixed(1)} В, а при транспозиции снизится до ${uNodeV.toFixed(1)} В; затраты ${transpCostOneChain.toFixed(2)} млн ₽, расчётная окупаемость <b>${paybackStr}</b>).`;
+            if (isManualTransp) {
+                explicitChoiceText = `<b>неидеальная транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — задана проектом; наведённое напряжение в узлах не превышает ${uNodeV.toFixed(1)} В (≤ 50 В), небаланс длин ${unbalPct.toFixed(1)}%, расчётный срок окупаемости <b>${paybackStr}</b>.`;
+            } else if (h.len > 1500 || !passSingleEnded) {
+                explicitChoiceText = `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — ${h.len > 1500 ? `длина линии L = ${h.len} м > 1500 м (кабель большой длины по М.В. Дмитриеву)` : `превышен порог допустимого наведённого напряжения на всю длину (U<sub>нав</sub> = ${uInduced.toFixed(1)} В / U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ)`}; наведённое напряжение в узлах снижается до ${uNodeV.toFixed(1)} В (≤ 50 В), расчётный срок окупаемости составляет <b>${paybackStr}</b>.`;
+            } else if (h.len >= 600) {
+                explicitChoiceText = `<b>одностороннее заземление экранов с коробкой ОПН на конце</b> — длина линии L = ${h.len} м относится к средней длине (600–1500 м), наведённое напряжение U<sub>нав</sub> = ${uInduced.toFixed(1)} В ≤ 50 В (запас ${margin50VPct.toFixed(0)}%), U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ ≤ 5,0 кВ; потерь в экране нет, затраты минимальны.`;
             } else {
-                explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — технически допустимо с большим запасом, потерь в экранах нет, затраты минимальны.`;
+                explicitChoiceText = okSolidBonding
+                    ? `<b>одностороннее заземление с коробкой ОПН</b> или <b>двухстороннее глухое заземление экранов</b> — длина линии L = ${h.len} м &lt; 600 м (малая длина по М.В. Дмитриеву), U<sub>нав</sub> = ${uInduced.toFixed(1)} В ≤ 50 В, и при двухстороннем заземлении проходит условие пропускной способности жилы (I<sub>доп.гл</sub> = ${iDopSolidBonding} А ≥ I<sub>p</sub> = ${core.cur.toFixed(1)} А).`
+                    : `<b>одностороннее заземление экранов с коробкой ОПН</b> — длина линии L = ${h.len} м &lt; 600 м (малая длина), U<sub>нав</sub> = ${uInduced.toFixed(1)} В ≤ 50 В; двухстороннее глухое заземление не применяется, так как не проходит по пропускной способности жилы (I<sub>доп.гл</sub> = ${iDopSolidBonding} А &lt; I<sub>p</sub> = ${core.cur.toFixed(1)} А).`;
             }
 
             const printAllSchemesHtml = `
@@ -2069,16 +2079,25 @@
 <title>Расчёт кабельной линии 10 кВ</title>
 <style>
     @page { size: A4; margin: 20mm 15mm 20mm 25mm; }
-    body { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.4; color: #000; background: #fff; margin: 0; padding: 0; }
-    h1 { font-size: 14pt; text-align: center; text-transform: uppercase; margin: 0 0 14pt 0; }
-    h2 { font-size: 12.5pt; margin: 14pt 0 6pt 0; border-bottom: 1px solid #000; padding-bottom: 2pt; }
+    body {
+        font-family: "ISOCPEUR", "GOST type A", "GOST Common", "Courier New", sans-serif;
+        font-style: italic;
+        font-size: 13pt;
+        line-height: 1.38;
+        color: #000;
+        background: #fff;
+        margin: 0;
+        padding: 0;
+    }
+    h1 { font-size: 16pt; text-align: center; text-transform: uppercase; margin: 0 0 12pt 0; letter-spacing: 0.5pt; }
+    h2 { font-size: 13.5pt; margin: 14pt 0 6pt 0; border-bottom: 1px solid #000; padding-bottom: 2pt; }
     p { margin: 4pt 0; text-align: justify; }
-    .formula { margin: 5pt 0 5pt 12pt; }
-    table { width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 11pt; }
+    .formula { margin: 5pt 0 5pt 14pt; }
+    table { width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 11.5pt; }
     th, td { border: 1px solid #000; padding: 4pt 6pt; text-align: left; vertical-align: top; }
     th { background: #f2f2f2; font-weight: bold; }
     .center { text-align: center; }
-    .verdict { border: 1px solid #000; padding: 8pt 10pt; margin-top: 10pt; background: #fafafa; }
+    .verdict { border: 1.5px solid #000; padding: 8pt 10pt; margin-top: 10pt; background: #fafafa; }
 </style>
 </head>
 <body>
@@ -2151,8 +2170,8 @@
     L<sub>неб</sub> = √(L<sub>A</sub>² + L<sub>B</sub>² + L<sub>C</sub>² − L<sub>A</sub>L<sub>B</sub> − L<sub>B</sub>L<sub>C</sub> − L<sub>A</sub>L<sub>C</sub>) = <b>${lUnbalM.toFixed(1)} м</b> (${unbalPct.toFixed(1)}% от L).<br>
     Остаточный уравнительный ток: I<sub>э.ост</sub> / I<sub>ж</sub> = (I<sub>э</sub> / I<sub>ж</sub>) · (L<sub>неб</sub> / L) = ${(iScreenRatio * 100).toFixed(1)}% · (${lUnbalM.toFixed(1)} / ${sumTotal}) = <b>${(iScreenTranspRatio * 100).toFixed(2)} %</b>.<br>
     Коэффициент снижения тока при небалансе: K<sub>и.тр</sub> = <b>${kiTranspFactor.toFixed(3)}</b> (I<sub>доп.тр</sub> = ${iDopTransp} А).</p>` : ''}
-    ${format === 'pdf' ? printAllSchemesHtml : ''}
     ` : ''}
+    ${format === 'pdf' && isXlpe ? printAllSchemesHtml : ''}
 
     <h2>5. Технико-экономическое обоснование схемы заземления (на 1 кабельную цепь${h.par > 1 ? ` из ${h.par}` : ''})</h2>
     <p class="formula">1) Расчётное время максимальных потерь (при числе часов использования максимума нагрузки T<sub>max</sub> = ${h.tmax} ч/год):<br>
