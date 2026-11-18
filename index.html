@@ -1089,10 +1089,17 @@
             const ikz2 = +(Math.sqrt(3) / 2 * h.ikz).toFixed(3);
             const kTime = +(1 / Math.sqrt(h.t)).toFixed(3);
             const iCore1s = (CORE_IKZ_1S[h.ins] && CORE_IKZ_1S[h.ins][h.mat][sec]) || 15;
-            const iCorePerm = +(iCore1s * kTime * h.par).toFixed(3);
+            const iCorePerm = +(iCore1s * kTime).toFixed(3); // проверка каждой нитки на полный ток 3-фазного КЗ
 
-            return { sec, r0, x0, baseIdop, kTotal, iDopFact, cur, dV, dPct, dP, loadPct: (cur / iDopFact) * 100, ikz2, kTime, iCore1s, iCorePerm, okI: iDopFact >= cur, okU: dPct <= h.limit, okCoreKz: iCorePerm > ikz2, okAll: iDopFact >= cur && dPct <= h.limit && iCorePerm > ikz2 };
-        }
+            return {
+    sec, r0, x0, baseIdop, kTotal, iDopFact, cur, dV, dPct, dP,
+    loadPct: (cur / iDopFact) * 100,
+    ikz2, kTime, iCore1s, iCorePerm,
+    okI: iDopFact >= cur,
+    okU: dPct <= h.limit,
+    okCoreKz: iCorePerm > h.ikz, // сравниваем с Iкз^(3)
+    okAll: iDopFact >= cur && dPct <= h.limit && iCorePerm > h.ikz
+};
             function renderTranspSvg(secs, iOneCable, xm, isManual) {
             // Берём первые 3 участка (1-й цикл) или разбиваем на 3 равных для наглядности
             const L = secs.slice(0, 3);
@@ -1541,7 +1548,7 @@
                         <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeCore.okCoreKz ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${activeCore.okCoreKz ? 'Выполняется' : 'Не выполняется'}</span>
                     </div>
                     <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${activeCore.okCoreKz ? 'text-emerald-300' : 'text-rose-300'}">
-                        I<sub>доп.кз</sub> (${activeCore.iCorePerm.toFixed(3)} кА) ${activeCore.okCoreKz ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${ikz2.toFixed(3)} кА)
+                        I<sub>доп.кз</sub> (${activeCore.iCorePerm.toFixed(3)} кА) ${activeCore.okCoreKz ? '>' : '<'} I⁽³⁾<sub>кз</sub> (${h.ikz.toFixed(3)} кА)
                     </div>
                 </div>
 
