@@ -1620,37 +1620,77 @@
                         : ''}
                 </div>
 
-                <!-- Экономика (Срок окупаемости на 1 цепь) -->
+                <!-- Экономика и сводка по 3 схемам заземления -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (okSolidBonding && h.len <= 800 ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
                     <div class="flex items-center justify-between gap-2">
-                        <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400">Экономика (на 1 цепь${h.par > 1 ? ` из ${h.par}` : ''})</span>
+                        <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400">Экономика и выбор схемы (на 1 цепь${h.par > 1 ? ` из ${h.par}` : ''})</span>
                         <span class="text-[10px] font-mono text-slate-400">T<sub>max</sub>=${h.tmax}ч &rarr; τ=${tauCalc}ч</span>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Экономия потерь (1 цепь)</span><strong class="text-xs font-mono text-white">${(pSavedWatts/1000).toFixed(2)} кВт</strong></div>
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Срок окупаемости</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1) + ' лет'}</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Потери в экранах (2-ст.)</span><strong class="text-xs font-mono text-white">${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Окупаемость трансп.</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1) + ' лет'}</strong></div>
                     </div>
-                    
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${isProfitable ? 'border-emerald-500/35' : 'border-amber-500/35'} rounded-xl p-2.5">
-                        Затраты на ${nCycles} цикл. транспозиции (1 цепь): <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong>.<br>
-                        Потери в экранах при глухом заземлении: <strong>${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>${isManualTransp ? ` (остаточные при небалансе: <strong>${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>)` : ''}.<br>
-                        Чистая экономия (при τ = ${tauCalc} ч/год): <strong>${moneySavedYearMln.toFixed(3)} млн ₽ в год</strong>.<br>
-                        ${isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Окупится за ${paybackYears.toFixed(1)} лет (меньше предела в ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> за заданный предел в ${h.horizon} лет.`}
+
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-[#8b5cf6]/25 rounded-xl p-2.5">
+                        Затраты на ${nCycles} цикл. транспозиции: <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong> • Экономия потерь: <strong>${(pSavedWatts/1000).toFixed(2)} кВт</strong> (<strong>${moneySavedYearMln.toFixed(3)} млн ₽/год</strong>).
                     </div>
-                    
-                    ${!isProfitable ? `
-                    <div class="text-[11px] leading-relaxed bg-[#0b0a17]/75 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-1">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#d8b4fe]">Глухое 2-стороннее заземление (без ОПН)</span>
-                            <span class="font-mono text-[10px] font-bold ${okSolidBonding ? 'text-emerald-400' : 'text-rose-400'}">K<sub>и</sub> = ${kiFactor.toFixed(2)} (${okSolidBonding ? 'Норма' : 'Перегрев'})</span>
+
+                    <!-- 3 ЧЁТКИХ ВЫВОДА ПО СХЕМАМ ЗАЗЕМЛЕНИЯ -->
+                    <div class="space-y-1.5 pt-0.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-0.5">Сводный вывод по способам заземления:</span>
+
+                        <!-- 1. Двухстороннее глухое заземление -->
+                        <div class="bg-[#0b0a17]/85 border ${okSolidBonding ? 'border-emerald-500/35' : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[11px] font-bold text-white">1. Двухстороннее глухое (без ОПН)</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${okSolidBonding ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
+                                    ${okSolidBonding ? '✓ Подходит' : '✕ Не подходит'}
+                                </span>
+                            </div>
+                            <div class="text-[10px] text-slate-300 leading-snug">
+                                Ток в экране <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong>, K<sub>и</sub> = <strong>${kiFactor.toFixed(2)}</strong> &rarr; I<sub>доп.гл</sub> = <strong class="${okSolidBonding ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong> (при I<sub>p</sub> = ${activeCore.cur.toFixed(1)} А).
+                                ${okSolidBonding
+                                    ? (isProfitable ? 'По току проходит, но даёт высокие потери — выгоднее транспозиция.' : 'Технически допустимо и не требует затрат на коробки ОПН.')
+                                    : 'Перегрев жилы от уравнительных токов в экранах (I<sub>доп.гл</sub> < I<sub>p</sub>).'}
+                            </div>
                         </div>
-                        <div class="text-slate-300">
-                            Ток в экране <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong> &rarr; допустимый ток жилы падает до <strong class="${okSolidBonding ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong>.
-                            ${okSolidBonding && h.len <= 800 ? '<span class="text-emerald-300 block mt-0.5">✓ Если ток позволяет, на короткой трассе заземлите экраны с 2 сторон без коробок ОПН.</span>' : ''}
+
+                        <!-- 2. Одностороннее заземление с коробкой ОПН -->
+                        <div class="bg-[#0b0a17]/85 border ${(pass50V && pass5kV) ? 'border-emerald-500/35' : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[11px] font-bold text-white">2. Одностороннее с коробкой ОПН</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${(pass50V && pass5kV) ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
+                                    ${(pass50V && pass5kV) ? '✓ Подходит' : '✕ Не подходит'}
+                                </span>
+                            </div>
+                            <div class="text-[10px] text-slate-300 leading-snug">
+                                На всю длину ${h.len} м: U<sub>нав</sub> = <strong class="${pass50V ? 'text-emerald-400' : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong> (≤50 В), U<sub>кз</sub><sup>(3)</sup> = <strong class="${pass5kV ? 'text-emerald-400' : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong> (≤5 кВ).
+                                ${(pass50V && pass5kV)
+                                    ? (h.len > 1200 ? 'По напряжениям проходит, но учтите строительную длину барабана (~1000 м).' : 'Оптимально: нет потерь в экранах и минимальные затраты на ОПН.')
+                                    : 'Превышено допустимое наведённое напряжение на разземлённом конце.'}
+                            </div>
                         </div>
-                    </div>` : ''}
+
+                        <!-- 3. Транспозиция экранов -->
+                        <div class="bg-[#0b0a17]/85 border ${(passTranspNodes && iDopTransp >= activeCore.cur) ? (isProfitable ? 'border-emerald-500/35' : 'border-amber-400/35') : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[11px] font-bold text-white">3. Транспозиция экранов (${nCycles} цикл.)</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${(passTranspNodes && iDopTransp >= activeCore.cur) ? (isProfitable ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-amber-500/15 text-amber-300 border border-amber-400/35') : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
+                                    ${(passTranspNodes && iDopTransp >= activeCore.cur) ? '✓ Подходит' : '✕ Не подходит'}
+                                </span>
+                            </div>
+                            <div class="text-[10px] text-slate-300 leading-snug">
+                                В узлах (${nSections} уч.): U<sub>узла</sub> = <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">${uNodeV.toFixed(1)} В</strong>, U<sub>кз</sub> = <strong class="${passNode5kV ? 'text-emerald-400' : 'text-rose-400'}">${uKzNodeKv.toFixed(2)} кВ</strong>.
+                                ${(passTranspNodes && iDopTransp >= activeCore.cur)
+                                    ? (isProfitable
+                                        ? `<span class="text-emerald-300 font-semibold">Экономически выгодна</span> (окупится за ${paybackYears.toFixed(1)} лет ≤ ${h.horizon} лет).`
+                                        : `<span class="text-amber-300 font-semibold">Не окупается</span> за ${h.horizon} лет (${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'}) — ставить только если не проходят п.1 и п.2.`)
+                                    : 'Требуется уменьшить длину макс. участка или добавить цикл транспозиции.'}
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Проверки ТКЗ -->
