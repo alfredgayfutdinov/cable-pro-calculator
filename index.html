@@ -663,6 +663,8 @@
                 mode: 'P', val: 5000, len: 2400, cos: 0.93,
                 ikz: 15.24, t: 1.5, limit: 5.0,
                 tariff: 9.0, tau: 8760, horizon: 10, transpCost: 2.5,
+                transpMode: 'auto', // 'auto' (идеальная) или 'manual' (неидеальная L1, L2, L3...)
+                transpSecs: [800, 800, 800],
                 selectedCore: null, selectedScreen: null
             }
         };
@@ -670,7 +672,13 @@
         function loadState() {
             try {
                 const s = JSON.parse(localStorage.getItem('kabelpro_v23'));
-                if (s && s.lvSegs && s.lvSegs.length) state = { ...state, ...s };
+                if (s && s.lvSegs && s.lvSegs.length) {
+                    state = { ...state, ...s, hv: { ...state.hv, ...(s.hv || {}) } };
+                    if (!Array.isArray(state.hv.transpSecs) || state.hv.transpSecs.length < 3) {
+                        const part = Math.round((state.hv.len || 2400) / 3);
+                        state.hv.transpSecs = [part, part, Math.max(1, (state.hv.len || 2400) - part * 2)];
+                    }
+                }
             } catch (e) {}
         }
         function saveState() {
@@ -985,7 +993,68 @@
         function toggleHvLoadMode() { state.hv.mode = (state.hv.mode === 'P') ? 'I' : 'P'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function pickHvCore(sec) { state.hv.selectedCore = sec; saveState(); runHvCalculation(); }
         function pickHvScreen(sec) { state.hv.selectedScreen = sec; saveState(); runHvCalculation(); }
+        function setHvTranspMode(mode) {
+            state.hv.transpMode = mode;
+            if (mode === 'manual') {
+                // Если сумма участков не совпадает с текущей длиной L, мягко пересчитаем равные доли как стартовые
+                const sum = state.hv.transpSecs.reduce((a, b) => a + (+b || 0), 0);
+                if (Math.abs(sum - state.hv.len) > 1) {
+                    const n = Math.max(3, state.hv.transpSecs.length);
+                    const base = Math.floor(state.hv.len / n);
+                    state.hv.transpSecs = Array.from({ length: n }, (_, i) => i === n - 1 ? state.hv.len - base * (n - 1) : base);
+                }
+            }
+            saveState();
+            runHvCalculation();
+        }
 
+        function updHvTranspSec(idx, val) {
+            const num = Math.max(1, parseFloat(val) || 0);
+            state.hv.transpSecs[idx] = num;
+            // Синхронизируем общую длину трассы L с суммой участков
+            const newTotal = Math.round(state.hv.transpSecs.reduce((a, b) => a + (+b || 0), 0));
+            if (newTotal > 0) {
+                state.hv.len = newTotal;
+                const lenInput = document.getElementById('hv-length');
+                if (lenInput) lenInput.value = newTotal;
+            }
+            saveState();
+            runHvCalculation();
+        }
+
+        function addHvTranspCycle() {
+            // Добавляем полный цикл транспозиции (+3 участка), деля последний участок или добавляя по 300 м
+            const last = state.hv.transpSecs[state.hv.transpSecs.length - 1] || 300;
+            const part = Math.max(50, Math.round(last / 4));
+            state.hv.transpSecs.push(part, part, part);
+            const newTotal = Math.round(state.hv.transpSecs.reduce((a, b) => a + (+b || 0), 0));
+            state.hv.len = newTotal;
+            const lenInput = document.getElementById('hv-length');
+            if (lenInput) lenInput.value = newTotal;
+            saveState();
+            runHvCalculation();
+            showToast('Добавлен цикл транспозиции (+3 уч.)');
+        }
+
+        function removeHvTranspCycle() {
+            if (state.hv.transpSecs.length <= 3) return;
+            state.hv.transpSecs.splice(-3, 3);
+            const newTotal = Math.round(state.hv.transpSecs.reduce((a, b) => a + (+b || 0), 0));
+            state.hv.len = newTotal;
+            const lenInput = document.getElementById('hv-length');
+            if (lenInput) lenInput.value = newTotal;
+            saveState();
+            runHvCalculation();
+        }
+
+        function equalizeHvTranspSecs() {
+            const n = state.hv.transpSecs.length;
+            const base = Math.floor(state.hv.len / n);
+            state.hv.transpSecs = Array.from({ length: n }, (_, i) => i === n - 1 ? state.hv.len - base * (n - 1) : base);
+            saveState();
+            runHvCalculation();
+            showToast('Длины участков выровнены');
+        }
         function updateHvUI() {
             const isXlpe = state.hv.ins === 'XLPE';
             const layWrap = document.getElementById('hv-laying-pill-wrap');
@@ -1103,26 +1172,74 @@
             const pass50V = uInduced <= 50.0;
             const pass5kV = uKzInducedKv <= 5.0;
 
+            // Авторасчёт минимального числа циклов для идеальной транспозиции
             const minCyclesBy50V = Math.max(1, Math.ceil(uInduced / (50 * 3)));
             const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedKv / (5.0 * 3)));
             const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
-            const nCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
-            const nSections = nCycles * 3;
-            const secLenM = Math.round(h.len / nSections);
-            const uNodeV = uInduced / nSections;
-            const uKzNodeKv = uKzInducedKv / nSections;
+            const autoCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
+
+            const isManualTransp = h.transpMode === 'manual';
+            let nCycles, nSections, maxSecLenM, uNodeV, uKzNodeKv, lUnbalM, unbalPct, iScreenTranspRatio, dpTranspRatio, kiTranspFactor, iDopTransp;
+
+            if (!isManualTransp) {
+                // Идеальная транспозиция (равные участки)
+                nCycles = autoCycles;
+                nSections = nCycles * 3;
+                maxSecLenM = Math.round(h.len / nSections);
+                uNodeV = uInduced / nSections;
+                uKzNodeKv = uKzInducedKv / nSections;
+                lUnbalM = 0;
+                unbalPct = 0;
+                iScreenTranspRatio = 0;
+                dpTranspRatio = 0;
+                kiTranspFactor = 1.0;
+                iDopTransp = activeCore.iDopFact;
+            } else {
+                // Неидеальная транспозиция (произвольные L1, L2, L3...)
+                const secs = h.transpSecs.map(x => Math.max(1, +x || 0));
+                nSections = secs.length;
+                nCycles = Math.max(1, Math.round(nSections / 3));
+                maxSecLenM = Math.max(...secs);
+                uNodeV = iOneCable * (maxSecLenM / 1000) * xm;
+                uKzNodeKv = ikz3OneCableKa * (maxSecLenM / 1000) * xm;
+
+                // Суммируем длины по фазным положениям A, B, C (каждые 3 участка)
+                let sumL1 = 0, sumL2 = 0, sumL3 = 0;
+                secs.forEach((L, idx) => {
+                    if (idx % 3 === 0) sumL1 += L;
+                    else if (idx % 3 === 1) sumL2 += L;
+                    else sumL3 += L;
+                });
+                const sumTotal = sumL1 + sumL2 + sumL3;
+                // Векторный небаланс длин по М.В. Дмитриеву: sqrt(L1^2 + L2^2 + L3^2 - L1*L2 - L2*L3 - L1*L3)
+                lUnbalM = Math.sqrt(Math.max(0, sumL1*sumL1 + sumL2*sumL2 + sumL3*sumL3 - sumL1*sumL2 - sumL2*sumL3 - sumL1*sumL3));
+                unbalPct = sumTotal > 0 ? (lUnbalM / sumTotal) * 100 : 0;
+
+                // Остаточный ток и потери в экранах при неидеальной транспозиции
+                iScreenTranspRatio = sumTotal > 0 ? iScreenRatio * (lUnbalM / sumTotal) : 0;
+                dpTranspRatio = (rScreenOhmKm / rCoreOhmKm) * Math.pow(iScreenTranspRatio, 2);
+                kiTranspFactor = 1 / Math.sqrt(1 + dpTranspRatio);
+                iDopTransp = +(activeCore.iDopFact * kiTranspFactor).toFixed(1);
+            }
+
+            const passNode50V = uNodeV <= 50.0;
+            const passNode5kV = uKzNodeKv <= 5.0;
+            const passTranspNodes = passNode50V && passNode5kV;
 
             const transpCostTotal = nCycles * h.transpCost;
-            
-            // Финансовые расчёты для окупаемости
+
+            // Финансовые расчёты: сравниваем глухое 2-стороннее заземление и выбранную транспозицию
             const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
-            const pScreenTotalWatts = pCoreTotalWatts * dpLossRatio;
-            const wScreenYearKwh = (pScreenTotalWatts / 1000) * h.tau;
-            const moneyLostYearMln = (wScreenYearKwh * h.tariff) / 1000000;
-            
+            const pScreenSolidWatts = pCoreTotalWatts * dpLossRatio;
+            const pScreenTranspWatts = pCoreTotalWatts * dpTranspRatio;
+            const pSavedWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
+
+            const wSavedYearKwh = (pSavedWatts / 1000) * h.tau;
+            const moneySavedYearMln = (wSavedYearKwh * h.tariff) / 1000000;
+
             let paybackYears = Infinity;
-            if (moneyLostYearMln > 0) {
-                paybackYears = transpCostTotal / moneyLostYearMln;
+            if (moneySavedYearMln > 0) {
+                paybackYears = transpCostTotal / moneySavedYearMln;
             }
             const isProfitable = paybackYears <= h.horizon;
 
@@ -1132,7 +1249,21 @@
             let schemeTitle = 'Одностороннее заземление экрана';
             let schemeRecHtml = '';
 
-            if (!pass50V || !pass5kV) {
+            if (isManualTransp) {
+                schemeStripe = passTranspNodes ? (unbalPct > 15 ? 'bg-amber-400' : 'bg-emerald-400') : 'bg-rose-500';
+                schemeBadge = passTranspNodes ? `Небаланс ${unbalPct.toFixed(1)}%` : 'Превышение в узле!';
+                schemeBadgeCls = passTranspNodes
+                    ? (unbalPct > 15 ? 'bg-amber-500/15 text-amber-300 border-amber-400/35' : 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35')
+                    : 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
+                schemeTitle = `Неидеальная транспозиция (${nCycles} цикл${nCycles > 1 ? 'а' : ''})`;
+                schemeRecHtml = `
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${passTranspNodes ? 'border-[#00f2fe]/35' : 'border-rose-500/40'} rounded-xl p-2.5 space-y-1">
+                        <div>• Макс. участок <strong>L<sub>max</sub> = ${maxSecLenM} м</strong>: <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В</strong> (≤50 В), <strong class="${passNode5kV ? 'text-emerald-400' : 'text-rose-400'}">U<sub>кз</sub> = ${uKzNodeKv.toFixed(2)} кВ</strong> (≤5 кВ).</div>
+                        <div>• Эквив. длина небаланса: <strong>L<sub>неб</sub> = ${lUnbalM.toFixed(1)} м</strong> (${unbalPct.toFixed(1)}% от L).</div>
+                        <div>• Остаточный ток в экране: <strong>I<sub>э.ост</sub>/I<sub>ж</sub> = ${(iScreenTranspRatio * 100).toFixed(1)}%</strong> &rarr; <strong class="text-[#00f2fe]">K<sub>и</sub> = ${kiTranspFactor.toFixed(3)}</strong> (I<sub>доп</sub> = ${iDopTransp} А).</div>
+                        ${!passTranspNodes ? `<div class="text-rose-300 font-semibold pt-0.5">⚠ Длинный участок превышает допустимое напряжение в узле! Уменьшите длину макс. участка или добавьте цикл транспозиции.</div>` : ''}
+                    </div>`;
+            } else if (!pass50V || !pass5kV) {
                 schemeStripe = 'bg-rose-500';
                 const failReasons = [];
                 if (!pass50V) failReasons.push(`Uнав = ${uInduced.toFixed(1)} В > 50 В`);
@@ -1143,15 +1274,15 @@
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-rose-500/35 rounded-xl p-2.5 space-y-1">
                         <div class="text-rose-300 font-semibold">Одностороннее заземление на всю длину (${h.len} м) не проходит: ${failReasons.join(' и ')}!</div>
-                        <div>• <strong>Решение:</strong> разбить трассу ${h.len} м на <strong>${nSections} уч. по ~${secLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''} транспозиции).</div>
-                        <div>• В узлах транспозиции (шаг ${secLenM} м): <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
+                        <div>• <strong>Решение:</strong> разбить трассу ${h.len} м на <strong>${nSections} уч. по ~${maxSecLenM} м</strong> (${nCycles} цикл${nCycles > 1 ? 'а' : ''} транспозиции).</div>
+                        <div>• В узлах транспозиции (шаг ${maxSecLenM} м): <strong class="text-emerald-400">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В &le; 50 В</strong> и <strong class="text-emerald-400">U<sub>кз.узла</sub> = ${uKzNodeKv.toFixed(2)} кВ &le; 5,0 кВ</strong>.</div>
                     </div>`;
             } else if (uInduced >= 40 || uKzInducedKv >= 4.0 || h.len > 1200) {
                 schemeStripe = 'bg-amber-400';
                 schemeBadge = 'Вблизи предела / Длинная КЛ';
                 schemeBadgeCls = 'bg-amber-500/15 text-amber-300 border-amber-400/35';
                 schemeTitle = 'Одностор. или Транспозиция (1 цикл)';
-                const l3 = Math.round(h.len / 3), u3 = uInduced / 3, uKz3 = uKzInducedKv / 3;
+                const l3 = Math.round(h.len / 3);
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-amber-400/35 rounded-xl p-2.5 space-y-1">
                         <div class="text-amber-300 font-semibold">Оба критерия на всю длину (${h.len} м) формально выполняются: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
@@ -1214,7 +1345,7 @@
 
             // --- ПОДВКЛАДКА 2: ЗАЗЕМЛЕНИЕ И ЭКОНОМИКА ---
             document.getElementById('hv-grounding-results-box').innerHTML = h.ins === 'XLPE' ? `
-                <!-- Схема заземления -->
+                <!-- Схема заземления и конструктор участков транспозиции -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
                     <div class="flex items-start justify-between gap-2">
@@ -1224,8 +1355,41 @@
                         </div>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">${schemeBadge}</span>
                     </div>
+
+                    <!-- Переключатель Идеальная / Неидеальная (L1, L2, L3) -->
+                    <div class="grid grid-cols-2 gap-1.5 bg-[#07060e]/85 p-1 rounded-full border border-[#8b5cf6]/30">
+                        <button type="button" onclick="setHvTranspMode('auto')" class="py-1.5 px-2 rounded-full text-[11px] font-bold transition ${!isManualTransp ? 'bg-[#00f2fe]/25 text-[#00f2fe] border border-[#00f2fe]/40' : 'text-slate-400 hover:text-white'}">
+                            Идеальная (равные L)
+                        </button>
+                        <button type="button" onclick="setHvTranspMode('manual')" class="py-1.5 px-2 rounded-full text-[11px] font-bold transition ${isManualTransp ? 'bg-[#a855f7]/30 text-[#d8b4fe] border border-[#a855f7]/50' : 'text-slate-400 hover:text-white'}">
+                            Неидеальная (L1, L2, L3)
+                        </button>
+                    </div>
+
+                    ${isManualTransp ? `
+                    <div class="bg-[#0b0a17]/85 border border-[#8b5cf6]/30 rounded-xl p-2.5 space-y-2">
+                        <div class="flex items-center justify-between gap-1">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Участки трассы (&Sigma;L = ${h.len} м)</span>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="equalizeHvTranspSecs()" class="text-[10px] text-slate-400 hover:text-[#00f2fe] underline">Выровнять</button>
+                                ${h.transpSecs.length > 3 ? `<button type="button" onclick="removeHvTranspCycle()" class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-bold">-3 уч.</button>` : ''}
+                                <button type="button" onclick="addHvTranspCycle()" class="px-2 py-0.5 rounded bg-[#00f2fe]/20 text-[#00f2fe] text-[10px] font-bold">+ Цикл (3 уч.)</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            ${h.transpSecs.map((secVal, idx) => `
+                                <div class="pill-control px-2 py-1 flex items-center justify-between gap-1">
+                                    <span class="text-[10px] font-mono text-[#a855f7] font-bold">L${idx + 1}:</span>
+                                    <input type="number" step="10" min="1" value="${secVal}" onchange="updHvTranspSec(${idx}, this.value)"
+                                        class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
+                                    <span class="text-[9px] text-slate-400">м</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+
                     <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">Норм. (≤50В):</span><strong class="text-xs font-mono ${pass50V ? (uInduced >= 40 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong></div>
+                        <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">На всю L (≤50В):</span><strong class="text-xs font-mono ${pass50V ? (uInduced >= 40 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong></div>
                         <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">При Iкз⁽³⁾ (≤5кВ):</span><strong class="text-xs font-mono ${pass5kV ? (uKzInducedKv >= 4.0 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong></div>
                     </div>
                     ${schemeRecHtml}
@@ -1237,14 +1401,15 @@
                     <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400 block">Экономическое обоснование</span>
                     
                     <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Потери в экранах</span><strong class="text-xs font-mono text-white">${(pScreenTotalWatts/1000).toFixed(2)} кВт</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Экономия потерь</span><strong class="text-xs font-mono text-white">${(pSavedWatts/1000).toFixed(2)} кВт</strong></div>
                         <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Срок окупаемости</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1) + ' лет'}</strong></div>
                     </div>
                     
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${isProfitable ? 'border-emerald-500/35' : 'border-amber-500/35'} rounded-xl p-2.5">
                         Стоимость ${nCycles} цикл. транспозиции: <strong>${transpCostTotal.toFixed(2)} млн ₽</strong>.<br>
-                        Финансовые убытки от нагрева экранов: <strong>${moneyLostYearMln.toFixed(3)} млн ₽ в год</strong>.<br>
-                        ${isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Окупится за ${paybackYears.toFixed(1)} лет (что меньше предела в ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> за заданный предел в ${h.horizon} лет.`}
+                        Потери при глухом заземлении: <strong>${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>${isManualTransp ? ` (остаточные при небалансе: <strong>${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>)` : ''}.<br>
+                        Чистая экономия от транспозиции: <strong>${moneySavedYearMln.toFixed(3)} млн ₽ в год</strong>.<br>
+                        ${isProfitable ? `<span class="text-emerald-300 font-bold">Транспозиция экономически выгодна!</span> Окупится за ${paybackYears.toFixed(1)} лет (меньше предела в ${h.horizon} лет).` : `<span class="text-amber-300 font-bold">Транспозиция не окупается</span> за заданный предел в ${h.horizon} лет.`}
                     </div>
                     
                     ${!isProfitable ? `
