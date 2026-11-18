@@ -329,6 +329,24 @@
                     </div>
                 </div>
 
+                <!-- Панель проектных сечений жилы и экрана (для вкладки Заземление и ₽) -->
+                <div id="hv-grounding-override-bar" class="hidden glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5 border border-[#00f2fe]/35">
+                    <div class="flex-1 pill-control px-2.5 py-1.5 flex items-center justify-between relative">
+                        <span class="text-[10px] text-slate-400 font-semibold shrink-0 mr-1">Жила:</span>
+                        <select id="hv-gnd-core-select" onchange="setHvGroundingCore(this.value)"
+                            class="w-full bg-transparent text-[#00f2fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3 text-right">
+                        </select>
+                        <span class="pointer-events-none absolute right-2 text-[8px] text-[#00f2fe]">▼</span>
+                    </div>
+                    <div id="hv-gnd-screen-wrap" class="flex-1 pill-control px-2.5 py-1.5 flex items-center justify-between relative">
+                        <span class="text-[10px] text-slate-400 font-semibold shrink-0 mr-1">Экран:</span>
+                        <select id="hv-gnd-screen-select" onchange="setHvGroundingScreen(this.value)"
+                            class="w-full bg-transparent text-[#d8b4fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3 text-right">
+                        </select>
+                        <span class="pointer-events-none absolute right-2 text-[8px] text-[#d8b4fe]">▼</span>
+                    </div>
+                </div>
+
                 <div id="hv-subtab-cable" class="space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
                         <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
@@ -708,13 +726,14 @@
                 tariff: 9.0, tmax: 4500, horizon: 10, transpCost: 2.5,
                 transpMode: 'auto',
                 transpSecs: [800, 800, 800],
-                selectedCore: null, selectedScreen: null
+                selectedCore: null, selectedScreen: null,
+                groundingCore: null, groundingScreen: null
             }
         };
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v25'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v26'));
                 if (s && s.lvSegs && s.lvSegs.length) {
                     state = { ...state, ...s, hv: { ...state.hv, ...(s.hv || {}) } };
                     if (!Array.isArray(state.hv.transpSecs) || state.hv.transpSecs.length < 3) {
@@ -725,7 +744,7 @@
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v25', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v26', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -799,6 +818,8 @@
             const isCable = sub === 'cable';
             document.getElementById('hv-subtab-cable').classList.toggle('hidden', !isCable);
             document.getElementById('hv-subtab-grounding').classList.toggle('hidden', isCable);
+            const ovBar = document.getElementById('hv-grounding-override-bar');
+            if (ovBar) ovBar.classList.toggle('hidden', isCable);
 
             document.getElementById('module-bottom-nav').innerHTML = `<div class="grid grid-cols-2 gap-2">
                 <button onclick="switchHvSubTab('cable')" class="flex items-center justify-center gap-2 py-3.5 rounded-2xl text-xs transition ${isCable ? 'bg-gradient-to-r from-[#00f2fe]/15 to-[#8b5cf6]/25 text-white border border-[#00f2fe]/40 font-bold shadow-[0_0_15px_rgba(0,242,254,0.12)]' : 'bg-white/5 text-slate-400 border border-white/5 hover:text-white font-semibold'}">
@@ -1045,6 +1066,8 @@
         function onHvNeutralChange() { state.hv.neutralMode = document.getElementById('hv-neutral-mode').value; saveState(); updateHvUI(); runHvCalculation(); }
         function pickHvCore(sec) { state.hv.selectedCore = sec; saveState(); runHvCalculation(); }
         function pickHvScreen(sec) { state.hv.selectedScreen = sec; saveState(); runHvCalculation(); }
+        function setHvGroundingCore(val) { state.hv.groundingCore = val === 'auto' ? null : +val; saveState(); runHvCalculation(); }
+        function setHvGroundingScreen(val) { state.hv.groundingScreen = val === 'auto' ? null : +val; saveState(); runHvCalculation(); }
 
         function onHvManualLengthInput(val) {
             const newLen = Math.max(1, parseFloat(val) || 100);
@@ -1357,11 +1380,36 @@
             const scrSliceStart = Math.max(0, Math.min(allScreens.length - 3, centerScrIdx - 1));
             const scrSlice = allScreens.slice(scrSliceStart, scrSliceStart + 3);
 
-            const geom = getCableGeometry(activeCore.sec, activeScr.sec);
+            // Populate override dropdowns for Grounding & Economics tab
+            const gndCoreSel = document.getElementById('hv-gnd-core-select');
+            if (gndCoreSel) {
+                const autoCoreSec = activeCore.sec;
+                const curVal = h.groundingCore ? String(h.groundingCore) : 'auto';
+                gndCoreSel.innerHTML = `<option value="auto" ${curVal === 'auto' ? 'selected' : ''} class="bg-[#0b0a17] text-white">Авто (${autoCoreSec} мм²)</option>` +
+                    HV_SECS.map(s => `<option value="${s}" ${curVal === String(s) ? 'selected' : ''} class="bg-[#0b0a17] text-white">${s} мм²</option>`).join('');
+            }
+            const gndScrWrap = document.getElementById('hv-gnd-screen-wrap');
+            const gndScrSel = document.getElementById('hv-gnd-screen-select');
+            if (gndScrWrap && gndScrSel) {
+                gndScrWrap.classList.toggle('hidden', h.ins !== 'XLPE');
+                const autoScrSec = activeScr.sec;
+                const curScrVal = h.groundingScreen ? String(h.groundingScreen) : 'auto';
+                gndScrSel.innerHTML = `<option value="auto" ${curScrVal === 'auto' ? 'selected' : ''} class="bg-[#0b0a17] text-white">Авто (${autoScrSec} мм²)</option>` +
+                    SCREEN_SECS.map(s => `<option value="${s}" ${curScrVal === String(s) ? 'selected' : ''} class="bg-[#0b0a17] text-white">${s} мм²</option>`).join('');
+            }
+
+            // Project core & screen used strictly in Grounding & Economics tab
+            const gndCore = (h.groundingCore && allCores.find(x => x.sec === h.groundingCore)) || activeCore;
+            const gndScr = (h.groundingScreen && allScreens.find(x => x.sec === h.groundingScreen)) || activeScr;
+            const isCustomGndCore = !!(h.groundingCore && h.groundingCore !== activeCore.sec);
+            const isCustomGndScr = !!(h.groundingScreen && h.groundingScreen !== activeScr.sec);
+
+            const geom = getCableGeometry(gndCore.sec, gndScr.sec);
             const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
             const lg2 = Math.log10(2);
-            const iOneCable = activeCore.cur / h.par;
+            const iOneCable = gndCore.cur / h.par;
+            const iDopOneCable = gndCore.iDopFact / h.par;
             const ikz3OneCableKa = h.ikz / h.par;
             const lenKm = h.len / 1000;
 
@@ -1370,19 +1418,22 @@
             else xm = 0.144 * Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
 
             const uInduced = iOneCable * lenKm * xm;
+            const uInducedAtIdop = iDopOneCable * lenKm * xm;
             const uKzInducedKv = ikz3OneCableKa * lenKm * xm;
 
-            // Согласованные сопротивления экрана (при 70°C: 21.4/S) и жилы при рабочей температуре rTheta (пункт 3)
-            const rScreenOhmKm = 21.4 / activeScr.sec;
-            const rCoreOhmKm = activeCore.rTheta;
+            const rScreenOhmKm = 21.4 / gndScr.sec;
+            const rCoreOhmKm = gndCore.rTheta;
             const iScreenRatio = 1 / Math.sqrt(1 + Math.pow(rScreenOhmKm / xm, 2));
             const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
             const kiFactor = 1 / Math.sqrt(1 + dpLossRatio);
-            const iDopSolidBonding = +(activeCore.iDopFact * kiFactor).toFixed(1);
-            const okSolidBonding = iDopSolidBonding >= activeCore.cur;
+            const iDopSolidBonding = +(gndCore.iDopFact * kiFactor).toFixed(1);
+            const okSolidBonding = iDopSolidBonding >= gndCore.cur;
 
             const pass50V = uInduced <= 50.0;
             const pass5kV = uKzInducedKv <= 5.0;
+            const passSingleEnded = pass50V && pass5kV;
+            const margin50VPct = Math.max(0, (1 - uInduced / 50.0) * 100);
+            const used50VPct = (uInduced / 50.0) * 100;
 
             const minCyclesBy50V = Math.max(1, Math.ceil(uInduced / (50 * 3)));
             const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedKv / (5.0 * 3)));
@@ -1403,7 +1454,7 @@
                 iScreenTranspRatio = 0;
                 dpTranspRatio = 0;
                 kiTranspFactor = 1.0;
-                iDopTransp = activeCore.iDopFact;
+                iDopTransp = gndCore.iDopFact;
             } else {
                 const secs = h.transpSecs.map(x => Math.max(1, +x || 0));
                 nSections = secs.length;
@@ -1425,28 +1476,32 @@
                 iScreenTranspRatio = sumTotal > 0 ? iScreenRatio * (lUnbalM / sumTotal) : 0;
                 dpTranspRatio = (rScreenOhmKm / rCoreOhmKm) * Math.pow(iScreenTranspRatio, 2);
                 kiTranspFactor = 1 / Math.sqrt(1 + dpTranspRatio);
-                iDopTransp = +(activeCore.iDopFact * kiTranspFactor).toFixed(1);
+                iDopTransp = +(gndCore.iDopFact * kiTranspFactor).toFixed(1);
             }
 
             const passNode50V = uNodeV <= 50.0;
             const passNode5kV = uKzNodeKv <= 5.0;
             const passTranspNodes = passNode50V && passNode5kV;
+            const passTranspAll = passTranspNodes && (iDopTransp >= gndCore.cur);
 
-            // Экономика на 1 цепь (нитку) — при n>=2 затраты и экономия масштабируются пропорционально n, срок окупаемости неизменен
+            // Экономика на 1 цепь:
+            // База сравнения: если допустимо одностороннее заземление (passSingleEnded), то потерь в экране там нет (0 кВт),
+            // и транспозиция сравнивается с односторонним (экономия = 0, окупаемость = Никогда).
+            // Если одностороннее недопустимо, альтернативой без коробок ОПН является глухое 2-стороннее заземление (экономия = P_гл - P_тр).
             const transpCostOneChain = nCycles * h.transpCost;
             const pCoreOneChainWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
             const pScreenSolidWatts = pCoreOneChainWatts * dpLossRatio;
             const pScreenTranspWatts = pCoreOneChainWatts * dpTranspRatio;
-            const pSavedWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
 
-            const wSavedYearKwh = (pSavedWatts / 1000) * tauCalc;
-            const moneySavedYearMln = (wSavedYearKwh * h.tariff) / 1000000;
+            const pSavedVsSolidWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
+            const wSavedVsSolidKwh = (pSavedVsSolidWatts / 1000) * tauCalc;
+            const moneySavedVsSolidMln = (wSavedVsSolidKwh * h.tariff) / 1000000;
+            const paybackVsSolid = moneySavedVsSolidMln > 0 ? transpCostOneChain / moneySavedVsSolidMln : Infinity;
 
-            let paybackYears = Infinity;
-            if (moneySavedYearMln > 0) {
-                paybackYears = transpCostOneChain / moneySavedYearMln;
-            }
-            const isProfitable = paybackYears <= h.horizon;
+            const pSavedEffectiveWatts = passSingleEnded ? 0 : pSavedVsSolidWatts;
+            const moneySavedEffectiveMln = passSingleEnded ? 0 : moneySavedVsSolidMln;
+            const paybackEffective = passSingleEnded ? Infinity : paybackVsSolid;
+            const isProfitable = !passSingleEnded && (paybackEffective <= h.horizon);
 
             let schemeStripe = 'bg-emerald-400';
             let schemeBadge = '50 В и 5 кВ: В норме';
@@ -1455,14 +1510,14 @@
             let schemeRecHtml = '';
 
             if (isManualTransp) {
-                schemeStripe = passTranspNodes ? (unbalPct > 15 ? 'bg-amber-400' : 'bg-emerald-400') : 'bg-rose-500';
-                schemeBadge = passTranspNodes ? `Небаланс ${unbalPct.toFixed(1)}%` : 'Превышение в узле!';
-                schemeBadgeCls = passTranspNodes
+                schemeStripe = passTranspAll ? (unbalPct > 15 ? 'bg-amber-400' : 'bg-emerald-400') : 'bg-rose-500';
+                schemeBadge = passTranspAll ? `Небаланс ${unbalPct.toFixed(1)}%` : 'Превышение в узле!';
+                schemeBadgeCls = passTranspAll
                     ? (unbalPct > 15 ? 'bg-amber-500/15 text-amber-300 border-amber-400/35' : 'bg-emerald-500/15 text-emerald-300 border-emerald-400/35')
                     : 'bg-rose-500/20 text-rose-300 border-rose-400/40 animate-pulse-sub';
                 schemeTitle = `Неидеальная транспозиция (${nCycles} цикл${nCycles > 1 ? 'а' : ''})`;
                 schemeRecHtml = `
-                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${passTranspNodes ? 'border-[#00f2fe]/35' : 'border-rose-500/40'} rounded-xl p-2.5 space-y-1">
+                    <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border ${passTranspAll ? 'border-[#00f2fe]/35' : 'border-rose-500/40'} rounded-xl p-2.5 space-y-1">
                         <div>• Макс. участок <strong>L<sub>max</sub> = ${maxSecLenM} м</strong>: <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">U<sub>узла</sub> = ${uNodeV.toFixed(1)} В</strong> (≤50 В), <strong class="${passNode5kV ? 'text-emerald-400' : 'text-rose-400'}">U<sub>кз</sub> = ${uKzNodeKv.toFixed(2)} кВ</strong> (≤5 кВ).</div>
                         <div>• Эквив. длина небаланса: <strong>L<sub>неб</sub> = ${lUnbalM.toFixed(1)} м</strong> (${unbalPct.toFixed(1)}% от L).</div>
                         <div>• Остаточный ток в экране: <strong>I<sub>э.ост</sub>/I<sub>ж</sub> = ${(iScreenTranspRatio * 100).toFixed(1)}%</strong> &rarr; <strong class="text-[#00f2fe]">K<sub>и</sub> = ${kiTranspFactor.toFixed(3)}</strong> (I<sub>доп</sub> = ${iDopTransp} А).</div>
@@ -1484,20 +1539,21 @@
                     </div>`;
             } else if (uInduced >= 40 || uKzInducedKv >= 4.0 || h.len > 1200) {
                 schemeStripe = 'bg-amber-400';
-                schemeBadge = 'Вблизи предела / Длинная КЛ';
+                schemeBadge = `Запас по 50 В: ${margin50VPct.toFixed(0)}%`;
                 schemeBadgeCls = 'bg-amber-500/15 text-amber-300 border-amber-400/35';
-                schemeTitle = 'Одностор. или Транспозиция (1 цикл)';
+                schemeTitle = 'Одностор. (близко к 50 В) или Трансп.';
                 const l3 = Math.round(h.len / 3);
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-amber-400/35 rounded-xl p-2.5 space-y-1">
-                        <div class="text-amber-300 font-semibold">Оба критерия на всю длину (${h.len} м) формально выполняются: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
-                        <div>• <strong>Рекомендация:</strong> т.к. ${h.len > 1200 ? `длина ${h.len} м превышает строительную длину барабана (~1000 м)` : `значения близки к предельным порогам`}, целесообразно заложить <strong>1 цикл транспозиции: 3 участка по ~${l3} м</strong>.</div>
+                        <div class="text-amber-300 font-semibold">Формально проходят оба критерия: U<sub>нав</sub> = ${uInduced.toFixed(1)} В (${used50VPct.toFixed(0)}% от 50 В, запас ${margin50VPct.toFixed(0)}%) и U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ ≤ 5,0 кВ.</div>
+                        <div>• При росте тока до предельного I<sub>доп</sub> = ${iDopOneCable.toFixed(0)} А наведённое напряжение вырастет до <strong>${uInducedAtIdop.toFixed(1)} В</strong>.</div>
+                        <div>• <strong>Рекомендация:</strong> если нужен запас на рост нагрузки или трасса &gt; 1200 м (${h.len} м), заложите <strong>1 цикл транспозиции (3 уч. по ~${l3} м, U<sub>узла</sub> = ${uNodeV.toFixed(1)} В)</strong>; иначе — <strong>одностороннее с ОПН</strong>.</div>
                     </div>`;
             } else {
                 schemeRecHtml = `
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-emerald-500/30 rounded-xl p-2.5 space-y-1">
-                        <div class="text-emerald-300 font-semibold">Оба критерия выполняются с запасом: U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
-                        <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление</strong> на всю длину <strong>L = ${h.len} м</strong> (или 2-стороннее наглухо, если проходит по току K<sub>и</sub>).</div>
+                        <div class="text-emerald-300 font-semibold">Оба критерия выполняются с запасом (${margin50VPct.toFixed(0)}%): U<sub>нав</sub> = ${uInduced.toFixed(1)} В &le; 50 В и U<sub>кз⁽³⁾</sub> = ${uKzInducedKv.toFixed(2)} кВ &le; 5,0 кВ.</div>
+                        <div>• <strong>Решение:</strong> применить <strong>одностороннее заземление с ОПН</strong> на всю длину <strong>L = ${h.len} м</strong> (потерь в экране нет, затрат минимум).</div>
                     </div>`;
             }
 
@@ -1569,7 +1625,7 @@
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 ${schemeStripe}"></div>
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Рекомендуемая схема заземления</span>
+                            <span class="text-[10px] uppercase tracking-wider font-bold text-[#00f2fe] block">Рекомендуемая схема (${parPrefix}${gndCore.sec}/${gndScr.sec} мм²${(isCustomGndCore || isCustomGndScr) ? ' • задано вручную' : ''})</span>
                             <div class="text-base sm:text-lg font-extrabold text-white mt-0.5 leading-snug">${schemeTitle}</div>
                         </div>
                         <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${schemeBadgeCls}">${schemeBadge}</span>
@@ -1622,19 +1678,21 @@
 
                 <!-- Экономика и сводка по 3 схемам заземления -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (okSolidBonding && h.len <= 800 ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (passSingleEnded ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
                     <div class="flex items-center justify-between gap-2">
-                        <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400">Экономика и выбор схемы (на 1 цепь${h.par > 1 ? ` из ${h.par}` : ''})</span>
+                        <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400">Экономика и выбор схемы (1 цепь${h.par > 1 ? ` из ${h.par}` : ''})</span>
                         <span class="text-[10px] font-mono text-slate-400">T<sub>max</sub>=${h.tmax}ч &rarr; τ=${tauCalc}ч</span>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Потери в экранах (2-ст.)</span><strong class="text-xs font-mono text-white">${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong></div>
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Окупаемость трансп.</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackYears === Infinity ? 'Никогда' : paybackYears.toFixed(1) + ' лет'}</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Экономия трансп.</span><strong class="text-xs font-mono text-white">${(pSavedEffectiveWatts/1000).toFixed(2)} кВт</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Окупаемость трансп.</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackEffective === Infinity ? 'Никогда' : paybackEffective.toFixed(1) + ' лет'}</strong></div>
                     </div>
-
+                    
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-[#8b5cf6]/25 rounded-xl p-2.5">
-                        Затраты на ${nCycles} цикл. транспозиции: <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong> • Экономия потерь: <strong>${(pSavedWatts/1000).toFixed(2)} кВт</strong> (<strong>${moneySavedYearMln.toFixed(3)} млн ₽/год</strong>).
+                        ${passSingleEnded
+                            ? `Поскольку допустимо <strong>одностороннее заземление</strong> (потерь в экране <strong>0 кВт</strong>), транспозиция (${transpCostOneChain.toFixed(2)} млн ₽) сравнивается с ним и <strong>экономии потерь не даёт</strong> (окупаемость: <strong>Никогда</strong>).`
+                            : `Поскольку одностороннее заземление не проходит, транспозиция (${transpCostOneChain.toFixed(2)} млн ₽) сравнивается с глухим 2-сторонним: экономия <strong>${(pSavedVsSolidWatts/1000).toFixed(2)} кВт</strong> (${moneySavedVsSolidMln.toFixed(3)} млн ₽/год), окупаемость <strong>${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'}</strong> (предел ${h.horizon} лет).`}
                     </div>
 
                     <!-- 3 ЧЁТКИХ ВЫВОДА ПО СХЕМАМ ЗАЗЕМЛЕНИЯ -->
@@ -1650,75 +1708,71 @@
                                 </span>
                             </div>
                             <div class="text-[10px] text-slate-300 leading-snug">
-                                Ток в экране <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong>, K<sub>и</sub> = <strong>${kiFactor.toFixed(2)}</strong> &rarr; I<sub>доп.гл</sub> = <strong class="${okSolidBonding ? 'text-[#00f2fe]' : 'text-rose-400'}">${iDopSolidBonding} А</strong> (при I<sub>p</sub> = ${activeCore.cur.toFixed(1)} А).
-                                ${okSolidBonding
-                                    ? (isProfitable ? 'По току проходит, но даёт высокие потери — выгоднее транспозиция.' : 'Технически допустимо и не требует затрат на коробки ОПН.')
-                                    : 'Перегрев жилы от уравнительных токов в экранах (I<sub>доп.гл</sub> < I<sub>p</sub>).'}
+                                Потери в экранах <strong>${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>, ток экрана <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong> (K<sub>и</sub> = ${kiFactor.toFixed(2)}). Допустимый ток <strong>${iDopSolidBonding} А</strong> против <strong>${gndCore.cur.toFixed(1)} А</strong> — ${okSolidBonding ? 'тепловой режим проходит.' : 'перегрев жилы (не проходит по току).'}
                             </div>
                         </div>
 
                         <!-- 2. Одностороннее заземление с коробкой ОПН -->
-                        <div class="bg-[#0b0a17]/85 border ${(pass50V && pass5kV) ? 'border-emerald-500/35' : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
+                        <div class="bg-[#0b0a17]/85 border ${passSingleEnded ? 'border-emerald-500/35' : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-[11px] font-bold text-white">2. Одностороннее с коробкой ОПН</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${(pass50V && pass5kV) ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
-                                    ${(pass50V && pass5kV) ? '✓ Подходит' : '✕ Не подходит'}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${passSingleEnded ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
+                                    ${passSingleEnded ? '✓ Подходит' : '✕ Не подходит'}
                                 </span>
                             </div>
                             <div class="text-[10px] text-slate-300 leading-snug">
-                                На всю длину ${h.len} м: U<sub>нав</sub> = <strong class="${pass50V ? 'text-emerald-400' : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong> (≤50 В), U<sub>кз</sub><sup>(3)</sup> = <strong class="${pass5kV ? 'text-emerald-400' : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong> (≤5 кВ).
-                                ${(pass50V && pass5kV)
-                                    ? (h.len > 1200 ? 'По напряжениям проходит, но учтите строительную длину барабана (~1000 м).' : 'Оптимально: нет потерь в экранах и минимальные затраты на ОПН.')
-                                    : 'Превышено допустимое наведённое напряжение на разземлённом конце.'}
+                                Потерь в экране нет, затрат минимум. U<sub>нав</sub> = <strong class="${pass50V ? 'text-emerald-400' : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong> (${used50VPct.toFixed(0)}% от 50 В, ${pass50V ? `запас ${margin50VPct.toFixed(0)}%` : 'превышение'}), при токе до I<sub>доп</sub> около <strong>${uInducedAtIdop.toFixed(1)} В</strong>; U<sub>кз</sub><sup>(3)</sup> = <strong class="${pass5kV ? 'text-emerald-400' : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong> (≤5 кВ).
                             </div>
                         </div>
 
                         <!-- 3. Транспозиция экранов -->
-                        <div class="bg-[#0b0a17]/85 border ${(passTranspNodes && iDopTransp >= activeCore.cur) ? (isProfitable ? 'border-emerald-500/35' : 'border-amber-400/35') : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
+                        <div class="bg-[#0b0a17]/85 border ${passTranspAll ? (isProfitable ? 'border-emerald-500/35' : 'border-amber-400/35') : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-[11px] font-bold text-white">3. Транспозиция экранов (${nCycles} цикл.)</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${(passTranspNodes && iDopTransp >= activeCore.cur) ? (isProfitable ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-amber-500/15 text-amber-300 border border-amber-400/35') : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
-                                    ${(passTranspNodes && iDopTransp >= activeCore.cur) ? '✓ Подходит' : '✕ Не подходит'}
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${passTranspAll ? (isProfitable ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-amber-500/15 text-amber-300 border-amber-400/35') : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">
+                                    ${passTranspAll ? '✓ Подходит' : '✕ Не подходит'}
                                 </span>
                             </div>
                             <div class="text-[10px] text-slate-300 leading-snug">
-                                В узлах (${nSections} уч.): U<sub>узла</sub> = <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">${uNodeV.toFixed(1)} В</strong>, U<sub>кз</sub> = <strong class="${passNode5kV ? 'text-emerald-400' : 'text-rose-400'}">${uKzNodeKv.toFixed(2)} кВ</strong>.
-                                ${(passTranspNodes && iDopTransp >= activeCore.cur)
-                                    ? (isProfitable
-                                        ? `<span class="text-emerald-300 font-semibold">Экономически выгодна</span> (окупится за ${paybackYears.toFixed(1)} лет ≤ ${h.horizon} лет).`
-                                        : `<span class="text-amber-300 font-semibold">Не окупается</span> за ${h.horizon} лет (${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'}) — ставить только если не проходят п.1 и п.2.`)
+                                Стоит <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong>, потерь ${isManualTransp ? `<strong>${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>` : 'нет'}, наведённое напряжение на участке <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">${uNodeV.toFixed(1)} В</strong> (U<sub>кз</sub> = ${uKzNodeKv.toFixed(2)} кВ).
+                                ${passTranspAll
+                                    ? (passSingleEnded
+                                        ? `<span class="text-amber-300 font-semibold">Не окупается</span> (т.к. проходит одностороннее с ОПН) — целесообразна только если нужен запас по напряжению (при росте нагрузки U<sub>нав</sub> → ${uInducedAtIdop.toFixed(1)} В).`
+                                        : (isProfitable
+                                            ? `<span class="text-emerald-300 font-semibold">Окупается за ${paybackVsSolid.toFixed(1)} лет</span> (≤ ${h.horizon} лет) и необходима по безопасности.`
+                                            : `<span class="text-amber-300 font-semibold">Окупаемость ${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'}</span> при пределе ${h.horizon} лет (не окупается), но требуется по безопасности.`))
                                     : 'Требуется уменьшить длину макс. участка или добавить цикл транспозиции.'}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Проверки ТКЗ -->
+                <!-- Проверки ТКЗ (по проектным сечениям вкладки) -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${gndCore.okCoreKz ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-center justify-between gap-2">
                         <div>
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-200 block">Проверка жилы на ток КЗ (ПУЭ)</span>
-                            <span class="text-[10px] text-slate-400">Жила ${activeCore.sec} мм² • K = 1/√t = ${kTime}</span>
+                            <span class="text-[10px] text-slate-400">Жила ${gndCore.sec} мм² • K = 1/√t = ${kTime}</span>
                         </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeCore.okCoreKz ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${activeCore.okCoreKz ? 'Выполняется' : 'Не выполняется'}</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${gndCore.okCoreKz ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${gndCore.okCoreKz ? 'Выполняется' : 'Не выполняется'}</span>
                     </div>
-                    <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${activeCore.okCoreKz ? 'text-emerald-300' : 'text-rose-300'}">
-                        I<sub>доп.кз</sub> (${activeCore.iCorePerm.toFixed(3)} кА) ${activeCore.okCoreKz ? '>' : '<'} I⁽³⁾<sub>кз</sub> (${h.ikz.toFixed(3)} кА)
+                    <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${gndCore.okCoreKz ? 'text-emerald-300' : 'text-rose-300'}">
+                        I<sub>доп.кз</sub> (${gndCore.iCorePerm.toFixed(3)} кА) ${gndCore.okCoreKz ? '>' : '<'} I⁽³⁾<sub>кз</sub> (${h.ikz.toFixed(3)} кА)
                     </div>
                 </div>
 
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${activeScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${gndScr.ok ? 'bg-emerald-400' : 'bg-rose-500'}"></div>
                     <div class="flex items-center justify-between gap-2">
                         <div>
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-200 block">Проверка экрана на ток КЗ (${isResistorNeutral ? 'Резистор' : 'Двойное ОЗЗ'})</span>
-                            <span class="text-[10px] text-slate-400">Экран ${activeScr.sec} мм² (θ<sub>к</sub>=${h.screenTemp}°C) • K = ${kTime}</span>
+                            <span class="text-[10px] text-slate-400">Экран ${gndScr.sec} мм² (θ<sub>к</sub>=${h.screenTemp}°C) • K = ${kTime}</span>
                         </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${activeScr.ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${activeScr.ok ? 'Выполняется' : 'Не выполняется'}</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold shrink-0 ${gndScr.ok ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">${gndScr.ok ? 'Выполняется' : 'Не выполняется'}</span>
                     </div>
-                    <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${activeScr.ok ? 'text-emerald-300' : 'text-rose-300'}">
-                        I<sub>доп.экр</sub> (${activeScr.iPerm.toFixed(3)} кА) ${activeScr.ok ? '≥' : '<'} ${faultLabelShort} (${iScreenFaultKa.toFixed(3)} кА)
+                    <div class="pill-control py-1 px-3 text-[11px] font-mono text-center ${gndScr.ok ? 'text-emerald-300' : 'text-rose-300'}">
+                        I<sub>доп.экр</sub> (${gndScr.iPerm.toFixed(3)} кА) ${gndScr.ok ? '≥' : '<'} ${faultLabelShort} (${iScreenFaultKa.toFixed(3)} кА)
                     </div>
                 </div>
 
@@ -1743,7 +1797,7 @@
                 <!-- Кнопки экспорта для БПИ (ААБл) -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
-                    <div class="text-xs font-bold text-white">Трёхжильный кабель с БПИ (${h.mat === 'Al' ? 'ААБл-10' : 'СБл-10'})</div>
+                    <div class="text-xs font-bold text-white">Трёхжильный кабель с БПИ (${h.mat === 'Al' ? 'ААБл-10' : 'СБл-10'}, жила ${gndCore.sec} мм²)</div>
                     <p class="text-[11px] text-slate-300 leading-relaxed">Для трёхжильных кабелей в общей металлической оболочке транспозиция не выполняется. Броня и оболочка заземляются с двух сторон по ПУЭ.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-1">
@@ -1772,7 +1826,8 @@
 
             const allCores = HV_SECS.map(s => evalHv(s, h));
             const recCore = allCores.find(x => x.okAll);
-            const core = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
+            const autoCore = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
+            const core = (h.groundingCore && allCores.find(x => x.sec === h.groundingCore)) || autoCore;
 
             const sinPhi = Math.sqrt(Math.max(0, 1 - h.cos * h.cos));
             const loadFormulaStr = h.mode === 'I'
@@ -1793,13 +1848,15 @@
                 return { sec: s, i1s, iPerm, ok: iPerm >= iScreenFaultKa };
             });
             const recScr = allScreens.find(x => x.ok);
-            const scr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
+            const autoScr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
+            const scr = (h.groundingScreen && allScreens.find(x => x.sec === h.groundingScreen)) || autoScr;
 
             const geom = getCableGeometry(core.sec, scr.sec);
             const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
             const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
             const lg2 = Math.log10(2);
             const iOneCable = core.cur / h.par;
+            const iDopOneCable = core.iDopFact / h.par;
             const ikz3OneCableKa = h.ikz / h.par;
             const lenKm = h.len / 1000;
 
@@ -1812,6 +1869,7 @@
                 : `X<sub>m</sub> = 0.144 · √(lg²(2S/d<sub>э</sub>) + lg²2 − lg(2S/d<sub>э</sub>)·lg2) = 0.144 · √(${lgRatio.toFixed(4)}² + ${lg2.toFixed(4)}² − ${lgRatio.toFixed(4)}·${lg2.toFixed(4)}) = <b>${xm.toFixed(4)} Ом/км</b>`;
 
             const uInduced = iOneCable * lenKm * xm;
+            const uInducedAtIdop = iDopOneCable * lenKm * xm;
             const uKzInducedKv = ikz3OneCableKa * lenKm * xm;
 
             const rScreenOhmKm = 21.4 / scr.sec;
@@ -1820,6 +1878,13 @@
             const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
             const kiFactor = 1 / Math.sqrt(1 + dpLossRatio);
             const iDopSolidBonding = +(core.iDopFact * kiFactor).toFixed(1);
+            const okSolidBonding = iDopSolidBonding >= core.cur;
+
+            const pass50V = uInduced <= 50.0;
+            const pass5kV = uKzInducedKv <= 5.0;
+            const passSingleEnded = pass50V && pass5kV;
+            const margin50VPct = Math.max(0, (1 - uInduced / 50.0) * 100);
+            const used50VPct = (uInduced / 50.0) * 100;
 
             const minCyclesBy50V = Math.max(1, Math.ceil(uInduced / (50 * 3)));
             const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedKv / (5.0 * 3)));
@@ -1852,18 +1917,41 @@
             const kiTranspFactor = 1 / Math.sqrt(1 + dpTranspRatio);
             const iDopTransp = +(core.iDopFact * kiTranspFactor).toFixed(1);
 
+            const passTranspNodes = (uNodeV <= 50.0) && (uKzNodeKv <= 5.0);
+            const passTranspAll = passTranspNodes && (iDopTransp >= core.cur);
+
             const tauCalc = Math.round(Math.pow(0.124 + h.tmax / 10000, 2) * 8760);
             const transpCostOneChain = nCycles * h.transpCost;
             const pCoreOneChainWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
             const pScreenSolidWatts = pCoreOneChainWatts * dpLossRatio;
             const pScreenTranspWatts = pCoreOneChainWatts * dpTranspRatio;
-            const pSavedWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
-            const wSavedYearKwh = (pSavedWatts / 1000) * tauCalc;
-            const moneySavedYearMln = (wSavedYearKwh * h.tariff) / 1000000;
-            const paybackYears = moneySavedYearMln > 0 ? transpCostOneChain / moneySavedYearMln : Infinity;
-            const isProfitable = paybackYears <= h.horizon;
 
-            const needTransp = isManualTransp || uInduced > 50 || uKzInducedKv > 5.0 || h.len > 1200;
+            const pSavedVsSolidWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
+            const wSavedVsSolidKwh = (pSavedVsSolidWatts / 1000) * tauCalc;
+            const moneySavedVsSolidMln = (wSavedVsSolidKwh * h.tariff) / 1000000;
+            const paybackVsSolid = moneySavedVsSolidMln > 0 ? transpCostOneChain / moneySavedVsSolidMln : Infinity;
+
+            const pSavedEffectiveWatts = passSingleEnded ? 0 : pSavedVsSolidWatts;
+            const wSavedEffectiveKwh = passSingleEnded ? 0 : wSavedVsSolidKwh;
+            const moneySavedEffectiveMln = passSingleEnded ? 0 : moneySavedVsSolidMln;
+            const paybackEffective = passSingleEnded ? Infinity : paybackVsSolid;
+            const isProfitable = !passSingleEnded && (paybackEffective <= h.horizon);
+
+            const needTransp = isManualTransp || !passSingleEnded || uInduced >= 40 || h.len > 1200;
+
+            // Явная формулировка итогового выбора схемы
+            let explicitChoiceText = '';
+            if (!passSingleEnded) {
+                explicitChoiceText = isProfitable
+                    ? `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — необходима по условиям безопасности (на всю длину U<sub>нав</sub> = ${uInduced.toFixed(1)} В / U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ превышает норму) и экономически окупается за ${paybackVsSolid.toFixed(1)} лет (≤ ${h.horizon} лет).`
+                    : `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — обусловлена техническими требованиями безопасности (на всю длину превышен порог 50 В / 5 кВ), коммерческий срок окупаемости (${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'}) превышает предел ${h.horizon} лет.`;
+            } else if (isManualTransp) {
+                explicitChoiceText = `<b>неидеальная транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м)</b> — задана проектом; наведённое напряжение в узлах не превышает ${uNodeV.toFixed(1)} В (≤ 50 В), небаланс длин ${unbalPct.toFixed(1)}%.`;
+            } else if (uInduced >= 40 || h.len > 1200) {
+                explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — формально проходит без потерь в экранах и не требует затрат на транспозицию (транспозиция не окупается, т.к. в одностороннем режиме потерь нет). <i>Альтернатива:</i> <b>транспозиция из-за запаса по напряжению</b> (при росте тока до I<sub>доп</sub> напряжение достигнет ${uInducedAtIdop.toFixed(1)} В, а при транспозиции снизится до ${uNodeV.toFixed(1)} В), но она не окупается (${transpCostOneChain.toFixed(2)} млн ₽).`;
+            } else {
+                explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — технически допустимо с большим запасом, потерь в экранах нет, затраты минимальны.`;
+            }
 
             const buildPrintSvg = () => {
                 const L = secs.slice(0, 3);
@@ -1968,7 +2056,7 @@
     <h2>2. Выбор и проверка сечения токопроводящей жилы</h2>
     <p class="formula">1) Расчётный рабочий ток линии:<br>${loadFormulaStr}</p>
     <p class="formula">2) Результирующий поправочный коэффициент:<br>K<sub>общ</sub> = K<sub>1</sub> · K<sub>2</sub> · K<sub>3</sub> · K<sub>4</sub> = ${h.k1} · ${h.k2} · ${h.k3} · ${h.k4} = <b>${core.kTotal.toFixed(3)}</b></p>
-    <p>Принимаем кабель сечением жилы <b>${h.par > 1 ? h.par + ' × ' : ''}${core.sec} мм²</b> (каталожный длительно допустимый ток для выбранного способа прокладки I<sub>табл</sub> = ${core.baseIdop} А, сопротивление при 20 °C по ГОСТ 22483-2021 R<sub>20</sub> = ${core.r20} Ом/км, X<sub>0</sub> = ${core.x0.toFixed(4)} Ом/км).</p>
+    <p>Принимаем к расчёту кабель сечением жилы <b>${h.par > 1 ? h.par + ' × ' : ''}${core.sec} мм²</b>${h.groundingCore ? ' <i>(задано вручную в проекте)</i>' : ''} (каталожный длительно допустимый ток I<sub>табл</sub> = ${core.baseIdop} А, сопротивление при 20 °C по ГОСТ 22483-2021 R<sub>20</sub> = ${core.r20} Ом/км, X<sub>0</sub> = ${core.x0.toFixed(4)} Ом/км).</p>
     <p class="formula">3) Проверка по длительно допустимому току нагрева в нормальном режиме:<br>I<sub>доп.ф</sub> = I<sub>табл</sub> · K<sub>общ</sub> · n = ${core.baseIdop} · ${core.kTotal.toFixed(3)} · ${h.par} = <b>${core.iDopFact} А</b> ${core.okI ? '≥' : '<'} I<sub>p</sub> = ${core.cur.toFixed(2)} А — <b>${core.okI ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b> (загрузка ${Math.round(core.loadPct)}%).</p>
     ${h.par >= 2 ? `<p class="formula">4) Проверка послеаварийного режима (отключение 1 нитки из ${h.par}, коэффициент аварийной перегрузки по ПУЭ K<sub>ав</sub> = ${core.kEmerg}):<br>
     I<sub>доп.ав</sub> = I<sub>табл</sub> · K<sub>общ</sub> · (n − 1) · K<sub>ав</sub> = ${core.baseIdop} · ${core.kTotal.toFixed(3)} · (${h.par} − 1) · ${core.kEmerg} = <b>${core.iDopEmerg} А</b> ${core.okEmerg ? '≥' : '<'} I<sub>p</sub> = ${core.cur.toFixed(2)} А — <b>${core.okEmerg ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>` : ''}
@@ -1988,7 +2076,7 @@
         : `При изолированной / компенсированной нейтрали расчётным является ток двойного замыкания на землю (методика М.В. Дмитриева): I<sub>кз</sub><sup>(2)</sup> = (√3 / 2) · I<sub>кз</sub><sup>(3)</sup> = 0.866 · ${h.ikz} = <b>${iScreenFaultKa.toFixed(3)} кА</b>.`}</p>
     <p class="formula">2) Расчётное минимальное сечение медного экрана по термической стойкости (ГОСТ Р МЭК 60949-2014, θ<sub>н</sub> = 70 °C, θ<sub>к</sub> = ${h.screenTemp} °C, β = 234.5):<br>
     S<sub>экр.расч</sub> = √( (${faultLabelHtml})² · t<sub>кз</sub> / (K<sub>т</sub>² · C² · ln((${h.screenTemp} + 234.5)/(70 + 234.5))) ) · 1000 = √( (${iScreenFaultKa.toFixed(3)}² · ${h.t}) / (1.089² · 226² · ${lnTerm.toFixed(4)}) ) · 1000 = <b>${sScreenCalc.toFixed(2)} мм²</b></p>
-    <p>Принимаем стандартное сечение медного экрана <b>S<sub>экр</sub> = ${scr.sec} мм²</b> (односекундный ток КЗ экрана по ГОСТ Р МЭК 60949 I<sub>экр.1с</sub> = ${scr.i1s.toFixed(2)} кА).</p>
+    <p>Принимаем к расчёту медный экран <b>S<sub>экр</sub> = ${scr.sec} мм²</b>${h.groundingScreen ? ' <i>(задано вручную в проекте)</i>' : ''} (односекундный ток КЗ экрана по ГОСТ Р МЭК 60949 I<sub>экр.1с</sub> = ${scr.i1s.toFixed(2)} кА).</p>
     <p class="formula">3) Проверка термической стойкости выбранного экрана:<br>
     I<sub>доп.экр</sub> = I<sub>экр.1с</sub> · K<sub>t</sub> = ${scr.i1s.toFixed(2)} · ${kTime.toFixed(3)} = <b>${scr.iPerm.toFixed(3)} кА</b> ${scr.ok ? '≥' : '<'} ${faultLabelHtml} = ${iScreenFaultKa.toFixed(3)} кА — <b>${scr.ok ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
 
@@ -1996,15 +2084,15 @@
     <p class="formula">1) Геометрические параметры кабеля (${core.sec}/${scr.sec} мм²): наружный диаметр d<sub>нар</sub> = ${geom.dOut} мм, средний диаметр экрана d<sub>э</sub> = ${geom.dScr} мм, расстояние между осями фаз S = ${sSpacing} мм.</p>
     <p class="formula">2) Взаимное индуктивное сопротивление между жилой и экраном:<br>${xmFormulaHtml}</p>
     <p class="formula">3) Наведённое напряжение на экране в нормальном режиме на всю длину (при одностороннем заземлении, ток одной нитки I<sub>1</sub> = ${iOneCable.toFixed(2)} А):<br>
-    U<sub>нав</sub> = I<sub>1</sub> · L · X<sub>m</sub> = ${iOneCable.toFixed(2)} · ${lenKm.toFixed(3)} · ${xm.toFixed(4)} = <b>${uInduced.toFixed(1)} В</b> (допустимый порог ≤ 50 В — <b>${uInduced <= 50 ? 'выполняется' : 'ПРЕВЫШЕН'}</b>).</p>
+    U<sub>нав</sub> = I<sub>1</sub> · L · X<sub>m</sub> = ${iOneCable.toFixed(2)} · ${lenKm.toFixed(3)} · ${xm.toFixed(4)} = <b>${uInduced.toFixed(1)} В</b> (${used50VPct.toFixed(0)}% от порога 50 В — <b>${pass50V ? `выполняется, запас ${margin50VPct.toFixed(0)}%` : 'ПРЕВЫШЕН'}</b>; при токе до предельного I<sub>доп</sub> = ${iDopOneCable.toFixed(1)} А составит ${uInducedAtIdop.toFixed(1)} В).</p>
     <p class="formula">4) Наведённое напряжение на экране при трёхфазном КЗ на всю длину (ток одной нитки I<sub>кз1</sub><sup>(3)</sup> = ${ikz3OneCableKa.toFixed(2)} кА):<br>
-    U<sub>кз</sub><sup>(3)</sup> = I<sub>кз1</sub><sup>(3)</sup> · L · X<sub>m</sub> = ${ikz3OneCableKa.toFixed(2)} · ${lenKm.toFixed(3)} · ${xm.toFixed(4)} = <b>${uKzInducedKv.toFixed(2)} кВ</b> (допустимый порог ≤ 5,0 кВ — <b>${uKzInducedKv <= 5.0 ? 'выполняется' : 'ПРЕВЫШЕН'}</b>).</p>
+    U<sub>кз</sub><sup>(3)</sup> = I<sub>кз1</sub><sup>(3)</sup> · L · X<sub>m</sub> = ${ikz3OneCableKa.toFixed(2)} · ${lenKm.toFixed(3)} · ${xm.toFixed(4)} = <b>${uKzInducedKv.toFixed(2)} кВ</b> (допустимый порог ≤ 5,0 кВ — <b>${pass5kV ? 'выполняется' : 'ПРЕВЫШЕН'}</b>).</p>
 
     <p class="formula">5) Оценка режима двухстороннего глухого заземления экранов (при рабочей температуре экрана ~70 °C):<br>
     R<sub>э</sub> = 21.4 / S<sub>экр</sub> = 21.4 / ${scr.sec} = ${rScreenOhmKm.toFixed(4)} Ом/км; &nbsp; R<sub>ж</sub>(θ) = <b>${rCoreOhmKm.toFixed(4)} Ом/км</b>.<br>
     Относительный ток в экране: I<sub>э</sub> / I<sub>ж</sub> = 1 / √(1 + (R<sub>э</sub> / X<sub>m</sub>)²) = 1 / √(1 + (${rScreenOhmKm.toFixed(4)} / ${xm.toFixed(4)})²) = <b>${(iScreenRatio * 100).toFixed(1)} %</b>.<br>
     Относительные потери в экранах: ΔP<sub>э</sub> / ΔP<sub>ж</sub> = (R<sub>э</sub> / R<sub>ж</sub>) / (1 + (R<sub>э</sub> / X<sub>m</sub>)²) = <b>${(dpLossRatio * 100).toFixed(1)} %</b>.<br>
-    Коэффициент снижения пропускной способности: K<sub>и</sub> = 1 / √(1 + ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = 1 / √(1 + ${dpLossRatio.toFixed(4)}) = <b>${kiFactor.toFixed(3)}</b> (I<sub>доп.гл</sub> = ${iDopSolidBonding} А).</p>
+    Коэффициент снижения пропускной способности: K<sub>и</sub> = 1 / √(1 + ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = 1 / √(1 + ${dpLossRatio.toFixed(4)}) = <b>${kiFactor.toFixed(3)}</b> (I<sub>доп.гл</sub> = ${iDopSolidBonding} А против I<sub>p</sub> = ${core.cur.toFixed(1)} А — <b>${okSolidBonding ? 'тепловой режим проходит' : 'перегрев жилы'}</b>).</p>
 
     ${needTransp ? `
     <p class="formula">6) Расчёт параметров транспозиции экранов (${isManualTransp ? 'неидеальная транспозиция, ручной ввод участков' : 'идеальная транспозиция, равные участки'}):<br>
@@ -2025,28 +2113,23 @@
     τ = (0.124 + T<sub>max</sub> / 10⁴)² · 8760 = (0.124 + ${h.tmax} / 10000)² · 8760 = <b>${tauCalc} ч/год</b></p>
     <p class="formula">2) Активные потери мощности в жилах одной цепи (при θ<sub>раб</sub> = ${core.thetaWork} °C):<br>
     ΔP<sub>ж</sub> = 3 · I<sub>1</sub>² · R<sub>ж</sub>(θ) · L = 3 · ${iOneCable.toFixed(2)}² · ${rCoreOhmKm.toFixed(4)} · ${lenKm.toFixed(3)} = <b>${(pCoreOneChainWatts / 1000).toFixed(2)} кВт</b></p>
-    <p class="formula">3) Потери мощности в экранах одной цепи при глухом 2-стороннем заземлении:<br>
-    ΔP<sub>э.гл</sub> = ΔP<sub>ж</sub> · (ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = ${(pCoreOneChainWatts / 1000).toFixed(2)} · ${dpLossRatio.toFixed(4)} = <b>${(pScreenSolidWatts / 1000).toFixed(2)} кВт</b></p>
-    ${isManualTransp ? `<p class="formula">4) Остаточные потери мощности в экранах при неидеальной транспозиции:<br>
-    ΔP<sub>э.ост</sub> = ΔP<sub>ж</sub> · (ΔP<sub>э.тр</sub> / ΔP<sub>ж</sub>) = ${(pCoreOneChainWatts / 1000).toFixed(2)} · ${dpTranspRatio.toFixed(5)} = <b>${(pScreenTranspWatts / 1000).toFixed(2)} кВт</b></p>` : ''}
-    <p class="formula">${isManualTransp ? '5' : '4'}) Годовая экономия электроэнергии и денежных средств на 1 цепь при применении транспозиции (тариф Т = ${h.tariff} ₽/кВт·ч):<br>
-    ΔW<sub>эк</sub> = (ΔP<sub>э.гл</sub> − ΔP<sub>э.ост</sub>) · τ = ${((pScreenSolidWatts - pScreenTranspWatts) / 1000).toFixed(2)} · ${tauCalc} = <b>${wSavedYearKwh.toFixed(0)} кВт·ч/год</b><br>
-    Э<sub>год</sub> = ΔW<sub>эк</sub> · Т = ${wSavedYearKwh.toFixed(0)} · ${h.tariff} = <b>${(moneySavedYearMln * 1000000).toFixed(0)} ₽/год (${moneySavedYearMln.toFixed(3)} млн ₽/год)</b></p>
-    <p class="formula">${isManualTransp ? '6' : '5'}) Капитальные затраты на ${nCycles} цикл(а) транспозиции (1 цепь) и простой срок окупаемости:<br>
-    К<sub>тр</sub> = n<sub>цикл</sub> · Ц<sub>1цикл</sub> = ${nCycles} · ${h.transpCost} = <b>${transpCostOneChain.toFixed(2)} млн ₽</b>${h.par > 1 ? ` (на все ${h.par} цепи: ${(transpCostOneChain * h.par).toFixed(2)} млн ₽)` : ''}<br>
-    Т<sub>ок</sub> = К<sub>тр</sub> / Э<sub>год</sub> = ${transpCostOneChain.toFixed(2)} / ${moneySavedYearMln.toFixed(3)} = <b>${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'}</b> (нормативный предел: ${h.horizon} лет).</p>
+    <p class="formula">3) Потери мощности в экранах одной цепи по вариантам заземления:<br>
+    • Двухстороннее глухое заземление: ΔP<sub>э.гл</sub> = ΔP<sub>ж</sub> · (ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = ${(pCoreOneChainWatts / 1000).toFixed(2)} · ${dpLossRatio.toFixed(4)} = <b>${(pScreenSolidWatts / 1000).toFixed(2)} кВт</b>;<br>
+    • Одностороннее заземление с ОПН: ΔP<sub>э.одн</sub> = <b>0.00 кВт</b> (контур экранов разомкнут);<br>
+    • Транспозиция экранов: ΔP<sub>э.тр</sub> = <b>${(pScreenTranspWatts / 1000).toFixed(2)} кВт</b>.</p>
+    <p class="formula">4) Сравнение окупаемости транспозиции (капитальные затраты К<sub>тр</sub> = ${nCycles} · ${h.transpCost} = <b>${transpCostOneChain.toFixed(2)} млн ₽</b>, тариф Т = ${h.tariff} ₽/кВт·ч):<br>
+    ${passSingleEnded
+        ? `• <b>Базовый вариант сравнения — одностороннее заземление с ОПН</b> (т.к. оба критерия 50 В и 5 кВ выполняются). Потерь в экране при одностороннем заземлении нет (0 кВт), поэтому транспозиция <b>экономии потерь не даёт</b> (ΔW<sub>эк</sub> = 0 кВт·ч/год, окупаемость: <b>не окупается</b>).<br>• <i>Справочно (относительно глухого 2-стороннего заземления):</i> экономия составила бы ${(pSavedVsSolidWatts/1000).toFixed(2)} кВт (${wSavedVsSolidKwh.toFixed(0)} кВт·ч/год = ${moneySavedVsSolidMln.toFixed(3)} млн ₽/год), окупаемость ${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'} при пределе ${h.horizon} лет.`
+        : `• <b>Базовый вариант сравнения — двухстороннее глухое заземление</b> (т.к. одностороннее недопустимо по напряжению).<br>ΔW<sub>эк</sub> = (ΔP<sub>э.гл</sub> − ΔP<sub>э.тр</sub>) · τ = ${((pScreenSolidWatts - pScreenTranspWatts) / 1000).toFixed(2)} · ${tauCalc} = <b>${wSavedEffectiveKwh.toFixed(0)} кВт·ч/год</b><br>Э<sub>год</sub> = ΔW<sub>эк</sub> · Т = ${wSavedEffectiveKwh.toFixed(0)} · ${h.tariff} = <b>${(moneySavedEffectiveMln * 1000000).toFixed(0)} ₽/год (${moneySavedEffectiveMln.toFixed(3)} млн ₽/год)</b><br>Т<sub>ок</sub> = К<sub>тр</sub> / Э<sub>год</sub> = ${transpCostOneChain.toFixed(2)} / ${moneySavedEffectiveMln.toFixed(3)} = <b>${paybackEffective === Infinity ? '∞' : paybackEffective.toFixed(1) + ' лет'}</b> (нормативный предел: ${h.horizon} лет).`}</p>
 
     <div class="verdict">
-        <b>Вывод по результатам расчёта:</b><br>
+        <b>Сводный вывод по результатам расчёта:</b><br>
         1. К прокладке принимается кабель марки <b>${cableMark} ${h.par > 1 ? h.par + ' × ' : ''}(1×${core.sec}/${scr.sec})</b>, проложенный ${layName}.<br>
-        2. Схема заземления экранов: <b>${needTransp ? `транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах транспозиции` : 'одностороннее заземление экранов с установкой ОПН на разземлённом конце'}</b>.<br>
-        3. Экономическая оценка: ${needTransp
-            ? (isProfitable
-                ? `применение транспозиции экранов технически необходимо и экономически целесообразно (срок окупаемости ${paybackYears.toFixed(1)} лет не превышает заданный горизонт ${h.horizon} лет).`
-                : `применение транспозиции обусловлено техническими требованиями безопасности (ограничение наведённого напряжения ≤ 50 В и ≤ 5 кВ), однако коммерческий срок окупаемости (${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'}) превышает заданный предел ${h.horizon} лет.`)
-            : (isProfitable
-                ? `формально по критериям 50 В и 5 кВ проходит одностороннее заземление, однако при глухом заземлении потери в экранах составляют ${(pScreenSolidWatts / 1000).toFixed(2)} кВт — выполнение транспозиции окупится за ${paybackYears.toFixed(1)} лет.`
-                : `выполнение транспозиции экономически нецелесообразно (срок окупаемости ${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'} > ${h.horizon} лет); рекомендуется одностороннее заземление экранов (или двухстороннее глухое при достаточном запасе по току I<sub>доп.гл</sub> = ${iDopSolidBonding} А).`)}
+        2. Сравнение трёх схем заземления экранов:<br>
+        &nbsp;&nbsp;• <b>Двухстороннее глухое (без ОПН):</b> ${okSolidBonding ? '<b>подходит по тепловому режиму</b>' : '<b>не подходит (перегрев)</b>'} — потери ${(pScreenSolidWatts / 1000).toFixed(2)} кВт, I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}% (K<sub>и</sub> = ${kiFactor.toFixed(2)}), I<sub>доп.гл</sub> = ${iDopSolidBonding} А против I<sub>p</sub> = ${core.cur.toFixed(1)} А.<br>
+        &nbsp;&nbsp;• <b>Одностороннее с коробкой ОПН:</b> ${passSingleEnded ? '<b>подходит</b>' : '<b>не подходит</b>'} — потерь нет, затрат минимум; U<sub>нав</sub> = ${uInduced.toFixed(1)} В (${used50VPct.toFixed(0)}% от 50 В, запас ${margin50VPct.toFixed(0)}%), при токе до I<sub>доп</sub> около ${uInducedAtIdop.toFixed(1)} В; U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ (≤ 5 кВ).<br>
+        &nbsp;&nbsp;• <b>Транспозиция экранов (${nCycles} цикл.):</b> ${passTranspAll ? '<b>подходит</b>' : '<b>не подходит</b>'} — стоит ${transpCostOneChain.toFixed(2)} млн ₽, потерь ${(pScreenTranspWatts / 1000).toFixed(2)} кВт, наведённое напряжение на участке ${uNodeV.toFixed(1)} В; ${isProfitable ? `окупается за ${paybackEffective.toFixed(1)} лет (≤ ${h.horizon} лет)` : 'не окупается'}.<br>
+        3. <b>Рекомендуемый выбор:</b> ${explicitChoiceText}
     </div>
     ` : `
     <div class="verdict">
