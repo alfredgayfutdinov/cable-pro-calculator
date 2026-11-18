@@ -1558,9 +1558,339 @@
                         I<sub>доп.экр</sub> (${activeScr.iPerm.toFixed(3)} кА) ${activeScr.ok ? '>' : '<'} I⁽²⁾<sub>кз</sub> (${ikz2.toFixed(3)} кА)
                     </div>
                 </div>
+                <!-- Кнопки экспорта отчёта 10 кВ -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button type="button" onclick="exportHvReport('word')"
+                        class="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-[#00f2fe]/20 to-[#0ea5e9]/25 border border-[#00f2fe]/45 text-white font-bold text-xs shadow-[0_0_15px_rgba(0,242,254,0.15)] active:scale-95 transition">
+                        <svg class="w-4 h-4 text-[#00f2fe] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <span>Скачать Word (.doc)</span>
+                    </button>
+                    <button type="button" onclick="exportHvReport('pdf')"
+                        class="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-[#8b5cf6]/25 to-[#d946ef]/25 border border-[#a855f7]/45 text-white font-bold text-xs shadow-[0_0_15px_rgba(168,85,247,0.15)] active:scale-95 transition">
+                        <svg class="w-4 h-4 text-[#d8b4fe] shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
+                        <span>Печать / PDF</span>
+                    </button>
+                </div>
             ` : '';
         }
+function exportHvReport(format) {
+            const h = state.hv;
+            const isXlpe = h.ins === 'XLPE';
+            const matName = h.mat === 'Cu' ? 'Медь (Cu)' : 'Алюминий (Al)';
+            const cableMark = isXlpe
+                ? `${h.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'}`
+                : `${h.mat === 'Al' ? 'ААБл-10' : 'СБл-10'}`;
+            const layName = isXlpe
+                ? (h.lay === 'triangle' ? 'треугольником вплотную (△)' : `в плоскости с шагом S = ${h.flatS} мм (—)`)
+                : 'трёхжильный кабель в земле';
 
+            // 1. Расчёт жилы
+            const allCores = HV_SECS.map(s => evalHv(s, h));
+            const recCore = allCores.find(x => x.okAll);
+            const core = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
+
+            const layFactor = (isXlpe && h.lay === 'flat') ? 0.92 : 1.0;
+            const sinPhi = Math.sqrt(Math.max(0, 1 - h.cos * h.cos));
+            const loadFormulaStr = h.mode === 'I'
+                ? `I<sub>p</sub> = ${h.val} А (задано током)`
+                : `I<sub>p</sub> = P / (√3 · U<sub>ном</sub> · cos φ) = ${h.val} / (1.732 · 10 · ${h.cos}) = <b>${core.cur.toFixed(2)} А</b>`;
+
+            // 2. Расчёт медного экрана (для СПЭ)
+            const ikz2 = core.ikz2;
+            const kTime = core.kTime;
+            const lnTerm = Math.log((350 + 228) / (70 + 228));
+            const sScreenCalc = Math.sqrt((Math.pow(ikz2, 2) * h.t) / (Math.pow(1.089, 2) * Math.pow(226, 2) * lnTerm)) * 1000;
+
+            const allScreens = SCREEN_SECS.map(s => {
+                const i1s = SCREEN_IKZ_1S[s];
+                const iPerm = +(i1s * kTime).toFixed(3);
+                return { sec: s, i1s, iPerm, ok: iPerm > ikz2 };
+            });
+            const recScr = allScreens.find(x => x.ok);
+            const scr = (h.selectedScreen && allScreens.find(x => x.sec === h.selectedScreen)) || recScr || allScreens[allScreens.length - 1];
+
+            // 3. Расчёт наведённых напряжений и транспозиции
+            const geom = getCableGeometry(core.sec, scr.sec);
+            const sSpacing = h.lay === 'triangle' ? geom.dOut : Math.max(geom.dOut, h.flatS);
+            const lgRatio = Math.log10((2 * sSpacing) / geom.dScr);
+            const lg2 = Math.log10(2);
+            const iOneCable = core.cur / h.par;
+            const ikz3OneCableKa = h.ikz / h.par;
+            const lenKm = h.len / 1000;
+
+            const xm = h.lay === 'triangle'
+                ? 0.144 * lgRatio
+                : 0.144 * Math.sqrt(Math.pow(lgRatio, 2) + Math.pow(lg2, 2) - lgRatio * lg2);
+
+            const xmFormulaHtml = h.lay === 'triangle'
+                ? `X<sub>m</sub> = 0.144 · lg(2 · S / d<sub>э</sub>) = 0.144 · lg(2 · ${sSpacing} / ${geom.dScr}) = 0.144 · ${lgRatio.toFixed(4)} = <b>${xm.toFixed(4)} Ом/км</b>`
+                : `X<sub>m</sub> = 0.144 · √(lg²(2S/d<sub>э</sub>) + lg²2 − lg(2S/d<sub>э</sub>)·lg2) = 0.144 · √(${lgRatio.toFixed(4)}² + ${lg2.toFixed(4)}² − ${lgRatio.toFixed(4)}·${lg2.toFixed(4)}) = <b>${xm.toFixed(4)} Ом/км</b>`;
+
+            const uInduced = iOneCable * lenKm * xm;
+            const uKzInducedKv = ikz3OneCableKa * lenKm * xm;
+
+            const rScreenOhmKm = 20.0 / scr.sec;
+            const rCoreOhmKm = (h.mat === 'Cu' ? 20.0 : 32.0) / core.sec;
+            const iScreenRatio = 1 / Math.sqrt(1 + Math.pow(rScreenOhmKm / xm, 2));
+            const dpLossRatio = (rScreenOhmKm / rCoreOhmKm) / (1 + Math.pow(rScreenOhmKm / xm, 2));
+            const kiFactor = 1 / Math.sqrt(1 + dpLossRatio);
+            const iDopSolidBonding = +(core.iDopFact * kiFactor).toFixed(1);
+
+            const minCyclesBy50V = Math.max(1, Math.ceil(uInduced / (50 * 3)));
+            const minCyclesBy5kV = Math.max(1, Math.ceil(uKzInducedKv / (5.0 * 3)));
+            const minCyclesByDrum = Math.max(1, Math.ceil(h.len / 3600));
+            const autoCycles = Math.max(minCyclesBy50V, minCyclesBy5kV, minCyclesByDrum);
+
+            const isManualTransp = h.transpMode === 'manual';
+            const secs = isManualTransp
+                ? h.transpSecs.map(x => Math.max(1, +x || 0))
+                : Array.from({ length: autoCycles * 3 }, () => Math.round(h.len / (autoCycles * 3)));
+
+            const nSections = secs.length;
+            const nCycles = Math.max(1, Math.round(nSections / 3));
+            const maxSecLenM = Math.max(...secs);
+            const uNodeV = iOneCable * (maxSecLenM / 1000) * xm;
+            const uKzNodeKv = ikz3OneCableKa * (maxSecLenM / 1000) * xm;
+
+            let sumL1 = 0, sumL2 = 0, sumL3 = 0;
+            secs.forEach((L, idx) => {
+                if (idx % 3 === 0) sumL1 += L;
+                else if (idx % 3 === 1) sumL2 += L;
+                else sumL3 += L;
+            });
+            const sumTotal = sumL1 + sumL2 + sumL3;
+            const lUnbalM = Math.sqrt(Math.max(0, sumL1*sumL1 + sumL2*sumL2 + sumL3*sumL3 - sumL1*sumL2 - sumL2*sumL3 - sumL1*sumL3));
+            const unbalPct = sumTotal > 0 ? (lUnbalM / sumTotal) * 100 : 0;
+
+            const iScreenTranspRatio = isManualTransp && sumTotal > 0 ? iScreenRatio * (lUnbalM / sumTotal) : 0;
+            const dpTranspRatio = isManualTransp ? (rScreenOhmKm / rCoreOhmKm) * Math.pow(iScreenTranspRatio, 2) : 0;
+            const kiTranspFactor = 1 / Math.sqrt(1 + dpTranspRatio);
+            const iDopTransp = +(core.iDopFact * kiTranspFactor).toFixed(1);
+
+            // 4. Экономика
+            const transpCostTotal = nCycles * h.transpCost;
+            const pCoreTotalWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
+            const pScreenSolidWatts = pCoreTotalWatts * dpLossRatio;
+            const pScreenTranspWatts = pCoreTotalWatts * dpTranspRatio;
+            const pSavedWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
+            const wSavedYearKwh = (pSavedWatts / 1000) * h.tau;
+            const moneySavedYearMln = (wSavedYearKwh * h.tariff) / 1000000;
+            const paybackYears = moneySavedYearMln > 0 ? transpCostTotal / moneySavedYearMln : Infinity;
+            const isProfitable = paybackYears <= h.horizon;
+
+            const needTransp = isManualTransp || uInduced > 50 || uKzInducedKv > 5.0 || h.len > 1200;
+
+            // Векторная SVG-схема для PDF (в светлых инженерных тонах)
+            const buildPrintSvg = () => {
+                const L = secs.slice(0, 3);
+                const sum3 = L.reduce((a, b) => a + b, 0) || 1;
+                const xStart = 55, xEnd = 525, span = xEnd - xStart;
+                const x1 = xStart + (L[0] / sum3) * span;
+                const x2 = x1 + (L[1] / sum3) * span;
+                const yA = 38, yB = 72, yC = 106;
+                const u1 = (iOneCable * (L[0] / 1000) * xm).toFixed(1);
+                const u2 = (iOneCable * (L[1] / 1000) * xm).toFixed(1);
+                const u3 = (iOneCable * (L[2] / 1000) * xm).toFixed(1);
+                const gnd = (x, y) => `
+                    <line x1="${x}" y1="${y}" x2="${x}" y2="${y + 12}" stroke="#000" stroke-width="1.3"/>
+                    <line x1="${x - 7}" y1="${y + 12}" x2="${x + 7}" y2="${y + 12}" stroke="#000" stroke-width="1.3"/>
+                    <line x1="${x - 4.5}" y1="${y + 15.5}" x2="${x + 4.5}" y2="${y + 15.5}" stroke="#000" stroke-width="1.2"/>
+                    <line x1="${x - 2}" y1="${y + 19}" x2="${x + 2}" y2="${y + 19}" stroke="#000" stroke-width="1.1"/>
+                `;
+                const nodeCross = (x, lbl, uVal) => `
+                    <line x1="${x}" y1="24" x2="${x}" y2="126" stroke="#666" stroke-dasharray="4 2" stroke-width="1"/>
+                    <rect x="${x - 8}" y="120" width="16" height="8" fill="#fff" stroke="#000" stroke-width="1.2"/>
+                    ${gnd(x, 128)}
+                    <text x="${x}" y="15" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" font-weight="bold">${lbl}</text>
+                    <text x="${x}" y="160" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" font-weight="bold">U = ${uVal} В</text>
+                `;
+                return `
+                <div style="margin: 12px 0; text-align: center;">
+                    <div style="font-size: 11pt; font-weight: bold; margin-bottom: 4px;">Схема транспозиции экранов кабельной линии 10 кВ ${nCycles > 1 ? `(Цикл 1 из ${nCycles})` : ''}</div>
+                    <svg viewBox="0 0 580 170" width="100%" style="max-width: 560px; border: 1px solid #999; background: #fff;">
+                        <text x="12" y="${yA + 4}" font-family="Times New Roman, serif" font-size="11" font-weight="bold">Экр. A</text>
+                        <text x="12" y="${yB + 4}" font-family="Times New Roman, serif" font-size="11" font-weight="bold">Экр. B</text>
+                        <text x="12" y="${yC + 4}" font-family="Times New Roman, serif" font-size="11" font-weight="bold">Экр. C</text>
+                        <line x1="${xStart}" y1="${yA}" x2="${x1 - 10}" y2="${yA}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${xStart}" y1="${yB}" x2="${x1 - 10}" y2="${yB}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${xStart}" y1="${yC}" x2="${x1 - 10}" y2="${yC}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${x1 - 10}" y1="${yA}" x2="${x1 + 10}" y2="${yB}" stroke="#000" stroke-width="1.4"/>
+                        <line x1="${x1 - 10}" y1="${yB}" x2="${x1 + 10}" y2="${yC}" stroke="#000" stroke-width="1.4"/>
+                        <line x1="${x1 - 10}" y1="${yC}" x2="${x1 + 10}" y2="${yA}" stroke="#000" stroke-width="1.4"/>
+                        <line x1="${x1 + 10}" y1="${yB}" x2="${x2 - 10}" y2="${yB}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${x1 + 10}" y1="${yC}" x2="${x2 - 10}" y2="${yC}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${x1 + 10}" y1="${yA}" x2="${x2 - 10}" y2="${yA}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${x2 - 10}" y1="${yB}" x2="${x2 + 10}" y2="${yC}" stroke="#000" stroke-width="1.4"/>
+                        <line x1="${x2 - 10}" y1="${yC}" x2="${x2 + 10}" y2="${yA}" stroke="#000" stroke-width="1.4"/>
+                        <line x1="${x2 - 10}" y1="${yA}" x2="${x2 + 10}" y2="${yB}" stroke="#000" stroke-width="1.4"/>
+                        <line x1="${x2 + 10}" y1="${yC}" x2="${xEnd}" y2="${yC}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${x2 + 10}" y1="${yA}" x2="${xEnd}" y2="${yA}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${x2 + 10}" y1="${yB}" x2="${xEnd}" y2="${yB}" stroke="#000" stroke-width="1.6"/>
+                        <line x1="${xStart}" y1="${yA}" x2="${xStart}" y2="${yC}" stroke="#000" stroke-width="1.8"/>
+                        ${gnd(xStart, yC)}
+                        <text x="${xStart}" y="22" text-anchor="middle" font-family="Times New Roman, serif" font-size="10" font-weight="bold">КМ-1</text>
+                        <line x1="${xEnd}" y1="${yA}" x2="${xEnd}" y2="${yC}" stroke="#000" stroke-width="1.8"/>
+                        ${gnd(xEnd, yC)}
+                        <text x="${xEnd}" y="22" text-anchor="middle" font-family="Times New Roman, serif" font-size="10" font-weight="bold">КМ-2</text>
+                        <text x="${xEnd}" y="160" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" font-weight="bold">U = ${u3} В</text>
+                        ${nodeCross(x1, 'КТ-1', u1)}
+                        ${nodeCross(x2, 'КТ-2', u2)}
+                        <text x="${(xStart + x1) / 2}" y="28" text-anchor="middle" font-family="Times New Roman, serif" font-size="11">L1 = ${Math.round(L[0])} м</text>
+                        <text x="${(x1 + x2) / 2}" y="28" text-anchor="middle" font-family="Times New Roman, serif" font-size="11">L2 = ${Math.round(L[1])} м</text>
+                        <text x="${(x2 + xEnd) / 2}" y="28" text-anchor="middle" font-family="Times New Roman, serif" font-size="11">L3 = ${Math.round(L[2])} м</text>
+                    </svg>
+                </div>`;
+            };
+
+            const nowStr = new Date().toLocaleDateString('ru-RU');
+            const docHtml = `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Расчёт кабельной линии 10 кВ</title>
+<style>
+    @page { size: A4; margin: 20mm 15mm 20mm 25mm; }
+    body { font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.4; color: #000; background: #fff; margin: 0; padding: 0; }
+    h1 { font-size: 14pt; text-align: center; text-transform: uppercase; margin: 0 0 14pt 0; }
+    h2 { font-size: 12.5pt; margin: 14pt 0 6pt 0; border-bottom: 1px solid #000; padding-bottom: 2pt; }
+    p { margin: 4pt 0; text-align: justify; }
+    .formula { margin: 5pt 0 5pt 12pt; }
+    table { width: 100%; border-collapse: collapse; margin: 8pt 0; font-size: 11pt; }
+    th, td { border: 1px solid #000; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+    th { background: #f2f2f2; font-weight: bold; }
+    .num { text-align: right; }
+    .center { text-align: center; }
+    .verdict { border: 1px solid #000; padding: 8pt 10pt; margin-top: 10pt; background: #fafafa; }
+</style>
+</head>
+<body>
+    <h1>Расчёт кабельной линии напряжением 10 кВ</h1>
+    <p style="text-align: right; font-size: 10.5pt;">Дата расчёта: ${nowStr} • Нормативная база: ПУЭ 7 изд., ГОСТ Р 55025-2012, методика М.В. Дмитриева</p>
+
+    <h2>1. Исходные данные</h2>
+    <table>
+        <tr><th style="width: 58%;">Наименование параметра</th><th style="width: 18%;">Обозначение</th><th>Значение</th></tr>
+        <tr><td>Номинальное напряжение сети</td><td class="center">U<sub>ном</sub></td><td>10 кВ</td></tr>
+        <tr><td>Марка кабеля и материал токопроводящей жилы</td><td class="center">—</td><td>${cableMark} (${matName})</td></tr>
+        <tr><td>Способ прокладки и количество параллельных ниток</td><td class="center">n</td><td>${layName}, n = ${h.par}</td></tr>
+        <tr><td>Расчётная длина трассы кабельной линии</td><td class="center">L</td><td>${h.len} м (${lenKm.toFixed(3)} км)</td></tr>
+        <tr><td>Расчётная нагрузка и коэффициент мощности</td><td class="center">P / cos φ</td><td>${h.mode === 'P' ? h.val + ' кВт' : h.val + ' А'}, cos φ = ${h.cos} (sin φ = ${sinPhi.toFixed(3)})</td></tr>
+        <tr><td>Допустимая потеря напряжения</td><td class="center">ΔU<sub>доп</sub></td><td>${h.limit.toFixed(1)} %</td></tr>
+        <tr><td>Ток трёхфазного КЗ на шинах и время отключения</td><td class="center">I<sub>кз</sub><sup>(3)</sup> / t<sub>кз</sub></td><td>${h.ikz} кА / ${h.t} с</td></tr>
+        <tr><td>Поправочные коэффициенты (темп., грунт, пучок, глубина, прокл.)</td><td class="center">K<sub>1</sub>..K<sub>4</sub>, K<sub>пр</sub></td><td>K<sub>1</sub>=${h.k1}, K<sub>2</sub>=${h.k2}, K<sub>3</sub>=${h.k3}, K<sub>4</sub>=${h.k4}, K<sub>пр</sub>=${layFactor}</td></tr>
+    </table>
+
+    <h2>2. Выбор и проверка сечения токопроводящей жилы</h2>
+    <p class="formula">1) Расчётный рабочий ток линии:<br>${loadFormulaStr}</p>
+    <p class="formula">2) Результирующий поправочный коэффициент:<br>K<sub>общ</sub> = K<sub>1</sub> · K<sub>2</sub> · K<sub>3</sub> · K<sub>4</sub> · K<sub>пр</sub> = ${h.k1} · ${h.k2} · ${h.k3} · ${h.k4} · ${layFactor} = <b>${core.kTotal.toFixed(3)}</b></p>
+    <p>Принимаем кабель сечением жилы <b>${h.par > 1 ? h.par + ' × ' : ''}${core.sec} мм²</b> (табличный длительно допустимый ток I<sub>табл</sub> = ${core.baseIdop} А, удельное сопротивление R<sub>0</sub> = ${core.r0} Ом/км, X<sub>0</sub> = ${core.x0.toFixed(3)} Ом/км).</p>
+    <p class="formula">3) Проверка по длительно допустимому току нагрева:<br>I<sub>доп.ф</sub> = I<sub>табл</sub> · K<sub>общ</sub> · n = ${core.baseIdop} · ${core.kTotal.toFixed(3)} · ${h.par} = <b>${core.iDopFact} А</b> ${core.okI ? '≥' : '<'} I<sub>p</sub> = ${core.cur.toFixed(2)} А — <b>${core.okI ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b> (загрузка ${Math.round(core.loadPct)}%).</p>
+    <p class="formula">4) Проверка потерей напряжения в нормальном режиме:<br>ΔU = √3 · I<sub>p</sub> · L · ((R<sub>0</sub> · cos φ + X<sub>0</sub> · sin φ) / n) = 1.732 · ${core.cur.toFixed(2)} · ${lenKm.toFixed(3)} · ((${core.r0} · ${h.cos} + ${core.x0.toFixed(3)} · ${sinPhi.toFixed(3)}) / ${h.par}) = <b>${core.dV.toFixed(1)} В</b></p>
+    <p class="formula">ΔU% = (ΔU / U<sub>ном</sub>) · 100% = (${core.dV.toFixed(1)} / 10000) · 100% = <b>${core.dPct.toFixed(2)} %</b> ${core.okU ? '≤' : '>'} ΔU<sub>доп</sub> = ${h.limit.toFixed(1)} % — <b>${core.okU ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
+    <p class="formula">5) Расчётный ток двухфазного КЗ и коэффициент времени:<br>I<sub>кз</sub><sup>(2)</sup> = (√3 / 2) · I<sub>кз</sub><sup>(3)</sup> = 0.866 · ${h.ikz} = <b>${ikz2.toFixed(3)} кА</b><br>K<sub>t</sub> = 1 / √t<sub>кз</sub> = 1 / √${h.t} = <b>${kTime.toFixed(3)}</b></p>
+    <p class="formula">6) Проверка термической стойкости жилы при КЗ (односекундный ток I<sub>кз.1с</sub> = ${core.iCore1s} кА):<br>I<sub>доп.кз</sub> = I<sub>кз.1с</sub> · K<sub>t</sub> · n = ${core.iCore1s} · ${kTime.toFixed(3)} · ${h.par} = <b>${core.iCorePerm.toFixed(3)} кА</b> ${core.okCoreKz ? '>' : '<'} I<sub>кз</sub><sup>(2)</sup> = ${ikz2.toFixed(3)} кА — <b>${core.okCoreKz ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
+
+    ${isXlpe ? `
+    <h2>3. Выбор и проверка сечения медного экрана кабеля</h2>
+    <p class="formula">1) Расчётное минимальное сечение медного экрана по термической стойкости (ГОСТ Р 55025-2012, θ<sub>н</sub> = 70 °C, θ<sub>к</sub> = 350 °C):<br>
+    S<sub>экр.расч</sub> = √( (I<sub>кз</sub><sup>(2)</sup>)² · t<sub>кз</sub> / (K<sub>т</sub>² · C² · ln((350 + 228)/(70 + 228))) ) · 1000 = √( (${ikz2.toFixed(3)}² · ${h.t}) / (1.089² · 226² · ${lnTerm.toFixed(4)}) ) · 1000 = <b>${sScreenCalc.toFixed(2)} мм²</b></p>
+    <p>Принимаем стандартное сечение медного экрана <b>S<sub>экр</sub> = ${scr.sec} мм²</b> (односекундный ток КЗ экрана I<sub>экр.1с</sub> = ${scr.i1s.toFixed(1)} кА).</p>
+    <p class="formula">2) Проверка термической стойкости выбранного экрана при КЗ:<br>
+    I<sub>доп.экр</sub> = I<sub>экр.1с</sub> · K<sub>t</sub> = ${scr.i1s.toFixed(1)} · ${kTime.toFixed(3)} = <b>${scr.iPerm.toFixed(3)} кА</b> ${scr.ok ? '>' : '<'} I<sub>кз</sub><sup>(2)</sup> = ${ikz2.toFixed(3)} кА — <b>${scr.ok ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
+
+    <h2>4. Выбор схемы заземления экранов (по методике М.В. Дмитриева)</h2>
+    <p class="formula">1) Геометрические параметры кабеля (${core.sec}/${scr.sec} мм²): наружный диаметр d<sub>нар</sub> = ${geom.dOut} мм, средний диаметр экрана d<sub>э</sub> = ${geom.dScr} мм, расстояние между осями фаз S = ${sSpacing} мм.</p>
+    <p class="formula">2) Взаимное индуктивное сопротивление между жилой и экраном:<br>${xmFormulaHtml}</p>
+    <p class="formula">3) Наведённое напряжение на экране в нормальном режиме на всю длину (при одностороннем заземлении, ток одной нитки I<sub>1</sub> = ${(iOneCable).toFixed(2)} А):<br>
+    U<sub>нав</sub> = I<sub>1</sub> · L · X<sub>m</sub> = ${iOneCable.toFixed(2)} · ${lenKm.toFixed(3)} · ${xm.toFixed(4)} = <b>${uInduced.toFixed(1)} В</b> (допустимый порог ≤ 50 В — <b>${uInduced <= 50 ? 'выполняется' : 'ПРЕВЫШЕН'}</b>).</p>
+    <p class="formula">4) Наведённое напряжение на экране при трёхфазном КЗ на всю длину (ток одной нитки I<sub>кз1</sub><sup>(3)</sup> = ${ikz3OneCableKa.toFixed(2)} кА):<br>
+    U<sub>кз</sub><sup>(3)</sup> = I<sub>кз1</sub><sup>(3)</sup> · L · X<sub>m</sub> = ${ikz3OneCableKa.toFixed(2)} · ${lenKm.toFixed(3)} · ${xm.toFixed(4)} = <b>${uKzInducedKv.toFixed(2)} кВ</b> (допустимый порог ≤ 5,0 кВ — <b>${uKzInducedKv <= 5.0 ? 'выполняется' : 'ПРЕВЫШЕН'}</b>).</p>
+
+    <p class="formula">5) Оценка режима двухстороннего глухого заземления экранов:<br>
+    R<sub>э</sub> = 20 / S<sub>экр</sub> = 20 / ${scr.sec} = ${rScreenOhmKm.toFixed(4)} Ом/км; &nbsp; R<sub>ж</sub> = ${h.mat === 'Cu' ? '20' : '32'} / S<sub>ж</sub> = ${rCoreOhmKm.toFixed(4)} Ом/км.<br>
+    Относительный ток в экране: I<sub>э</sub> / I<sub>ж</sub> = 1 / √(1 + (R<sub>э</sub> / X<sub>m</sub>)²) = 1 / √(1 + (${rScreenOhmKm.toFixed(4)} / ${xm.toFixed(4)})²) = <b>${(iScreenRatio * 100).toFixed(1)} %</b>.<br>
+    Относительные потери в экранах: ΔP<sub>э</sub> / ΔP<sub>ж</sub> = (R<sub>э</sub> / R<sub>ж</sub>) / (1 + (R<sub>э</sub> / X<sub>m</sub>)²) = <b>${(dpLossRatio * 100).toFixed(1)} %</b>.<br>
+    Коэффициент снижения пропускной способности: K<sub>и</sub> = 1 / √(1 + ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = 1 / √(1 + ${dpLossRatio.toFixed(4)}) = <b>${kiFactor.toFixed(3)}</b> (I<sub>доп.гл</sub> = ${iDopSolidBonding} А).</p>
+
+    ${needTransp ? `
+    <p class="formula">6) Расчёт параметров транспозиции экранов (${isManualTransp ? 'неидеальная транспозиция, ручной ввод участков' : 'идеальная транспозиция, равные участки'}):<br>
+    Число циклов транспозиции: <b>${nCycles}</b> (количество участков: ${nSections}, длины: ${secs.map((v, i) => `L<sub>${i+1}</sub>=${v} м`).join(', ')}).<br>
+    Максимальное напряжение в узле транспозиции (на участке L<sub>max</sub> = ${maxSecLenM} м):<br>
+    U<sub>узла</sub> = I<sub>1</sub> · L<sub>max</sub> · X<sub>m</sub> = ${iOneCable.toFixed(2)} · ${(maxSecLenM/1000).toFixed(3)} · ${xm.toFixed(4)} = <b>${uNodeV.toFixed(1)} В</b> (≤ 50 В — <b>${uNodeV <= 50 ? 'норма' : 'ПРЕВЫШЕНИЕ'}</b>);<br>
+    U<sub>кз.узла</sub> = I<sub>кз1</sub><sup>(3)</sup> · L<sub>max</sub> · X<sub>m</sub> = ${ikz3OneCableKa.toFixed(2)} · ${(maxSecLenM/1000).toFixed(3)} · ${xm.toFixed(4)} = <b>${uKzNodeKv.toFixed(2)} кВ</b> (≤ 5,0 кВ — <b>${uKzNodeKv <= 5.0 ? 'норма' : 'ПРЕВЫШЕНИЕ'}</b>).</p>
+    ${isManualTransp ? `
+    <p class="formula">7) Расчёт небаланса при неидеальной транспозиции (ΣL<sub>A</sub>=${sumL1} м, ΣL<sub>B</sub>=${sumL2} м, ΣL<sub>C</sub>=${sumL3} м):<br>
+    L<sub>неб</sub> = √(L<sub>A</sub>² + L<sub>B</sub>² + L<sub>C</sub>² − L<sub>A</sub>L<sub>B</sub> − L<sub>B</sub>L<sub>C</sub> − L<sub>A</sub>L<sub>C</sub>) = <b>${lUnbalM.toFixed(1)} м</b> (${unbalPct.toFixed(1)}% от L).<br>
+    Остаточный уравнительный ток: I<sub>э.ост</sub> / I<sub>ж</sub> = (I<sub>э</sub> / I<sub>ж</sub>) · (L<sub>неб</sub> / L) = ${(iScreenRatio * 100).toFixed(1)}% · (${lUnbalM.toFixed(1)} / ${sumTotal}) = <b>${(iScreenTranspRatio * 100).toFixed(2)} %</b>.<br>
+    Коэффициент снижения тока при небалансе: K<sub>и.тр</sub> = <b>${kiTranspFactor.toFixed(3)}</b> (I<sub>доп.тр</sub> = ${iDopTransp} А).</p>` : ''}
+    ${format === 'pdf' ? buildPrintSvg() : ''}
+    ` : ''}
+
+    <h2>5. Технико-экономическое обоснование схемы заземления</h2>
+    <p class="formula">1) Активные потери мощности в жилах (на 1 нитку):<br>
+    ΔP<sub>ж</sub> = 3 · I<sub>1</sub>² · R<sub>ж</sub> · L = 3 · ${iOneCable.toFixed(2)}² · ${rCoreOhmKm.toFixed(4)} · ${lenKm.toFixed(3)} = <b>${(pCoreTotalWatts / 1000).toFixed(2)} кВт</b></p>
+    <p class="formula">2) Потери мощности в экранах при глухом 2-стороннем заземлении:<br>
+    ΔP<sub>э.гл</sub> = ΔP<sub>ж</sub> · (ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = ${(pCoreTotalWatts / 1000).toFixed(2)} · ${dpLossRatio.toFixed(4)} = <b>${(pScreenSolidWatts / 1000).toFixed(2)} кВт</b></p>
+    ${isManualTransp ? `<p class="formula">3) Остаточные потери мощности в экранах при неидеальной транспозиции:<br>
+    ΔP<sub>э.ост</sub> = ΔP<sub>ж</sub> · (ΔP<sub>э.тр</sub> / ΔP<sub>ж</sub>) = ${(pCoreTotalWatts / 1000).toFixed(2)} · ${dpTranspRatio.toFixed(5)} = <b>${(pScreenTranspWatts / 1000).toFixed(2)} кВт</b></p>` : ''}
+    <p class="formula">${isManualTransp ? '4' : '3'}) Годовая экономия электроэнергии и денежных средств при применении транспозиции (тариф Т = ${h.tariff} ₽/кВт·ч, время потерь τ = ${h.tau} ч/год):<br>
+    ΔW<sub>эк</sub> = (ΔP<sub>э.гл</sub> − ΔP<sub>э.ост</sub>) · τ = ${((pScreenSolidWatts - pScreenTranspWatts) / 1000).toFixed(2)} · ${h.tau} = <b>${wSavedYearKwh.toFixed(0)} кВт·ч/год</b><br>
+    Э<sub>год</sub> = ΔW<sub>эк</sub> · Т = ${wSavedYearKwh.toFixed(0)} · ${h.tariff} = <b>${(moneySavedYearMln * 1000000).toFixed(0)} ₽/год (${moneySavedYearMln.toFixed(3)} млн ₽/год)</b></p>
+    <p class="formula">${isManualTransp ? '5' : '4'}) Капитальные затраты на ${nCycles} цикл(а) транспозиции и простой срок окупаемости:<br>
+    К<sub>тр</sub> = n<sub>цикл</sub> · Ц<sub>1цикл</sub> = ${nCycles} · ${h.transpCost} = <b>${transpCostTotal.toFixed(2)} млн ₽</b><br>
+    Т<sub>ок</sub> = К<sub>тр</sub> / Э<sub>год</sub> = ${transpCostTotal.toFixed(2)} / ${moneySavedYearMln.toFixed(3)} = <b>${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'}</b> (нормативный предел: ${h.horizon} лет).</p>
+
+    <div class="verdict">
+        <b>Вывод по результатам расчёта:</b><br>
+        1. К прокладке принимается кабель марки <b>${cableMark} ${h.par > 1 ? h.par + ' × ' : ''}(1×${core.sec}/${scr.sec})</b>, проложенный ${layName}.<br>
+        2. Схема заземления экранов: <b>${needTransp ? `транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах транспозиции` : 'одностороннее заземление экранов с установкой ОПН на разземлённом конце'}</b>.<br>
+        3. Экономическая оценка: ${needTransp
+            ? (isProfitable
+                ? `применение транспозиции экранов технически необходимо и экономически целесообразно (срок окупаемости ${paybackYears.toFixed(1)} лет не превышает заданный горизонт ${h.horizon} лет).`
+                : `применение транспозиции обусловлено техническими требованиями безопасности (ограничение наведённого напряжения ≤ 50 В и ≤ 5 кВ), однако коммерческий срок окупаемости (${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'}) превышает заданный предел ${h.horizon} лет.`)
+            : (isProfitable
+                ? `формально по критериям 50 В и 5 кВ проходит одностороннее заземление, однако при глухом заземлении потери в экранах составляют ${(pScreenSolidWatts / 1000).toFixed(2)} кВт — выполнение транспозиции окупится за ${paybackYears.toFixed(1)} лет.`
+                : `выполнение транспозиции экономически нецелесообразно (срок окупаемости ${paybackYears === Infinity ? '∞' : paybackYears.toFixed(1) + ' лет'} > ${h.horizon} лет); рекомендуется одностороннее заземление экранов (или двухстороннее глухое при достаточном запасе по току I<sub>доп.гл</sub> = ${iDopSolidBonding} А).`)}
+    </div>
+    ` : `
+    <div class="verdict">
+        <b>Вывод по результатам расчёта:</b><br>
+        К прокладке принимается трёхжильный кабель с бумажно-пропитанной изоляцией марки <b>${cableMark} ${h.par > 1 ? h.par + ' × ' : ''}(3×${core.sec})</b>. Броня и металлическая оболочка заземляются с двух сторон стандартным порядком согласно ПУЭ.
+    </div>
+    `}
+</body>
+</html>`;
+
+            if (format === 'word') {
+                const wordHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>`;
+                const wordContent = docHtml.replace('<html lang="ru">', wordHeader);
+                const blob = new Blob(['\ufeff', wordContent], { type: 'application/msword;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Расчет_КЛ_10кВ_${core.sec}мм2.doc`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showToast('Файл Word (.doc) скачан');
+            } else {
+                const printWin = window.open('', '_blank');
+                if (!printWin) {
+                    showToast('Разрешите всплывающие окна для PDF');
+                    return;
+                }
+                printWin.document.open();
+                printWin.document.write(docHtml);
+                printWin.document.close();
+                printWin.focus();
+                setTimeout(() => { printWin.print(); }, 350);
+            }
+        }
         // === СПРАВОЧНИК ===
         function renderReferenceTable() {
             const mat = document.getElementById('ref-mat-filter').value, ins = document.getElementById('ref-ins-filter').value;
