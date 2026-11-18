@@ -540,13 +540,8 @@
                             </div>
                         </div>
                         <div class="grid grid-cols-12 gap-1.5 items-center">
-                            <div class="col-span-5 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Предел ок.:</span>
-                                <input id="hv-eco-horizon" type="number" step="1" value="10" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
-                                <span class="text-[10px] text-slate-400 shrink-0">лет</span>
-                            </div>
-                            <div class="col-span-7 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
-                                <span class="text-[10px] text-slate-400 shrink-0">Цена 1 цикла:</span>
+                            <div class="col-span-12 pill-control px-2.5 py-1.5 flex items-center justify-between gap-1">
+                                <span class="text-[10px] text-slate-400 shrink-0">Стоимость 1 цикла транспозиции:</span>
                                 <input id="hv-eco-cost" type="number" step="0.1" value="2.5" oninput="runHvCalculation()" class="w-full bg-transparent text-right font-mono text-[11px] font-bold text-white outline-none">
                                 <span class="text-[10px] text-slate-400 shrink-0">млн ₽</span>
                             </div>
@@ -1053,7 +1048,6 @@
             
             document.getElementById('hv-eco-tariff').value = state.hv.tariff;
             document.getElementById('hv-eco-tmax').value = state.hv.tmax || 4500;
-            document.getElementById('hv-eco-horizon').value = state.hv.horizon;
             document.getElementById('hv-eco-cost').value = state.hv.transpCost;
 
             updateHvUI();
@@ -1232,86 +1226,185 @@
             };
         }
 
-        function renderTranspSvg(secs, iOneCable, xm) {
-            const L = secs.slice(0, 3);
-            const sum3 = L.reduce((a, b) => a + b, 0) || 1;
-            const totalCycles = Math.max(1, Math.round(secs.length / 3));
+        function renderGroundingSchemeSvg(schemeType, p, theme = 'dark') {
+            const isPrint = theme === 'print';
+            const font = isPrint ? 'Times New Roman, serif' : 'JetBrains Mono, monospace';
+            const cA = isPrint ? '#000' : '#00f2fe';
+            const cB = isPrint ? '#000' : '#a855f7';
+            const cC = isPrint ? '#000' : '#38bdf8';
+            const cTxt = isPrint ? '#000' : '#f8fafc';
+            const cMuted = isPrint ? '#444' : '#94a3b8';
+            const cOpn = isPrint ? '#000' : '#a855f7';
+            const bgBox = isPrint ? '#fff' : '#0b0a17';
 
-            const xStart = 42, xEnd = 398, span = xEnd - xStart;
-            const x1 = xStart + (L[0] / sum3) * span;
-            const x2 = x1 + (L[1] / sum3) * span;
-
-            const yA = 34, yB = 64, yC = 94;
-
-            const u1 = (iOneCable * (L[0] / 1000) * xm).toFixed(1);
-            const u2 = (iOneCable * (L[1] / 1000) * xm).toFixed(1);
-            const u3 = (iOneCable * (L[2] / 1000) * xm).toFixed(1);
-
-            const c1 = +u1 <= 50 ? '#10b981' : '#f43f5e';
-            const c2 = +u2 <= 50 ? '#10b981' : '#f43f5e';
-            const c3 = +u3 <= 50 ? '#10b981' : '#f43f5e';
-
-            const gnd = (x, y, color = '#00f2fe') => `
+            const gnd = (x, y, color = cA) => `
                 <line x1="${x}" y1="${y}" x2="${x}" y2="${y + 10}" stroke="${color}" stroke-width="1.5"/>
                 <line x1="${x - 6}" y1="${y + 10}" x2="${x + 6}" y2="${y + 10}" stroke="${color}" stroke-width="1.5"/>
                 <line x1="${x - 4}" y1="${y + 13}" x2="${x + 4}" y2="${y + 13}" stroke="${color}" stroke-width="1.3"/>
                 <line x1="${x - 1.5}" y1="${y + 16}" x2="${x + 1.5}" y2="${y + 16}" stroke="${color}" stroke-width="1.2"/>
             `;
 
-            const nodeCross = (x, label, uVal, uColor) => `
-                <line x1="${x}" y1="22" x2="${x}" y2="112" stroke="rgba(168,85,247,0.35)" stroke-dasharray="3 2" stroke-width="1"/>
-                <rect x="${x - 7}" y="106" width="14" height="7" rx="1.5" fill="#0b0a17" stroke="#a855f7" stroke-width="1.2"/>
-                ${gnd(x, 113, '#a855f7')}
-                <text x="${x}" y="14" text-anchor="middle" fill="#d8b4fe" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">${label}</text>
-                <text x="${x}" y="139" text-anchor="middle" fill="${uColor}" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">${uVal}В</text>
+            const opnNode = (x, yStart, label, uText, uColor) => `
+                <line x1="${x}" y1="${yStart}" x2="${x}" y2="106" stroke="${cOpn}" stroke-width="1.3"/>
+                <rect x="${x - 7}" y="106" width="14" height="7" rx="1.5" fill="${bgBox}" stroke="${cOpn}" stroke-width="1.3"/>
+                ${gnd(x, 113, cOpn)}
+                ${label ? `<text x="${x}" y="14" text-anchor="middle" fill="${isPrint ? '#000' : '#d8b4fe'}" font-family="${font}" font-size="8.5" font-weight="700">${label}</text>` : ''}
+                ${uText ? `<text x="${x}" y="139" text-anchor="middle" fill="${uColor}" font-family="${font}" font-size="8.5" font-weight="700">${uText}</text>` : ''}
             `;
 
+            const xStart = 44, xEnd = 396;
+            const yA = 34, yB = 64, yC = 94;
+            let svgInner = '';
+            let headerLeft = '';
+            let headerRight = '';
+
+            if (schemeType === 'solid') {
+                headerLeft = '1. Двухстороннее глухое заземление';
+                headerRight = `Iэ/Iж = ${p.iScreenPct}% • ΔPэ = ${p.dpSolidKw} кВт`;
+                const cStatus = isPrint ? '#000' : (p.okSolid ? '#10b981' : '#f43f5e');
+
+                svgInner = `
+                    <text x="10" y="${yA + 3}" fill="${cA}" font-family="${font}" font-size="8.5" font-weight="700">Экр.A</text>
+                    <text x="10" y="${yB + 3}" fill="${cB}" font-family="${font}" font-size="8.5" font-weight="700">Экр.B</text>
+                    <text x="10" y="${yC + 3}" fill="${cC}" font-family="${font}" font-size="8.5" font-weight="700">Экр.C</text>
+
+                    <line x1="${xStart}" y1="${yA}" x2="${xEnd}" y2="${yA}" stroke="${cA}" stroke-width="2"/>
+                    <line x1="${xStart}" y1="${yB}" x2="${xEnd}" y2="${yB}" stroke="${cB}" stroke-width="2"/>
+                    <line x1="${xStart}" y1="${yC}" x2="${xEnd}" y2="${yC}" stroke="${cC}" stroke-width="2"/>
+
+                    <text x="${(xStart + xEnd) / 2}" y="${yA - 4}" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8">L = ${p.len} м (замкнутый контур экранов &rarr; Iэ = ${p.iScreenA} А)</text>
+                    <text x="${(xStart + xEnd) / 2}" y="${yB - 4}" text-anchor="middle" fill="${cB}" font-family="${font}" font-size="8">&rarr; Iэ</text>
+                    <text x="${(xStart + xEnd) / 2}" y="${yC - 4}" text-anchor="middle" fill="${cC}" font-family="${font}" font-size="8">&rarr; Iэ</text>
+
+                    <line x1="${xStart}" y1="${yA}" x2="${xStart}" y2="${yC}" stroke="${cA}" stroke-width="2"/>
+                    ${gnd(xStart, yC, cA)}
+                    <text x="${xStart}" y="20" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8" font-weight="700">КМ-1</text>
+                    <text x="${xStart}" y="136" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8">U = 0 В</text>
+
+                    <line x1="${xEnd}" y1="${yA}" x2="${xEnd}" y2="${yC}" stroke="${cA}" stroke-width="2"/>
+                    ${gnd(xEnd, yC, cA)}
+                    <text x="${xEnd}" y="20" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8" font-weight="700">КМ-2</text>
+                    <text x="${xEnd}" y="136" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8">U = 0 В</text>
+
+                    <text x="${(xStart + xEnd) / 2}" y="136" text-anchor="middle" fill="${cStatus}" font-family="${font}" font-size="8.5" font-weight="700">Kи = ${p.ki} • Iдоп.гл = ${p.iDopSolid} А</text>
+                `;
+            } else if (schemeType === 'single') {
+                headerLeft = '2. Одностороннее с коробкой ОПН';
+                headerRight = 'Потери в экранах = 0 кВт';
+                const uCol = isPrint ? '#000' : (p.passSingle ? '#10b981' : '#f43f5e');
+
+                svgInner = `
+                    <text x="10" y="${yA + 3}" fill="${cA}" font-family="${font}" font-size="8.5" font-weight="700">Экр.A</text>
+                    <text x="10" y="${yB + 3}" fill="${cB}" font-family="${font}" font-size="8.5" font-weight="700">Экр.B</text>
+                    <text x="10" y="${yC + 3}" fill="${cC}" font-family="${font}" font-size="8.5" font-weight="700">Экр.C</text>
+
+                    <line x1="${xStart}" y1="${yA}" x2="${xEnd - 24}" y2="${yA}" stroke="${cA}" stroke-width="2"/>
+                    <line x1="${xStart}" y1="${yB}" x2="${xEnd - 12}" y2="${yB}" stroke="${cB}" stroke-width="2"/>
+                    <line x1="${xStart}" y1="${yC}" x2="${xEnd}" y2="${yC}" stroke="${cC}" stroke-width="2"/>
+
+                    <text x="${(xStart + xEnd) / 2}" y="24" text-anchor="middle" fill="${cTxt}" font-family="${font}" font-size="8.5" font-weight="600">L = ${p.len} м (разомкнутый контур • Iэ = 0 А)</text>
+
+                    <line x1="${xStart}" y1="${yA}" x2="${xStart}" y2="${yC}" stroke="${cA}" stroke-width="2"/>
+                    ${gnd(xStart, yC, cA)}
+                    <text x="${xStart}" y="20" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8" font-weight="700">КМ-1</text>
+                    <text x="${xStart}" y="139" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8">U = 0 В</text>
+
+                    <text x="${xEnd - 12}" y="20" text-anchor="middle" fill="${cOpn}" font-family="${font}" font-size="8" font-weight="700">КМ-2 (ОПН)</text>
+                    ${opnNode(xEnd - 24, yA, '', '', uCol)}
+                    ${opnNode(xEnd - 12, yB, '', '', uCol)}
+                    ${opnNode(xEnd, yC, '', `Uнав = ${p.uInduced} В`, uCol)}
+                `;
+            } else {
+                const L = p.secs.slice(0, 3);
+                const sum3 = L.reduce((a, b) => a + b, 0) || 1;
+                const totalCycles = Math.max(1, Math.round(p.secs.length / 3));
+                headerLeft = `3. Транспозиция экранов ${totalCycles > 1 ? `(Цикл 1 из ${totalCycles})` : ''}`;
+                headerRight = 'ОПН в узлах КТ';
+
+                const span = xEnd - xStart;
+                const x1 = xStart + (L[0] / sum3) * span;
+                const x2 = x1 + (L[1] / sum3) * span;
+
+                const u1 = (p.iOneCable * (L[0] / 1000) * p.xm).toFixed(1);
+                const u2 = (p.iOneCable * (L[1] / 1000) * p.xm).toFixed(1);
+                const u3 = (p.iOneCable * (L[2] / 1000) * p.xm).toFixed(1);
+
+                const c1 = isPrint ? '#000' : (+u1 <= 50 ? '#10b981' : '#f43f5e');
+                const c2 = isPrint ? '#000' : (+u2 <= 50 ? '#10b981' : '#f43f5e');
+                const c3 = isPrint ? '#000' : (+u3 <= 50 ? '#10b981' : '#f43f5e');
+
+                const crossNode = (x, label, uVal, uColor) => `
+                    <line x1="${x}" y1="22" x2="${x}" y2="106" stroke="${isPrint ? '#666' : 'rgba(168,85,247,0.35)'}" stroke-dasharray="3 2" stroke-width="1"/>
+                    <rect x="${x - 7}" y="106" width="14" height="7" rx="1.5" fill="${bgBox}" stroke="${cOpn}" stroke-width="1.2"/>
+                    ${gnd(x, 113, cOpn)}
+                    <text x="${x}" y="14" text-anchor="middle" fill="${isPrint ? '#000' : '#d8b4fe'}" font-family="${font}" font-size="8.5" font-weight="700">${label}</text>
+                    <text x="${x}" y="139" text-anchor="middle" fill="${uColor}" font-family="${font}" font-size="8.5" font-weight="700">${uVal}В</text>
+                `;
+
+                svgInner = `
+                    <text x="10" y="${yA + 3}" fill="${cA}" font-family="${font}" font-size="8.5" font-weight="700">Экр.A</text>
+                    <text x="10" y="${yB + 3}" fill="${cB}" font-family="${font}" font-size="8.5" font-weight="700">Экр.B</text>
+                    <text x="10" y="${yC + 3}" fill="${cC}" font-family="${font}" font-size="8.5" font-weight="700">Экр.C</text>
+
+                    <line x1="${xStart}" y1="${yA}" x2="${x1 - 8}" y2="${yA}" stroke="${cA}" stroke-width="2"/>
+                    <line x1="${xStart}" y1="${yB}" x2="${x1 - 8}" y2="${yB}" stroke="${cB}" stroke-width="2"/>
+                    <line x1="${xStart}" y1="${yC}" x2="${x1 - 8}" y2="${yC}" stroke="${cC}" stroke-width="2"/>
+
+                    <line x1="${x1 - 8}" y1="${yA}" x2="${x1 + 8}" y2="${yB}" stroke="${cA}" stroke-width="1.8"/>
+                    <line x1="${x1 - 8}" y1="${yB}" x2="${x1 + 8}" y2="${yC}" stroke="${cB}" stroke-width="1.8"/>
+                    <line x1="${x1 - 8}" y1="${yC}" x2="${x1 + 8}" y2="${yA}" stroke="${cC}" stroke-width="1.8"/>
+
+                    <line x1="${x1 + 8}" y1="${yB}" x2="${x2 - 8}" y2="${yB}" stroke="${cA}" stroke-width="2"/>
+                    <line x1="${x1 + 8}" y1="${yC}" x2="${x2 - 8}" y2="${yC}" stroke="${cB}" stroke-width="2"/>
+                    <line x1="${x1 + 8}" y1="${yA}" x2="${x2 - 8}" y2="${yA}" stroke="${cC}" stroke-width="2"/>
+
+                    <line x1="${x2 - 8}" y1="${yB}" x2="${x2 + 8}" y2="${yC}" stroke="${cA}" stroke-width="1.8"/>
+                    <line x1="${x2 - 8}" y1="${yC}" x2="${x2 + 8}" y2="${yA}" stroke="${cB}" stroke-width="1.8"/>
+                    <line x1="${x2 - 8}" y1="${yA}" x2="${x2 + 8}" y2="${yB}" stroke="${cC}" stroke-width="1.8"/>
+
+                    <line x1="${x2 + 8}" y1="${yC}" x2="${xEnd}" y2="${yC}" stroke="${cA}" stroke-width="2"/>
+                    <line x1="${x2 + 8}" y1="${yA}" x2="${xEnd}" y2="${yA}" stroke="${cB}" stroke-width="2"/>
+                    <line x1="${x2 + 8}" y1="${yB}" x2="${xEnd}" y2="${yB}" stroke="${cC}" stroke-width="2"/>
+
+                    <line x1="${xStart}" y1="${yA}" x2="${xStart}" y2="${yC}" stroke="${cA}" stroke-width="2"/>
+                    ${gnd(xStart, yC, cA)}
+                    <text x="${xStart}" y="22" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8">КМ-1</text>
+
+                    <line x1="${xEnd}" y1="${yA}" x2="${xEnd}" y2="${yC}" stroke="${cA}" stroke-width="2"/>
+                    ${gnd(xEnd, yC, cA)}
+                    <text x="${xEnd}" y="22" text-anchor="middle" fill="${cMuted}" font-family="${font}" font-size="8">КМ-2</text>
+                    <text x="${xEnd}" y="139" text-anchor="middle" fill="${c3}" font-family="${font}" font-size="8.5" font-weight="700">${u3}В</text>
+
+                    ${crossNode(x1, 'КТ-1', u1, c1)}
+                    ${crossNode(x2, 'КТ-2', u2, c2)}
+
+                    <text x="${(xStart + x1) / 2}" y="25" text-anchor="middle" fill="${cTxt}" font-family="${font}" font-size="8.5" font-weight="600">L1:${Math.round(L[0])}м</text>
+                    <text x="${(x1 + x2) / 2}" y="25" text-anchor="middle" fill="${cTxt}" font-family="${font}" font-size="8.5" font-weight="600">L2:${Math.round(L[1])}м</text>
+                    <text x="${(x2 + xEnd) / 2}" y="25" text-anchor="middle" fill="${cTxt}" font-family="${font}" font-size="8.5" font-weight="600">L3:${Math.round(L[2])}м</text>
+                `;
+            }
+
+            if (isPrint) {
+                return `
+                <div style="margin: 8pt 0; page-break-inside: avoid; border: 1px solid #999; padding: 6pt 8pt; background: #fff;">
+                    <div style="display: flex; justify-content: space-between; font-size: 10pt; font-weight: bold; margin-bottom: 3pt;">
+                        <span>${headerLeft}</span>
+                        <span style="font-weight: normal;">${headerRight}</span>
+                    </div>
+                    <svg viewBox="0 0 440 146" width="100%" style="max-width: 520px; display: block; margin: 0 auto;">
+                        ${svgInner}
+                    </svg>
+                </div>`;
+            }
+
             return `
-            <div class="bg-[#07060e]/90 border border-[#8b5cf6]/30 rounded-xl p-2 space-y-1">
+            <div class="bg-[#07060e]/90 border border-[#8b5cf6]/30 rounded-xl p-2 space-y-1 mt-1.5">
                 <div class="flex items-center justify-between px-1">
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Схема транспозиции экранов ${totalCycles > 1 ? `(Цикл 1 из ${totalCycles})` : ''}</span>
-                    <span class="text-[9px] font-mono text-[#a855f7]">ОПН в узлах КТ</span>
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">${headerLeft}</span>
+                    <span class="text-[9px] font-mono text-[#a855f7]">${headerRight}</span>
                 </div>
                 <svg viewBox="0 0 440 146" class="w-full h-auto block select-none">
-                    <text x="10" y="${yA + 3}" fill="#00f2fe" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">Экр.A</text>
-                    <text x="10" y="${yB + 3}" fill="#a855f7" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">Экр.B</text>
-                    <text x="10" y="${yC + 3}" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">Экр.C</text>
-
-                    <line x1="${xStart}" y1="${yA}" x2="${x1 - 8}" y2="${yA}" stroke="#00f2fe" stroke-width="2"/>
-                    <line x1="${xStart}" y1="${yB}" x2="${x1 - 8}" y2="${yB}" stroke="#a855f7" stroke-width="2"/>
-                    <line x1="${xStart}" y1="${yC}" x2="${x1 - 8}" y2="${yC}" stroke="#38bdf8" stroke-width="2"/>
-
-                    <line x1="${x1 - 8}" y1="${yA}" x2="${x1 + 8}" y2="${yB}" stroke="#00f2fe" stroke-width="1.8"/>
-                    <line x1="${x1 - 8}" y1="${yB}" x2="${x1 + 8}" y2="${yC}" stroke="#a855f7" stroke-width="1.8"/>
-                    <line x1="${x1 - 8}" y1="${yC}" x2="${x1 + 8}" y2="${yA}" stroke="#38bdf8" stroke-width="1.8"/>
-
-                    <line x1="${x1 + 8}" y1="${yB}" x2="${x2 - 8}" y2="${yB}" stroke="#00f2fe" stroke-width="2"/>
-                    <line x1="${x1 + 8}" y1="${yC}" x2="${x2 - 8}" y2="${yC}" stroke="#a855f7" stroke-width="2"/>
-                    <line x1="${x1 + 8}" y1="${yA}" x2="${x2 - 8}" y2="${yA}" stroke="#38bdf8" stroke-width="2"/>
-
-                    <line x1="${x2 - 8}" y1="${yB}" x2="${x2 + 8}" y2="${yC}" stroke="#00f2fe" stroke-width="1.8"/>
-                    <line x1="${x2 - 8}" y1="${yC}" x2="${x2 + 8}" y2="${yA}" stroke="#a855f7" stroke-width="1.8"/>
-                    <line x1="${x2 - 8}" y1="${yA}" x2="${x2 + 8}" y2="${yB}" stroke="#38bdf8" stroke-width="1.8"/>
-
-                    <line x1="${x2 + 8}" y1="${yC}" x2="${xEnd}" y2="${yC}" stroke="#00f2fe" stroke-width="2"/>
-                    <line x1="${x2 + 8}" y1="${yA}" x2="${xEnd}" y2="${yA}" stroke="#a855f7" stroke-width="2"/>
-                    <line x1="${x2 + 8}" y1="${yB}" x2="${xEnd}" y2="${yB}" stroke="#38bdf8" stroke-width="2"/>
-
-                    <line x1="${xStart}" y1="${yA}" x2="${xStart}" y2="${yC}" stroke="#00f2fe" stroke-width="2"/>
-                    ${gnd(xStart, yC, '#00f2fe')}
-                    <text x="${xStart}" y="22" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="8">КМ-1</text>
-
-                    <line x1="${xEnd}" y1="${yA}" x2="${xEnd}" y2="${yC}" stroke="#00f2fe" stroke-width="2"/>
-                    ${gnd(xEnd, yC, '#00f2fe')}
-                    <text x="${xEnd}" y="22" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="8">КМ-2</text>
-                    <text x="${xEnd}" y="139" text-anchor="middle" fill="${c3}" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700">${u3}В</text>
-
-                    ${nodeCross(x1, 'КТ-1', u1, c1)}
-                    ${nodeCross(x2, 'КТ-2', u2, c2)}
-
-                    <text x="${(xStart + x1) / 2}" y="25" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600">L1:${Math.round(L[0])}м</text>
-                    <text x="${(x1 + x2) / 2}" y="25" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600">L2:${Math.round(L[1])}м</text>
-                    <text x="${(x2 + xEnd) / 2}" y="25" text-anchor="middle" fill="#f8fafc" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="600">L3:${Math.round(L[2])}м</text>
+                    ${svgInner}
                 </svg>
             </div>`;
         }
@@ -1336,7 +1429,6 @@
             
             h.tariff = Math.max(0, +document.getElementById('hv-eco-tariff').value || 9.0);
             h.tmax = Math.min(8760, Math.max(100, +document.getElementById('hv-eco-tmax').value || 4500));
-            h.horizon = Math.max(1, +document.getElementById('hv-eco-horizon').value || 10);
             h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
             saveState();
 
@@ -1485,23 +1577,17 @@
             const passTranspAll = passTranspNodes && (iDopTransp >= gndCore.cur);
 
             // Экономика на 1 цепь:
-            // База сравнения: если допустимо одностороннее заземление (passSingleEnded), то потерь в экране там нет (0 кВт),
-            // и транспозиция сравнивается с односторонним (экономия = 0, окупаемость = Никогда).
-            // Если одностороннее недопустимо, альтернативой без коробок ОПН является глухое 2-стороннее заземление (экономия = P_гл - P_тр).
+            // Окупаемость транспозиции всегда выводится числом (относительно глухого 2-стороннего заземления) для наглядности
             const transpCostOneChain = nCycles * h.transpCost;
             const pCoreOneChainWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
             const pScreenSolidWatts = pCoreOneChainWatts * dpLossRatio;
             const pScreenTranspWatts = pCoreOneChainWatts * dpTranspRatio;
 
-            const pSavedVsSolidWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
-            const wSavedVsSolidKwh = (pSavedVsSolidWatts / 1000) * tauCalc;
-            const moneySavedVsSolidMln = (wSavedVsSolidKwh * h.tariff) / 1000000;
-            const paybackVsSolid = moneySavedVsSolidMln > 0 ? transpCostOneChain / moneySavedVsSolidMln : Infinity;
-
-            const pSavedEffectiveWatts = passSingleEnded ? 0 : pSavedVsSolidWatts;
-            const moneySavedEffectiveMln = passSingleEnded ? 0 : moneySavedVsSolidMln;
-            const paybackEffective = passSingleEnded ? Infinity : paybackVsSolid;
-            const isProfitable = !passSingleEnded && (paybackEffective <= h.horizon);
+            const pSavedWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
+            const wSavedYearKwh = (pSavedWatts / 1000) * tauCalc;
+            const moneySavedYearMln = (wSavedYearKwh * h.tariff) / 1000000;
+            const paybackYears = moneySavedYearMln > 0 ? transpCostOneChain / moneySavedYearMln : Infinity;
+            const paybackStr = paybackYears === Infinity ? '∞' : `${paybackYears.toFixed(1)} лет`;
 
             let schemeStripe = 'bg-emerald-400';
             let schemeBadge = '50 В и 5 кВ: В норме';
@@ -1667,37 +1753,28 @@
                         <div class="pill-control py-1.5 px-2.5 flex items-center justify-between"><span class="text-[9px] text-slate-400">При Iкз⁽³⁾ (≤5кВ):</span><strong class="text-xs font-mono ${pass5kV ? (uKzInducedKv >= 4.0 ? 'text-amber-400' : 'text-emerald-400') : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong></div>
                     </div>
                     ${schemeRecHtml}
-                    ${(isManualTransp || !pass50V || !pass5kV || h.len > 1200)
-                        ? renderTranspSvg(
-                            isManualTransp ? h.transpSecs : [h.len / (nCycles * 3), h.len / (nCycles * 3), h.len / (nCycles * 3)],
-                            iOneCable,
-                            xm
-                        )
-                        : ''}
                 </div>
 
                 <!-- Экономика и сводка по 3 схемам заземления -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${isProfitable ? 'bg-emerald-400' : (passSingleEnded ? 'bg-[#00f2fe]' : 'bg-amber-400')}"></div>
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${passSingleEnded ? 'bg-[#00f2fe]' : 'bg-amber-400'}"></div>
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-[10px] uppercase tracking-wider font-bold text-amber-400">Экономика и выбор схемы (1 цепь${h.par > 1 ? ` из ${h.par}` : ''})</span>
                         <span class="text-[10px] font-mono text-slate-400">T<sub>max</sub>=${h.tmax}ч &rarr; τ=${tauCalc}ч</span>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-1.5 text-center">
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Экономия трансп.</span><strong class="text-xs font-mono text-white">${(pSavedEffectiveWatts/1000).toFixed(2)} кВт</strong></div>
-                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Окупаемость трансп.</span><strong class="text-xs font-mono ${isProfitable ? 'text-emerald-400' : 'text-rose-400'}">${paybackEffective === Infinity ? 'Никогда' : paybackEffective.toFixed(1) + ' лет'}</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Экономия потерь (vs 2-ст.)</span><strong class="text-xs font-mono text-white">${(pSavedWatts/1000).toFixed(2)} кВт</strong></div>
+                        <div class="pill-control py-1.5 px-2.5"><span class="text-[9px] text-slate-400 block">Окупаемость трансп.</span><strong class="text-xs font-mono text-[#00f2fe]">${paybackStr}</strong></div>
                     </div>
                     
                     <div class="text-[11px] text-slate-300 leading-relaxed bg-[#0b0a17]/80 border border-[#8b5cf6]/25 rounded-xl p-2.5">
-                        ${passSingleEnded
-                            ? `Поскольку допустимо <strong>одностороннее заземление</strong> (потерь в экране <strong>0 кВт</strong>), транспозиция (${transpCostOneChain.toFixed(2)} млн ₽) сравнивается с ним и <strong>экономии потерь не даёт</strong> (окупаемость: <strong>Никогда</strong>).`
-                            : `Поскольку одностороннее заземление не проходит, транспозиция (${transpCostOneChain.toFixed(2)} млн ₽) сравнивается с глухим 2-сторонним: экономия <strong>${(pSavedVsSolidWatts/1000).toFixed(2)} кВт</strong> (${moneySavedVsSolidMln.toFixed(3)} млн ₽/год), окупаемость <strong>${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'}</strong> (предел ${h.horizon} лет).`}
+                        Затраты на ${nCycles} цикл. транспозиции: <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong> • Годовая экономия (относительно глухого 2-ст. заземления при τ=${tauCalc} ч): <strong>${moneySavedYearMln.toFixed(3)} млн ₽/год</strong> (${wSavedYearKwh.toFixed(0)} кВт·ч) &rarr; расчётная окупаемость: <strong class="text-[#00f2fe]">${paybackStr}</strong>.
                     </div>
 
-                    <!-- 3 ЧЁТКИХ ВЫВОДА ПО СХЕМАМ ЗАЗЕМЛЕНИЯ -->
-                    <div class="space-y-1.5 pt-0.5">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-0.5">Сводный вывод по способам заземления:</span>
+                    <!-- 3 ЧЁТКИХ ВЫВОДА СО СХЕМАМИ ПО ВСЕМ СПОСОБАМ ЗАЗЕМЛЕНИЯ -->
+                    <div class="space-y-2 pt-0.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-0.5">Сводный вывод и схемы по способам заземления:</span>
 
                         <!-- 1. Двухстороннее глухое заземление -->
                         <div class="bg-[#0b0a17]/85 border ${okSolidBonding ? 'border-emerald-500/35' : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
@@ -1710,6 +1787,15 @@
                             <div class="text-[10px] text-slate-300 leading-snug">
                                 Потери в экранах <strong>${(pScreenSolidWatts/1000).toFixed(2)} кВт</strong>, ток экрана <strong>I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}%</strong> (K<sub>и</sub> = ${kiFactor.toFixed(2)}). Допустимый ток <strong>${iDopSolidBonding} А</strong> против <strong>${gndCore.cur.toFixed(1)} А</strong> — ${okSolidBonding ? 'тепловой режим проходит.' : 'перегрев жилы (не проходит по току).'}
                             </div>
+                            ${renderGroundingSchemeSvg('solid', {
+                                len: h.len,
+                                iScreenPct: (iScreenRatio * 100).toFixed(0),
+                                iScreenA: (iOneCable * iScreenRatio).toFixed(1),
+                                dpSolidKw: (pScreenSolidWatts / 1000).toFixed(2),
+                                ki: kiFactor.toFixed(2),
+                                iDopSolid: iDopSolidBonding,
+                                okSolid: okSolidBonding
+                            }, 'dark')}
                         </div>
 
                         <!-- 2. Одностороннее заземление с коробкой ОПН -->
@@ -1723,26 +1809,29 @@
                             <div class="text-[10px] text-slate-300 leading-snug">
                                 Потерь в экране нет, затрат минимум. U<sub>нав</sub> = <strong class="${pass50V ? 'text-emerald-400' : 'text-rose-400'}">${uInduced.toFixed(1)} В</strong> (${used50VPct.toFixed(0)}% от 50 В, ${pass50V ? `запас ${margin50VPct.toFixed(0)}%` : 'превышение'}), при токе до I<sub>доп</sub> около <strong>${uInducedAtIdop.toFixed(1)} В</strong>; U<sub>кз</sub><sup>(3)</sup> = <strong class="${pass5kV ? 'text-emerald-400' : 'text-rose-400'}">${uKzInducedKv.toFixed(2)} кВ</strong> (≤5 кВ).
                             </div>
+                            ${renderGroundingSchemeSvg('single', {
+                                len: h.len,
+                                uInduced: uInduced.toFixed(1),
+                                passSingle: passSingleEnded
+                            }, 'dark')}
                         </div>
 
                         <!-- 3. Транспозиция экранов -->
-                        <div class="bg-[#0b0a17]/85 border ${passTranspAll ? (isProfitable ? 'border-emerald-500/35' : 'border-amber-400/35') : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
+                        <div class="bg-[#0b0a17]/85 border ${passTranspAll ? 'border-emerald-500/35' : 'border-rose-500/35'} rounded-xl p-2.5 space-y-1">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-[11px] font-bold text-white">3. Транспозиция экранов (${nCycles} цикл.)</span>
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${passTranspAll ? (isProfitable ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-amber-500/15 text-amber-300 border-amber-400/35') : 'bg-rose-500/20 text-rose-300 border-rose-400/40'}">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono shrink-0 ${passTranspAll ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/35' : 'bg-rose-500/20 text-rose-300 border border-rose-400/40'}">
                                     ${passTranspAll ? '✓ Подходит' : '✕ Не подходит'}
                                 </span>
                             </div>
                             <div class="text-[10px] text-slate-300 leading-snug">
-                                Стоит <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong>, потерь ${isManualTransp ? `<strong>${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>` : 'нет'}, наведённое напряжение на участке <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">${uNodeV.toFixed(1)} В</strong> (U<sub>кз</sub> = ${uKzNodeKv.toFixed(2)} кВ).
-                                ${passTranspAll
-                                    ? (passSingleEnded
-                                        ? `<span class="text-amber-300 font-semibold">Не окупается</span> (т.к. проходит одностороннее с ОПН) — целесообразна только если нужен запас по напряжению (при росте нагрузки U<sub>нав</sub> → ${uInducedAtIdop.toFixed(1)} В).`
-                                        : (isProfitable
-                                            ? `<span class="text-emerald-300 font-semibold">Окупается за ${paybackVsSolid.toFixed(1)} лет</span> (≤ ${h.horizon} лет) и необходима по безопасности.`
-                                            : `<span class="text-amber-300 font-semibold">Окупаемость ${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'}</span> при пределе ${h.horizon} лет (не окупается), но требуется по безопасности.`))
-                                    : 'Требуется уменьшить длину макс. участка или добавить цикл транспозиции.'}
+                                Стоит <strong>${transpCostOneChain.toFixed(2)} млн ₽</strong>, потерь ${isManualTransp ? `<strong>${(pScreenTranspWatts/1000).toFixed(2)} кВт</strong>` : 'нет'}, наведённое напряжение на участке <strong class="${passNode50V ? 'text-emerald-400' : 'text-rose-400'}">${uNodeV.toFixed(1)} В</strong> (U<sub>кз</sub> = ${uKzNodeKv.toFixed(2)} кВ). Расчётная окупаемость: <strong class="text-[#00f2fe]">${paybackStr}</strong>.
                             </div>
+                            ${renderGroundingSchemeSvg('transp', {
+                                secs: isManualTransp ? h.transpSecs : [h.len / (nCycles * 3), h.len / (nCycles * 3), h.len / (nCycles * 3)],
+                                iOneCable,
+                                xm
+                            }, 'dark')}
                         </div>
                     </div>
                 </div>
@@ -1926,95 +2015,52 @@
             const pScreenSolidWatts = pCoreOneChainWatts * dpLossRatio;
             const pScreenTranspWatts = pCoreOneChainWatts * dpTranspRatio;
 
-            const pSavedVsSolidWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
-            const wSavedVsSolidKwh = (pSavedVsSolidWatts / 1000) * tauCalc;
-            const moneySavedVsSolidMln = (wSavedVsSolidKwh * h.tariff) / 1000000;
-            const paybackVsSolid = moneySavedVsSolidMln > 0 ? transpCostOneChain / moneySavedVsSolidMln : Infinity;
-
-            const pSavedEffectiveWatts = passSingleEnded ? 0 : pSavedVsSolidWatts;
-            const wSavedEffectiveKwh = passSingleEnded ? 0 : wSavedVsSolidKwh;
-            const moneySavedEffectiveMln = passSingleEnded ? 0 : moneySavedVsSolidMln;
-            const paybackEffective = passSingleEnded ? Infinity : paybackVsSolid;
-            const isProfitable = !passSingleEnded && (paybackEffective <= h.horizon);
+            const pSavedWatts = Math.max(0, pScreenSolidWatts - pScreenTranspWatts);
+            const wSavedYearKwh = (pSavedWatts / 1000) * tauCalc;
+            const moneySavedYearMln = (wSavedYearKwh * h.tariff) / 1000000;
+            const paybackYears = moneySavedYearMln > 0 ? transpCostOneChain / moneySavedYearMln : Infinity;
+            const paybackStr = paybackYears === Infinity ? '∞' : `${paybackYears.toFixed(1)} лет`;
 
             const needTransp = isManualTransp || !passSingleEnded || uInduced >= 40 || h.len > 1200;
 
             // Явная формулировка итогового выбора схемы
             let explicitChoiceText = '';
             if (!passSingleEnded) {
-                explicitChoiceText = isProfitable
-                    ? `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — необходима по условиям безопасности (на всю длину U<sub>нав</sub> = ${uInduced.toFixed(1)} В / U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ превышает норму) и экономически окупается за ${paybackVsSolid.toFixed(1)} лет (≤ ${h.horizon} лет).`
-                    : `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — обусловлена техническими требованиями безопасности (на всю длину превышен порог 50 В / 5 кВ), коммерческий срок окупаемости (${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'}) превышает предел ${h.horizon} лет.`;
+                explicitChoiceText = `<b>транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — необходима по условиям безопасности (на всю длину U<sub>нав</sub> = ${uInduced.toFixed(1)} В / U<sub>кз</sub> = ${uKzInducedKv.toFixed(2)} кВ превышает допустимый порог), расчётный срок окупаемости составляет <b>${paybackStr}</b>.`;
             } else if (isManualTransp) {
-                explicitChoiceText = `<b>неидеальная транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м)</b> — задана проектом; наведённое напряжение в узлах не превышает ${uNodeV.toFixed(1)} В (≤ 50 В), небаланс длин ${unbalPct.toFixed(1)}%.`;
+                explicitChoiceText = `<b>неидеальная транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м)</b> — задана проектом; наведённое напряжение в узлах не превышает ${uNodeV.toFixed(1)} В (≤ 50 В), небаланс длин ${unbalPct.toFixed(1)}%, расчётный срок окупаемости <b>${paybackStr}</b>.`;
             } else if (uInduced >= 40 || h.len > 1200) {
-                explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — формально проходит без потерь в экранах и не требует затрат на транспозицию (транспозиция не окупается, т.к. в одностороннем режиме потерь нет). <i>Альтернатива:</i> <b>транспозиция из-за запаса по напряжению</b> (при росте тока до I<sub>доп</sub> напряжение достигнет ${uInducedAtIdop.toFixed(1)} В, а при транспозиции снизится до ${uNodeV.toFixed(1)} В), но она не окупается (${transpCostOneChain.toFixed(2)} млн ₽).`;
+                explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — проходит по критериям безопасности без потерь в экранах и при минимальных затратах. <i>Альтернатива:</i> <b>транспозиция из-за запаса по напряжению</b> (при росте тока до I<sub>доп</sub> напряжение достигнет ${uInducedAtIdop.toFixed(1)} В, а при транспозиции снизится до ${uNodeV.toFixed(1)} В; затраты ${transpCostOneChain.toFixed(2)} млн ₽, расчётная окупаемость <b>${paybackStr}</b>).`;
             } else {
                 explicitChoiceText = `<b>одностороннее заземление с коробкой ОПН (U<sub>нав</sub> = ${uInduced.toFixed(1)} В, запас ${margin50VPct.toFixed(0)}%)</b> — технически допустимо с большим запасом, потерь в экранах нет, затраты минимальны.`;
             }
 
-            const buildPrintSvg = () => {
-                const L = secs.slice(0, 3);
-                const sum3 = L.reduce((a, b) => a + b, 0) || 1;
-                const xStart = 55, xEnd = 525, span = xEnd - xStart;
-                const x1 = xStart + (L[0] / sum3) * span;
-                const x2 = x1 + (L[1] / sum3) * span;
-                const yA = 38, yB = 72, yC = 106;
-                const u1 = (iOneCable * (L[0] / 1000) * xm).toFixed(1);
-                const u2 = (iOneCable * (L[1] / 1000) * xm).toFixed(1);
-                const u3 = (iOneCable * (L[2] / 1000) * xm).toFixed(1);
-                const gnd = (x, y) => `
-                    <line x1="${x}" y1="${y}" x2="${x}" y2="${y + 12}" stroke="#000" stroke-width="1.3"/>
-                    <line x1="${x - 7}" y1="${y + 12}" x2="${x + 7}" y2="${y + 12}" stroke="#000" stroke-width="1.3"/>
-                    <line x1="${x - 4.5}" y1="${y + 15.5}" x2="${x + 4.5}" y2="${y + 15.5}" stroke="#000" stroke-width="1.2"/>
-                    <line x1="${x - 2}" y1="${y + 19}" x2="${x + 2}" y2="${y + 19}" stroke="#000" stroke-width="1.1"/>
-                `;
-                const nodeCross = (x, lbl, uVal) => `
-                    <line x1="${x}" y1="24" x2="${x}" y2="126" stroke="#666" stroke-dasharray="4 2" stroke-width="1"/>
-                    <rect x="${x - 8}" y="120" width="16" height="8" fill="#fff" stroke="#000" stroke-width="1.2"/>
-                    ${gnd(x, 128)}
-                    <text x="${x}" y="15" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" font-weight="bold">${lbl}</text>
-                    <text x="${x}" y="160" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" font-weight="bold">U = ${uVal} В</text>
-                `;
-                return `
-                <div style="margin: 12px 0; text-align: center;">
-                    <div style="font-size: 11pt; font-weight: bold; margin-bottom: 4px;">Схема транспозиции экранов кабельной линии 10 кВ ${nCycles > 1 ? `(Цикл 1 из ${nCycles})` : ''}</div>
-                    <svg viewBox="0 0 580 170" width="100%" style="max-width: 560px; border: 1px solid #999; background: #fff;">
-                        <text x="12" y="${yA + 4}" font-family="Times New Roman, serif" font-size="11" font-weight="bold">Экр. A</text>
-                        <text x="12" y="${yB + 4}" font-family="Times New Roman, serif" font-size="11" font-weight="bold">Экр. B</text>
-                        <text x="12" y="${yC + 4}" font-family="Times New Roman, serif" font-size="11" font-weight="bold">Экр. C</text>
-                        <line x1="${xStart}" y1="${yA}" x2="${x1 - 10}" y2="${yA}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${xStart}" y1="${yB}" x2="${x1 - 10}" y2="${yB}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${xStart}" y1="${yC}" x2="${x1 - 10}" y2="${yC}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${x1 - 10}" y1="${yA}" x2="${x1 + 10}" y2="${yB}" stroke="#000" stroke-width="1.4"/>
-                        <line x1="${x1 - 10}" y1="${yB}" x2="${x1 + 10}" y2="${yC}" stroke="#000" stroke-width="1.4"/>
-                        <line x1="${x1 - 10}" y1="${yC}" x2="${x1 + 10}" y2="${yA}" stroke="#000" stroke-width="1.4"/>
-                        <line x1="${x1 + 10}" y1="${yB}" x2="${x2 - 10}" y2="${yB}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${x1 + 10}" y1="${yC}" x2="${x2 - 10}" y2="${yC}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${x1 + 10}" y1="${yA}" x2="${x2 - 10}" y2="${yA}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${x2 - 10}" y1="${yB}" x2="${x2 + 10}" y2="${yC}" stroke="#000" stroke-width="1.4"/>
-                        <line x1="${x2 - 10}" y1="${yC}" x2="${x2 + 10}" y2="${yA}" stroke="#000" stroke-width="1.4"/>
-                        <line x1="${x2 - 10}" y1="${yA}" x2="${x2 + 10}" y2="${yB}" stroke="#000" stroke-width="1.4"/>
-                        <line x1="${x2 + 10}" y1="${yC}" x2="${xEnd}" y2="${yC}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${x2 + 10}" y1="${yA}" x2="${xEnd}" y2="${yA}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${x2 + 10}" y1="${yB}" x2="${xEnd}" y2="${yB}" stroke="#000" stroke-width="1.6"/>
-                        <line x1="${xStart}" y1="${yA}" x2="${xStart}" y2="${yC}" stroke="#000" stroke-width="1.8"/>
-                        ${gnd(xStart, yC)}
-                        <text x="${xStart}" y="22" text-anchor="middle" font-family="Times New Roman, serif" font-size="10" font-weight="bold">КМ-1</text>
-                        <line x1="${xEnd}" y1="${yA}" x2="${xEnd}" y2="${yC}" stroke="#000" stroke-width="1.8"/>
-                        ${gnd(xEnd, yC)}
-                        <text x="${xEnd}" y="22" text-anchor="middle" font-family="Times New Roman, serif" font-size="10" font-weight="bold">КМ-2</text>
-                        <text x="${xEnd}" y="160" text-anchor="middle" font-family="Times New Roman, serif" font-size="11" font-weight="bold">U = ${u3} В</text>
-                        ${nodeCross(x1, 'КТ-1', u1)}
-                        ${nodeCross(x2, 'КТ-2', u2)}
-                        <text x="${(xStart + x1) / 2}" y="28" text-anchor="middle" font-family="Times New Roman, serif" font-size="11">L1 = ${Math.round(L[0])} м</text>
-                        <text x="${(x1 + x2) / 2}" y="28" text-anchor="middle" font-family="Times New Roman, serif" font-size="11">L2 = ${Math.round(L[1])} м</text>
-                        <text x="${(x2 + xEnd) / 2}" y="28" text-anchor="middle" font-family="Times New Roman, serif" font-size="11">L3 = ${Math.round(L[2])} м</text>
-                    </svg>
-                </div>`;
-            };
+            const printAllSchemesHtml = `
+                <div style="margin-top: 8pt;">
+                    <div style="font-size: 11.5pt; font-weight: bold; margin-bottom: 4pt;">Схемы заземления экранов для рассматриваемых вариантов:</div>
+                    ${renderGroundingSchemeSvg('solid', {
+                        len: h.len,
+                        iScreenPct: (iScreenRatio * 100).toFixed(0),
+                        iScreenA: (iOneCable * iScreenRatio).toFixed(1),
+                        dpSolidKw: (pScreenSolidWatts / 1000).toFixed(2),
+                        ki: kiFactor.toFixed(2),
+                        iDopSolid: iDopSolidBonding,
+                        okSolid: okSolidBonding
+                    }, 'print')}
+                    ${renderGroundingSchemeSvg('single', {
+                        len: h.len,
+                        uInduced: uInduced.toFixed(1),
+                        passSingle: passSingleEnded
+                    }, 'print')}
+                    ${renderGroundingSchemeSvg('transp', {
+                        secs: secs,
+                        iOneCable,
+                        xm
+                    }, 'print')}
+                </div>
+            `;
 
-            const nowStr = new Date().toLocaleDateString('ru-RU');
+                        const nowStr = new Date().toLocaleDateString('ru-RU');
             const alphaVal = h.mat === 'Cu' ? 0.00393 : 0.00403;
             const docHtml = `<!DOCTYPE html>
 <html lang="ru">
@@ -2105,7 +2151,7 @@
     L<sub>неб</sub> = √(L<sub>A</sub>² + L<sub>B</sub>² + L<sub>C</sub>² − L<sub>A</sub>L<sub>B</sub> − L<sub>B</sub>L<sub>C</sub> − L<sub>A</sub>L<sub>C</sub>) = <b>${lUnbalM.toFixed(1)} м</b> (${unbalPct.toFixed(1)}% от L).<br>
     Остаточный уравнительный ток: I<sub>э.ост</sub> / I<sub>ж</sub> = (I<sub>э</sub> / I<sub>ж</sub>) · (L<sub>неб</sub> / L) = ${(iScreenRatio * 100).toFixed(1)}% · (${lUnbalM.toFixed(1)} / ${sumTotal}) = <b>${(iScreenTranspRatio * 100).toFixed(2)} %</b>.<br>
     Коэффициент снижения тока при небалансе: K<sub>и.тр</sub> = <b>${kiTranspFactor.toFixed(3)}</b> (I<sub>доп.тр</sub> = ${iDopTransp} А).</p>` : ''}
-    ${format === 'pdf' ? buildPrintSvg() : ''}
+    ${format === 'pdf' ? printAllSchemesHtml : ''}
     ` : ''}
 
     <h2>5. Технико-экономическое обоснование схемы заземления (на 1 кабельную цепь${h.par > 1 ? ` из ${h.par}` : ''})</h2>
@@ -2117,10 +2163,10 @@
     • Двухстороннее глухое заземление: ΔP<sub>э.гл</sub> = ΔP<sub>ж</sub> · (ΔP<sub>э</sub> / ΔP<sub>ж</sub>) = ${(pCoreOneChainWatts / 1000).toFixed(2)} · ${dpLossRatio.toFixed(4)} = <b>${(pScreenSolidWatts / 1000).toFixed(2)} кВт</b>;<br>
     • Одностороннее заземление с ОПН: ΔP<sub>э.одн</sub> = <b>0.00 кВт</b> (контур экранов разомкнут);<br>
     • Транспозиция экранов: ΔP<sub>э.тр</sub> = <b>${(pScreenTranspWatts / 1000).toFixed(2)} кВт</b>.</p>
-    <p class="formula">4) Сравнение окупаемости транспозиции (капитальные затраты К<sub>тр</sub> = ${nCycles} · ${h.transpCost} = <b>${transpCostOneChain.toFixed(2)} млн ₽</b>, тариф Т = ${h.tariff} ₽/кВт·ч):<br>
-    ${passSingleEnded
-        ? `• <b>Базовый вариант сравнения — одностороннее заземление с ОПН</b> (т.к. оба критерия 50 В и 5 кВ выполняются). Потерь в экране при одностороннем заземлении нет (0 кВт), поэтому транспозиция <b>экономии потерь не даёт</b> (ΔW<sub>эк</sub> = 0 кВт·ч/год, окупаемость: <b>не окупается</b>).<br>• <i>Справочно (относительно глухого 2-стороннего заземления):</i> экономия составила бы ${(pSavedVsSolidWatts/1000).toFixed(2)} кВт (${wSavedVsSolidKwh.toFixed(0)} кВт·ч/год = ${moneySavedVsSolidMln.toFixed(3)} млн ₽/год), окупаемость ${paybackVsSolid === Infinity ? '∞' : paybackVsSolid.toFixed(1) + ' лет'} при пределе ${h.horizon} лет.`
-        : `• <b>Базовый вариант сравнения — двухстороннее глухое заземление</b> (т.к. одностороннее недопустимо по напряжению).<br>ΔW<sub>эк</sub> = (ΔP<sub>э.гл</sub> − ΔP<sub>э.тр</sub>) · τ = ${((pScreenSolidWatts - pScreenTranspWatts) / 1000).toFixed(2)} · ${tauCalc} = <b>${wSavedEffectiveKwh.toFixed(0)} кВт·ч/год</b><br>Э<sub>год</sub> = ΔW<sub>эк</sub> · Т = ${wSavedEffectiveKwh.toFixed(0)} · ${h.tariff} = <b>${(moneySavedEffectiveMln * 1000000).toFixed(0)} ₽/год (${moneySavedEffectiveMln.toFixed(3)} млн ₽/год)</b><br>Т<sub>ок</sub> = К<sub>тр</sub> / Э<sub>год</sub> = ${transpCostOneChain.toFixed(2)} / ${moneySavedEffectiveMln.toFixed(3)} = <b>${paybackEffective === Infinity ? '∞' : paybackEffective.toFixed(1) + ' лет'}</b> (нормативный предел: ${h.horizon} лет).`}</p>
+    <p class="formula">4) Расчётный срок окупаемости транспозиции (относительно глухого 2-стороннего заземления, капитальные затраты К<sub>тр</sub> = ${nCycles} · ${h.transpCost} = <b>${transpCostOneChain.toFixed(2)} млн ₽</b>, тариф Т = ${h.tariff} ₽/кВт·ч):<br>
+    ΔW<sub>эк</sub> = (ΔP<sub>э.гл</sub> − ΔP<sub>э.тр</sub>) · τ = ${((pScreenSolidWatts - pScreenTranspWatts) / 1000).toFixed(2)} · ${tauCalc} = <b>${wSavedYearKwh.toFixed(0)} кВт·ч/год</b><br>
+    Э<sub>год</sub> = ΔW<sub>эк</sub> · Т = ${wSavedYearKwh.toFixed(0)} · ${h.tariff} = <b>${(moneySavedYearMln * 1000000).toFixed(0)} ₽/год (${moneySavedYearMln.toFixed(3)} млн ₽/год)</b><br>
+    Т<sub>ок</sub> = К<sub>тр</sub> / Э<sub>год</sub> = ${transpCostOneChain.toFixed(2)} / ${moneySavedYearMln.toFixed(3)} = <b>${paybackStr}</b>.</p>
 
     <div class="verdict">
         <b>Сводный вывод по результатам расчёта:</b><br>
@@ -2128,7 +2174,7 @@
         2. Сравнение трёх схем заземления экранов:<br>
         &nbsp;&nbsp;• <b>Двухстороннее глухое (без ОПН):</b> ${okSolidBonding ? '<b>подходит по тепловому режиму</b>' : '<b>не подходит (перегрев)</b>'} — потери ${(pScreenSolidWatts / 1000).toFixed(2)} кВт, I<sub>э</sub>/I<sub>ж</sub> = ${(iScreenRatio * 100).toFixed(0)}% (K<sub>и</sub> = ${kiFactor.toFixed(2)}), I<sub>доп.гл</sub> = ${iDopSolidBonding} А против I<sub>p</sub> = ${core.cur.toFixed(1)} А.<br>
         &nbsp;&nbsp;• <b>Одностороннее с коробкой ОПН:</b> ${passSingleEnded ? '<b>подходит</b>' : '<b>не подходит</b>'} — потерь нет, затрат минимум; U<sub>нав</sub> = ${uInduced.toFixed(1)} В (${used50VPct.toFixed(0)}% от 50 В, запас ${margin50VPct.toFixed(0)}%), при токе до I<sub>доп</sub> около ${uInducedAtIdop.toFixed(1)} В; U<sub>кз</sub><sup>(3)</sup> = ${uKzInducedKv.toFixed(2)} кВ (≤ 5 кВ).<br>
-        &nbsp;&nbsp;• <b>Транспозиция экранов (${nCycles} цикл.):</b> ${passTranspAll ? '<b>подходит</b>' : '<b>не подходит</b>'} — стоит ${transpCostOneChain.toFixed(2)} млн ₽, потерь ${(pScreenTranspWatts / 1000).toFixed(2)} кВт, наведённое напряжение на участке ${uNodeV.toFixed(1)} В; ${isProfitable ? `окупается за ${paybackEffective.toFixed(1)} лет (≤ ${h.horizon} лет)` : 'не окупается'}.<br>
+        &nbsp;&nbsp;• <b>Транспозиция экранов (${nCycles} цикл.):</b> ${passTranspAll ? '<b>подходит</b>' : '<b>не подходит</b>'} — стоит ${transpCostOneChain.toFixed(2)} млн ₽, потерь ${(pScreenTranspWatts / 1000).toFixed(2)} кВт, наведённое напряжение на участке ${uNodeV.toFixed(1)} В, расчётная окупаемость: <b>${paybackStr}</b>.<br>
         3. <b>Рекомендуемый выбор:</b> ${explicitChoiceText}
     </div>
     ` : `
