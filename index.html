@@ -118,7 +118,7 @@
             <section id="view-hub" class="space-y-3.5 pt-1">
                 <div class="px-1">
                     <span class="text-[11px] font-bold uppercase tracking-wider text-[#00f2fe]">Выберите раздел расчёта</span>
-                    <p class="text-xs text-slate-400 mt-0.5">ГОСТ 31996-2012 • ГОСТ Р 55025-2012 • ПУЭ 7 изд.</p>
+                    <p class="text-xs text-slate-400 mt-0.5">ГОСТ 31996-2012 • ГОСТ Р 34832-2022 • ПУЭ 7 изд.</p>
                 </div>
 
                 <button type="button" onclick="openModule('lv')" class="w-full text-left glass-panel hover:border-[#00f2fe]/55 active:scale-[0.99] rounded-2xl p-4 transition-all group flex items-center gap-3.5">
@@ -1781,7 +1781,7 @@
 </head>
 <body>
     <h1>Расчёт кабельной линии напряжением 10 кВ</h1>
-    <p style="text-align: right; font-size: 10.5pt;">Дата расчёта: ${nowStr} • Нормативная база: ПУЭ 7 изд., ГОСТ Р 55025-2012, ГОСТ Р МЭК 60949-2014, методика М.В. Дмитриева</p>
+    <p style="text-align: right; font-size: 10.5pt;">Дата расчёта: ${nowStr} • Нормативная база: ПУЭ 7 изд., ГОСТ Р 34832-2022, ГОСТ Р МЭК 60949-2014, методика М.В. Дмитриева</p>
 
     <h2>1. Исходные данные</h2>
     <table>
@@ -1808,7 +1808,7 @@
 
     ${isXlpe ? `
     <h2>3. Выбор и проверка сечения медного экрана кабеля</h2>
-    <p class="formula">1) Расчётное минимальное сечение медного экрана по термической стойкости при двойном замыкании на землю (ГОСТ Р МЭК 60949-2014, ГОСТ Р 55025-2012, θ<sub>н</sub> = 70 °C, θ<sub>к</sub> = 350 °C):<br>
+    <p class="formula">1) Расчётное минимальное сечение медного экрана по термической стойкости при двойном замыкании на землю (ГОСТ Р МЭК 60949-2014, ГОСТ Р 34832-2022, θ<sub>н</sub> = 70 °C, θ<sub>к</sub> = 350 °C):<br>
     S<sub>экр.расч</sub> = √( (I<sub>кз</sub><sup>(2)</sup>)² · t<sub>кз</sub> / (K<sub>т</sub>² · C² · ln((350 + 228)/(70 + 228))) ) · 1000 = √( (${ikz2.toFixed(3)}² · ${h.t}) / (1.089² · 226² · ${lnTerm.toFixed(4)}) ) · 1000 = <b>${sScreenCalc.toFixed(2)} мм²</b></p>
     <p>Принимаем стандартное сечение медного экрана <b>S<sub>экр</sub> = ${scr.sec} мм²</b> (односекундный ток КЗ экрана I<sub>экр.1с</sub> = ${scr.i1s.toFixed(1)} кА).</p>
     <p class="formula">2) Проверка термической стойкости выбранного экрана при КЗ:<br>
