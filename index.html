@@ -8,7 +8,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="КабельПро">
-    <title>КабельПро PRO / by ARG — Расчёт КЛ 0,4 и 10 кВ</title>
+    <title>КабельПро PRO / by ARG — Расчёт КЛ 0,4 / 6 / 10 кВ</title>
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2300f2fe'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M34.5 14L17 36h15l-2.5 14L47 28H32l2.5-14z' fill='none' stroke='%23090814' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <link id="apple-touch-icon-link" rel="apple-touch-icon" sizes="180x180" href="">
@@ -141,7 +141,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h2 class="text-base font-bold text-white">Расчёт КЛ 10 кВ</h2>
+                            <h2 class="text-base font-bold text-white">Расчёт КЛ 6 / 10 кВ</h2>
                             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#8b5cf6]/20 text-[#d8b4fe] border border-[#a855f7]/35">АПвПг / ААБл</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1 leading-snug">Подбор жилы (до 630 мм²) и экрана СПЭ, режим нейтрали, выбор заземления по М.В. Дмитриеву.</p>
@@ -303,29 +303,38 @@
             </section>
 
             <!-- =====================================================
-                 МОДУЛЬ 2: 10 кВ
+                 МОДУЛЬ 2: 6 / 10 кВ
                  ===================================================== -->
             <section id="view-hv" class="space-y-3 hidden">
                 
-                <div class="glass-panel rounded-2xl p-2 px-2.5 flex items-center justify-between gap-1.5">
-                    <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2.5 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
+                <div class="glass-panel rounded-2xl p-2 px-2 flex items-center justify-between gap-1">
+                    <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
                         <select id="hv-insulation" onchange="onHvCableTypeChange()"
-                            class="bg-transparent text-[#00f2fe] font-mono text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-3">
+                            class="bg-transparent text-[#00f2fe] font-mono text-[10px] sm:text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-2.5">
                             <option value="XLPE" selected class="bg-[#0b0a17] text-white">АПвПг (СПЭ)</option>
                             <option value="PAPER" class="bg-[#0b0a17] text-white">ААБл (БПИ)</option>
                         </select>
-                        <span class="pointer-events-none absolute right-2 text-[8px] text-[#00f2fe]">▼</span>
+                        <span class="pointer-events-none absolute right-1.5 text-[7px] text-[#00f2fe]">▼</span>
                     </div>
 
-                    <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-2.5 py-1.5">
-                        <span class="text-[10px] text-slate-300 font-semibold mr-1 whitespace-nowrap">&Delta;Uдоп:</span>
+                    <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
+                        <select id="hv-voltage-select" onchange="onHvVoltageChange()"
+                            class="bg-transparent text-[#00f2fe] font-mono text-[10px] sm:text-[11px] font-extrabold outline-none appearance-none cursor-pointer pr-2.5">
+                            <option value="10" selected class="bg-[#0b0a17] text-white">10 кВ</option>
+                            <option value="6" class="bg-[#0b0a17] text-white">6 кВ</option>
+                        </select>
+                        <span class="pointer-events-none absolute right-1.5 text-[7px] text-[#00f2fe]">▼</span>
+                    </div>
+
+                    <div class="relative flex items-center bg-[#a855f7]/15 border border-[#a855f7]/55 rounded-full px-2 py-1.5">
+                        <span class="text-[10px] text-slate-300 font-semibold mr-0.5 whitespace-nowrap">&Delta;U:</span>
                         <input id="hv-maxdrop" type="number" step="0.5" min="0.5" max="15" value="5.0" oninput="runHvCalculation()"
-                            class="w-8 bg-transparent text-right font-mono text-[11px] font-extrabold text-white outline-none">
+                            class="w-7 bg-transparent text-right font-mono text-[10px] sm:text-[11px] font-extrabold text-white outline-none">
                         <span class="text-[10px] text-[#00f2fe] font-mono font-bold ml-0.5">%</span>
                     </div>
 
-                    <div class="pill-control px-2.5 py-1.5 flex items-center">
-                        <span id="hv-k-total-badge" class="text-[10px] font-mono font-bold text-[#00f2fe] whitespace-nowrap">Kобщ: 0.959</span>
+                    <div class="pill-control px-2 py-1.5 flex items-center">
+                        <span id="hv-k-total-badge" class="text-[10px] font-mono font-bold text-[#00f2fe] whitespace-nowrap">K:0.959</span>
                     </div>
                 </div>
 
@@ -349,7 +358,7 @@
 
                 <div id="hv-subtab-cable" class="space-y-3">
                     <div class="px-1 pt-0.5 flex items-center justify-between">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
+                        <span id="hv-params-section-title" class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Исходные параметры КЛ 10 кВ</span>
                         <span id="hv-cable-mark-badge" class="text-[10px] font-mono text-[#d8b4fe]">АПвПг-10 (△)</span>
                     </div>
 
@@ -449,10 +458,10 @@
                             </div>
                         </div>
 
-                        <!-- Режим заземления нейтрали сети 10 кВ -->
+                        <!-- Режим заземления нейтрали сети 6/10 кВ -->
                         <div id="hv-neutral-row" class="grid grid-cols-12 gap-1.5 items-center">
                             <div id="hv-neutral-select-col" class="col-span-12 pill-control px-2.5 py-1 flex items-center justify-between relative">
-                                <span class="text-[10px] text-slate-400 shrink-0">Нейтраль 10 кВ:</span>
+                                <span id="hv-neutral-label" class="text-[10px] text-slate-400 shrink-0">Нейтраль 10 кВ:</span>
                                 <select id="hv-neutral-mode" onchange="onHvNeutralChange()"
                                     class="bg-transparent text-white font-mono text-[10px] font-bold outline-none appearance-none cursor-pointer pr-3 text-right">
                                     <option value="isolated" selected class="bg-[#0b0a17] text-white">Изолир. / ДГР (Iкз⁽²⁾)</option>
@@ -562,7 +571,7 @@
                     <div class="grid grid-cols-2 gap-2">
                         <select id="ref-mat-filter" onchange="renderReferenceTable()" class="bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none"><option value="Al">Алюминий (Al)</option><option value="Cu">Медь (Cu)</option></select>
                         <select id="ref-ins-filter" onchange="renderReferenceTable()" class="bg-[#0b0a17]/80 border border-[#8b5cf6]/30 rounded-xl px-3 py-2 text-xs font-bold text-white outline-none">
-                            <option value="XLPE">СПЭ (10 кВ — АПвПг / ПвПг)</option><option value="PAPER">БПИ (10 кВ — ААБл / СБл)</option><option value="PVC">ПВХ (0,4 кВ — АВБбШв / ВВГ)</option>
+                            <option value="XLPE">СПЭ (6/10 кВ — АПвПг / ПвПг)</option><option value="PAPER">БПИ (6/10 кВ — ААБл / СБл)</option><option value="PVC">ПВХ (0,4 кВ — АВБбШв / ВВГ)</option>
                         </select>
                     </div>
                     <div class="overflow-x-auto custom-scroll rounded-xl border border-[#8b5cf6]/25">
@@ -647,7 +656,7 @@
             }
         };
 
-        // Геометрия кабелей АПвПг-10 (dOut - наружный диаметр, dScr - средний диаметр по экрану, rCore - радиус жилы в мм)
+        // Геометрия кабелей АПвПг-6/10 (dOut - наружный диаметр, dScr - средний диаметр по экрану, rCore - радиус жилы в мм)
         const XLPE_GEOM_DB = {
             50:  { dOut: 29, dScr: 22, rCore: 4.1 },
             70:  { dOut: 31, dScr: 24, rCore: 4.9 },
@@ -711,7 +720,7 @@
                 { id: 1, name: 'ТП-10/0.4 → ВРУ-1', mat: 'Al', ins: 'PVC', sec: 150, par: 1, len: 100, mode: 'P', p: 150, i: 253, cos: 0.9 }
             ],
             hv: {
-                ins: 'XLPE', mat: 'Al', lay: 'triangle', flatS: 100, par: 1,
+                ins: 'XLPE', voltageKv: 10, mat: 'Al', lay: 'triangle', flatS: 100, par: 1,
                 k1: 1.09, k2: 1.0, k3: 1.0, k4: 0.88,
                 mode: 'P', val: 5000, len: 2400, cos: 0.93,
                 ikz: 15.24, t: 1.5, limit: 5.0,
@@ -728,9 +737,10 @@
 
         function loadState() {
             try {
-                const s = JSON.parse(localStorage.getItem('kabelpro_v26'));
+                const s = JSON.parse(localStorage.getItem('kabelpro_v27'));
                 if (s && s.lvSegs && s.lvSegs.length) {
                     state = { ...state, ...s, hv: { ...state.hv, ...(s.hv || {}) } };
+                    if (!state.hv.voltageKv) state.hv.voltageKv = 10;
                     if (!Array.isArray(state.hv.transpSecs) || state.hv.transpSecs.length < 3) {
                         const part = Math.round((state.hv.len || 2400) / 3);
                         state.hv.transpSecs = [part, part, Math.max(1, (state.hv.len || 2400) - part * 2)];
@@ -739,7 +749,7 @@
             } catch (e) {}
         }
         function saveState() {
-            try { localStorage.setItem('kabelpro_v26', JSON.stringify(state)); } catch (e) {}
+            try { localStorage.setItem('kabelpro_v27', JSON.stringify(state)); } catch (e) {}
         }
 
         function openModule(mod) {
@@ -770,7 +780,7 @@
                 switchLvSubTab(state.lvSub || 'drop');
             } else if (mod === 'hv') {
                 document.getElementById('view-hv').classList.remove('hidden');
-                sub.textContent = 'Модуль 10 кВ • По методике М.В. Дмитриева';
+                sub.textContent = `Модуль ${state.hv.voltageKv || 10} кВ • По методике М.В. Дмитриева`;
                 switchHvSubTab(state.hvSub || 'cable');
                 initHvControls();
                 runHvCalculation();
@@ -1026,9 +1036,10 @@
         }
         function applyLvRec(sec, mat, ins, par, p, len, cos) { state.lvSegs.push({ id: Date.now(), name: `Подобранный ${sec} мм²`, mat, ins, sec, par, len, mode: 'P', p, i: 50, cos }); saveState(); renderLvSegments(); updateLvSummary(); switchLvSubTab('drop'); showToast('Добавлено в схему 0,4 кВ'); }
 
-        // === МОДУЛЬ 10 кВ ===
+        // === МОДУЛЬ 6 / 10 кВ ===
         function initHvControls() {
             document.getElementById('hv-insulation').value = state.hv.ins;
+            document.getElementById('hv-voltage-select').value = String(state.hv.voltageKv || 10);
             document.getElementById('hv-laying-select').value = state.hv.lay;
             document.getElementById('hv-flat-spacing').value = state.hv.flatS || 100;
             document.getElementById('hv-parallel').value = state.hv.par;
@@ -1054,6 +1065,7 @@
         }
 
         function onHvCableTypeChange() { state.hv.ins = document.getElementById('hv-insulation').value; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
+        function onHvVoltageChange() { state.hv.voltageKv = +document.getElementById('hv-voltage-select').value || 10; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function toggleHvMaterial() { state.hv.mat = (state.hv.mat === 'Cu') ? 'Al' : 'Cu'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function setHvLaying(l) { state.hv.lay = l; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
         function toggleHvLoadMode() { state.hv.mode = (state.hv.mode === 'P') ? 'I' : 'P'; state.hv.selectedCore = null; saveState(); updateHvUI(); runHvCalculation(); }
@@ -1136,6 +1148,17 @@
 
         function updateHvUI() {
             const isXlpe = state.hv.ins === 'XLPE';
+            const uKv = state.hv.voltageKv || 10;
+
+            const sub = document.getElementById('header-subtitle');
+            if (sub && state.mod === 'hv') sub.textContent = `Модуль ${uKv} кВ • По методике М.В. Дмитриева`;
+
+            const secTitle = document.getElementById('hv-params-section-title');
+            if (secTitle) secTitle.textContent = `Исходные параметры КЛ ${uKv} кВ`;
+
+            const neutLabel = document.getElementById('hv-neutral-label');
+            if (neutLabel) neutLabel.textContent = `Нейтраль ${uKv} кВ:`;
+
             const layWrap = document.getElementById('hv-laying-pill-wrap');
             if (layWrap) layWrap.style.opacity = isXlpe ? '1' : '0.45';
 
@@ -1158,7 +1181,9 @@
                 iozzCol.classList.toggle('hidden', !isResistor);
             }
 
-            document.getElementById('hv-cable-mark-badge').textContent = isXlpe ? `${state.hv.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'} (${state.hv.lay === 'triangle' ? '△' : '—'})` : `${state.hv.mat === 'Al' ? 'ААБл-10' : 'СБл-10'} (3ж)`;
+            document.getElementById('hv-cable-mark-badge').textContent = isXlpe
+                ? `${state.hv.mat === 'Al' ? 'АПвПг-' + uKv : 'ПвПг-' + uKv} (${state.hv.lay === 'triangle' ? '△' : '—'})`
+                : `${state.hv.mat === 'Al' ? 'ААБл-' + uKv : 'СБл-' + uKv} (3ж)`;
 
             const matBtn = document.getElementById('hv-mat-pill-btn');
             if (state.hv.mat === 'Al') { matBtn.textContent = 'Алюм. (Al)'; matBtn.className = 'w-full py-1 px-2 rounded-full text-[11px] font-extrabold transition bg-[#00f2fe]/25 text-[#00f2fe] text-center'; }
@@ -1169,6 +1194,7 @@
         }
 
         function evalHv(sec, h) {
+            const uKv = h.voltageKv || 10;
             const rx = R_X_DB[sec] || R_X_DB[240];
             const geom = XLPE_GEOM_DB[sec] || XLPE_GEOM_DB[240];
             const r20 = h.mat === 'Cu' ? rx[0] : rx[1];
@@ -1188,7 +1214,7 @@
             const iDopFact = +(iDopOne * h.par).toFixed(1);
 
             const sin = Math.sqrt(Math.max(0, 1 - h.cos * h.cos));
-            const cur = h.mode === 'I' ? h.val : (h.val / (Math.sqrt(3) * 10 * h.cos));
+            const cur = h.mode === 'I' ? h.val : (h.val / (Math.sqrt(3) * uKv * h.cos));
             const loadRatio = iDopFact > 0 ? Math.min(1.2, cur / iDopFact) : 1.0;
 
             // Рабочая температура жилы с учётом загрузки и температурный пересчёт R_theta (пункт 3)
@@ -1199,7 +1225,7 @@
             const rTheta = +(r20 * (1 + alpha * (thetaWork - 20))).toFixed(4);
 
             const dV = Math.sqrt(3) * cur * (h.len / 1000) * ((rTheta * h.cos + x0 * sin) / h.par);
-            const dPct = (dV / 10000) * 100;
+            const dPct = (dV / (uKv * 1000)) * 100;
             const dP = (3 * cur * cur * (rTheta / h.par) * (h.len / 1000)) / 1000;
 
             // Послеаварийный режим (n-1) по ПУЭ (допустимая аварийная перегрузка K_ав = 1.15 для СПЭ, 1.0 для БПИ)
@@ -1411,6 +1437,7 @@
 
         function runHvCalculation() {
             const h = state.hv;
+            h.voltageKv = +document.getElementById('hv-voltage-select').value || 10;
             h.par = +document.getElementById('hv-parallel').value || 1;
             h.flatS = Math.max(30, +document.getElementById('hv-flat-spacing').value || 100);
             h.len = Math.max(1, +document.getElementById('hv-length').value || 100);
@@ -1432,7 +1459,7 @@
             h.transpCost = Math.max(0, +document.getElementById('hv-eco-cost').value || 2.5);
             saveState();
 
-            // Время максимальных потерь tau = (0.124 + T_max / 10^4)^2 * 8760 (пункт 2)
+            // Время максимальных потерь tau = (0.124 + T_max / 10^4)^2 * 8760
             const tauCalc = Math.round(Math.pow(0.124 + h.tmax / 10000, 2) * 8760);
             const tauBadge = document.getElementById('hv-eco-tau-badge');
             if (tauBadge) tauBadge.textContent = `τ = ${tauCalc} ч/год`;
@@ -1442,7 +1469,7 @@
             const recCore = recCoreIdx !== -1 ? allCores[recCoreIdx] : null;
             const activeCore = (h.selectedCore && allCores.find(x => x.sec === h.selectedCore)) || recCore || allCores[allCores.length - 1];
 
-            document.getElementById('hv-k-total-badge').textContent = `Kобщ: ${activeCore.kTotal.toFixed(3)}`;
+            document.getElementById('hv-k-total-badge').textContent = `K:${activeCore.kTotal.toFixed(3)}`;
             document.getElementById('hv-calc-ip-badge').textContent = `Ip: ${activeCore.cur.toFixed(1)} А`;
 
             const centerCoreIdx = recCoreIdx !== -1 ? recCoreIdx : allCores.length - 2;
@@ -1450,7 +1477,7 @@
             const coreSlice = allCores.slice(coreSliceStart, coreSliceStart + 3);
             const parPrefix = h.par > 1 ? `${h.par} × ` : '';
 
-            // Расчётный ток КЗ для экрана в зависимости от режима нейтрали (пункт 6)
+            // Расчётный ток КЗ для экрана в зависимости от режима нейтрали
             const isResistorNeutral = h.neutralMode === 'resistor';
             const iScreenFaultKa = isResistorNeutral ? +(h.iozz / 1000).toFixed(3) : activeCore.ikz2;
             const faultLabelShort = isResistorNeutral ? 'Iозз' : 'I⁽²⁾кз';
@@ -1577,7 +1604,6 @@
             const passTranspAll = passTranspNodes && (iDopTransp >= gndCore.cur);
 
             // Экономика на 1 цепь:
-            // Окупаемость транспозиции всегда выводится числом (относительно глухого 2-стороннего заземления) для наглядности
             const transpCostOneChain = nCycles * h.transpCost;
             const pCoreOneChainWatts = 3 * Math.pow(iOneCable, 2) * (rCoreOhmKm * lenKm);
             const pScreenSolidWatts = pCoreOneChainWatts * dpLossRatio;
@@ -1873,7 +1899,7 @@
                     </div>
                 </div>
 
-                <!-- Кнопки экспорта отчёта 10 кВ -->
+                <!-- Кнопки экспорта отчёта 6/10 кВ -->
                 <div class="grid grid-cols-2 gap-2 pt-1">
                     <button type="button" onclick="exportHvReport('word')"
                         class="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-[#00f2fe]/20 to-[#0ea5e9]/25 border border-[#00f2fe]/45 text-white font-bold text-xs shadow-[0_0_15px_rgba(0,242,254,0.15)] active:scale-95 transition">
@@ -1894,7 +1920,7 @@
                 <!-- Кнопки экспорта для БПИ (ААБл) -->
                 <div class="glass-panel rounded-2xl p-3.5 pl-4 relative overflow-hidden space-y-2.5">
                     <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#00f2fe]"></div>
-                    <div class="text-xs font-bold text-white">Трёхжильный кабель с БПИ (${h.mat === 'Al' ? 'ААБл-10' : 'СБл-10'}, жила ${gndCore.sec} мм²)</div>
+                    <div class="text-xs font-bold text-white">Трёхжильный кабель с БПИ (${h.mat === 'Al' ? 'ААБл-' + h.voltageKv : 'СБл-' + h.voltageKv}, жила ${gndCore.sec} мм²)</div>
                     <p class="text-[11px] text-slate-300 leading-relaxed">Для трёхжильных кабелей в общей металлической оболочке транспозиция не выполняется. Броня и оболочка заземляются с двух сторон по ПУЭ.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-1">
@@ -1912,11 +1938,12 @@
 
         function exportHvReport(format) {
             const h = state.hv;
+            const uKv = h.voltageKv || 10;
             const isXlpe = h.ins === 'XLPE';
             const matName = h.mat === 'Cu' ? 'Медь (Cu)' : 'Алюминий (Al)';
             const cableMark = isXlpe
-                ? `${h.mat === 'Al' ? 'АПвПг-10' : 'ПвПг-10'}`
-                : `${h.mat === 'Al' ? 'ААБл-10' : 'СБл-10'}`;
+                ? `${h.mat === 'Al' ? 'АПвПг-' + uKv : 'ПвПг-' + uKv}`
+                : `${h.mat === 'Al' ? 'ААБл-' + uKv : 'СБл-' + uKv}`;
             const layName = isXlpe
                 ? (h.lay === 'triangle' ? 'треугольником вплотную (△)' : `в плоскости с шагом S = ${h.flatS} мм (—)`)
                 : 'трёхжильный кабель в земле';
@@ -1929,7 +1956,7 @@
             const sinPhi = Math.sqrt(Math.max(0, 1 - h.cos * h.cos));
             const loadFormulaStr = h.mode === 'I'
                 ? `I<sub>p</sub> = ${h.val} А (задано током)`
-                : `I<sub>p</sub> = P / (√3 · U<sub>ном</sub> · cos φ) = ${h.val} / (1.732 · 10 · ${h.cos}) = <b>${core.cur.toFixed(2)} А</b>`;
+                : `I<sub>p</sub> = P / (√3 · U<sub>ном</sub> · cos φ) = ${h.val} / (1.732 · ${uKv} · ${h.cos}) = <b>${core.cur.toFixed(2)} А</b>`;
 
             const isResistorNeutral = h.neutralMode === 'resistor';
             const iScreenFaultKa = isResistorNeutral ? +(h.iozz / 1000).toFixed(3) : core.ikz2;
@@ -2031,7 +2058,6 @@
 
             const needTransp = isManualTransp || h.len > 1500 || !passSingleEnded;
 
-            // Явная формулировка итогового выбора схемы по классификации длин М.В. Дмитриева (<600 м, 600-1500 м, >1500 м)
             let explicitChoiceText = '';
             if (isManualTransp) {
                 explicitChoiceText = `<b>неидеальная транспозиция экранов (${nCycles} цикл., ${nSections} уч.: ${secs.join(' / ')} м) с установкой ОПН в узлах</b> — задана проектом; наведённое напряжение в узлах не превышает ${uNodeV.toFixed(1)} В (≤ 50 В), небаланс длин ${unbalPct.toFixed(1)}%, расчётный срок окупаемости <b>${paybackStr}</b>.`;
@@ -2070,13 +2096,13 @@
                 </div>
             `;
 
-                        const nowStr = new Date().toLocaleDateString('ru-RU');
+            const nowStr = new Date().toLocaleDateString('ru-RU');
             const alphaVal = h.mat === 'Cu' ? 0.00393 : 0.00403;
             const docHtml = `<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Расчёт кабельной линии 10 кВ</title>
+<title>Расчёт кабельной линии ${uKv} кВ</title>
 <style>
     @page { size: A4; margin: 20mm 15mm 20mm 25mm; }
     body {
@@ -2101,19 +2127,19 @@
 </style>
 </head>
 <body>
-    <h1>Расчёт кабельной линии напряжением 10 кВ</h1>
+    <h1>Расчёт кабельной линии напряжением ${uKv} кВ</h1>
     <p style="text-align: right; font-size: 10.5pt;">Дата расчёта: ${nowStr} • Нормативная база: ПУЭ 7 изд., ГОСТ 34832-2022, ГОСТ 22483-2021, ГОСТ Р МЭК 60949-2014, методика М.В. Дмитриева</p>
 
     <h2>1. Исходные данные</h2>
     <table>
         <tr><th style="width: 58%;">Наименование параметра</th><th style="width: 18%;">Обозначение</th><th>Значение</th></tr>
-        <tr><td>Номинальное напряжение сети</td><td class="center">U<sub>ном</sub></td><td>10 кВ</td></tr>
+        <tr><td>Номинальное напряжение сети</td><td class="center">U<sub>ном</sub></td><td>${uKv} кВ</td></tr>
         <tr><td>Марка кабеля и материал токопроводящей жилы</td><td class="center">—</td><td>${cableMark} (${matName})</td></tr>
         <tr><td>Способ прокладки и количество параллельных ниток</td><td class="center">n</td><td>${layName}, n = ${h.par}</td></tr>
         <tr><td>Расчётная длина трассы кабельной линии</td><td class="center">L</td><td>${h.len} м (${lenKm.toFixed(3)} км)</td></tr>
         <tr><td>Расчётная нагрузка и коэффициент мощности</td><td class="center">P / cos φ</td><td>${h.mode === 'P' ? h.val + ' кВт' : h.val + ' А'}, cos φ = ${h.cos} (sin φ = ${sinPhi.toFixed(3)})</td></tr>
         <tr><td>Допустимая потеря напряжения</td><td class="center">ΔU<sub>доп</sub></td><td>${h.limit.toFixed(1)} %</td></tr>
-        <tr><td>Режим заземления нейтрали сети 10 кВ</td><td class="center">—</td><td>${isResistorNeutral ? `Через резистор (I<sub>озз</sub> = ${h.iozz} А)` : 'Изолированная / компенсированная (ДГР)'}</td></tr>
+        <tr><td>Режим заземления нейтрали сети ${uKv} кВ</td><td class="center">—</td><td>${isResistorNeutral ? `Через резистор (I<sub>озз</sub> = ${h.iozz} А)` : 'Изолированная / компенсированная (ДГР)'}</td></tr>
         <tr><td>Ток трёхфазного КЗ на шинах и время отключения</td><td class="center">I<sub>кз</sub><sup>(3)</sup> / t<sub>кз</sub></td><td>${h.ikz} кА / ${h.t} с</td></tr>
         <tr><td>Поправочные коэффициенты прокладки (грунт, опорная +15 °C)</td><td class="center">K<sub>1</sub>..K<sub>4</sub></td><td>K<sub>1</sub>=${h.k1}, K<sub>2</sub>=${h.k2}, K<sub>3</sub>=${h.k3}, K<sub>4</sub>=${h.k4}</td></tr>
     </table>
@@ -2128,7 +2154,7 @@
     <p class="formula">${h.par >= 2 ? '5' : '4'}) Температурный пересчёт активного сопротивления жилы на рабочую температуру θ<sub>раб</sub> = ${core.thetaWork} °C:<br>
     R<sub>θ</sub> = R<sub>20</sub> · (1 + α · (θ<sub>раб</sub> − 20)) = ${core.r20} · (1 + ${alphaVal} · (${core.thetaWork} − 20)) = <b>${core.rTheta.toFixed(4)} Ом/км</b></p>
     <p class="formula">${h.par >= 2 ? '6' : '5'}) Проверка потерей напряжения в нормальном режиме:<br>ΔU = √3 · I<sub>p</sub> · L · ((R<sub>θ</sub> · cos φ + X<sub>0</sub> · sin φ) / n) = 1.732 · ${core.cur.toFixed(2)} · ${lenKm.toFixed(3)} · ((${core.rTheta.toFixed(4)} · ${h.cos} + ${core.x0.toFixed(4)} · ${sinPhi.toFixed(3)}) / ${h.par}) = <b>${core.dV.toFixed(1)} В</b></p>
-    <p class="formula">ΔU% = (ΔU / U<sub>ном</sub>) · 100% = (${core.dV.toFixed(1)} / 10000) · 100% = <b>${core.dPct.toFixed(2)} %</b> ${core.okU ? '≤' : '>'} ΔU<sub>доп</sub> = ${h.limit.toFixed(1)} % — <b>${core.okU ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
+    <p class="formula">ΔU% = (ΔU / U<sub>ном</sub>) · 100% = (${core.dV.toFixed(1)} / ${uKv * 1000}) · 100% = <b>${core.dPct.toFixed(2)} %</b> ${core.okU ? '≤' : '>'} ΔU<sub>доп</sub> = ${h.limit.toFixed(1)} % — <b>${core.okU ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
     <p class="formula">${h.par >= 2 ? '7' : '6'}) Коэффициент времени и проверка термической стойкости жилы по трёхфазному току КЗ (ПУЭ гл. 1.4, I<sub>кз.1с</sub> = ${core.iCore1s} кА):<br>
     K<sub>t</sub> = 1 / √t<sub>кз</sub> = 1 / √${h.t} = <b>${kTime.toFixed(3)}</b><br>
     I<sub>доп.кз</sub> = I<sub>кз.1с</sub> · K<sub>t</sub> = ${core.iCore1s} · ${kTime.toFixed(3)} = <b>${core.iCorePerm.toFixed(3)} кА</b> ${core.okCoreKz ? '>' : '<'} I<sub>кз</sub><sup>(3)</sup> = ${h.ikz.toFixed(3)} кА — <b>${core.okCoreKz ? 'условие выполняется' : 'НЕ ВЫПОЛНЯЕТСЯ'}</b>.</p>
@@ -2208,11 +2234,11 @@
             if (format === 'word') {
                 const wordHeader = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>`;
                 const wordContent = docHtml.replace('<html lang="ru">', wordHeader);
-                const blob = new Blob(['﻿', wordContent], { type: 'application/msword;charset=utf-8' });
+                const blob = new Blob(['\ufeff', wordContent], { type: 'application/msword;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Расчет_КЛ_10кВ_${core.sec}мм2.doc`;
+                a.download = `Расчет_КЛ_${uKv}кВ_${core.sec}мм2.doc`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
