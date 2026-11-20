@@ -119,7 +119,7 @@
             </div>
         </header>
 
-        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-6 px-3.5 lg:px-6 pt-3 lg:pt-5 space-y-3 relative z-10">
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scroll pb-6 lg:pb-0 px-3.5 lg:px-6 pt-3 lg:pt-4 space-y-3 relative z-10">
 
             <!-- СТАРТОВЫЙ ЭКРАН-ХАБ (на ПК сетка из 3 карточек в ряд) -->
             <section id="view-hub" class="space-y-4 pt-1 lg:pt-8 lg:max-w-[980px] lg:mx-auto">
@@ -330,12 +330,12 @@
             </section>
 
             <!-- =====================================================
-                 МОДУЛЬ 2: 6 / 10 кВ (на ПК: слева исходные данные и экономика, справа результаты, схемы и ТКЗ)
+                 МОДУЛЬ 2: 6 / 10 кВ (на ПК: слева закреплённые исходные данные, справа прокручиваемый расчёт)
                  ===================================================== -->
-            <section id="view-hv" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-5 items-start">
+            <section id="view-hv" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-5 items-start lg:h-full lg:overflow-hidden">
                 
-                <!-- ЛЕВАЯ КОЛОНКА НА ПК (ВВОД ПАРАМЕТРОВ) -->
-                <div class="lg:col-span-5 space-y-3">
+                <!-- ЛЕВАЯ КОЛОНКА НА ПК (ЗАКРЕПЛЁННЫЙ ВВОД ПАРАМЕТРОВ) -->
+                <div class="lg:col-span-5 space-y-3 lg:h-full lg:overflow-y-auto custom-scroll lg:pr-1.5 lg:pb-6">
                     <!-- Верхняя панель: изоляция, напряжение 6/10 кВ, ΔUдоп, Kобщ -->
                     <div class="glass-panel rounded-2xl p-2 px-2 flex items-center justify-between gap-1">
                         <div class="relative flex items-center bg-[#00f2fe]/15 border border-[#00f2fe]/55 rounded-full px-2 py-1.5 shadow-[0_0_12px_rgba(0,242,254,0.18)]">
@@ -587,8 +587,8 @@
                     </div>
                 </div>
 
-                <!-- ПРАВАЯ КОЛОНКА НА ПК (ВСЕ РЕЗУЛЬТАТЫ РАСЧЁТА, СХЕМЫ И ЭКСПОРТ) -->
-                <div class="lg:col-span-7 space-y-3">
+                <!-- ПРАВАЯ КОЛОНКА НА ПК (НЕЗАВИСИМО ПРОКРУЧИВАЕМЫЕ РЕЗУЛЬТАТЫ, СХЕМЫ И ЭКСПОРТ) -->
+                <div id="hv-right-scroll-col" class="lg:col-span-7 space-y-3 lg:h-full lg:overflow-y-auto custom-scroll lg:pr-2 lg:pb-6">
                     <div id="hv-subtab-cable" class="space-y-3">
                         <div id="hv-cable-results-box" class="space-y-3"></div>
                     </div>
@@ -798,6 +798,7 @@
             document.getElementById('app-content').scrollTop = 0;
 
             dock.classList.add('hidden');
+            document.getElementById('app-content').classList.remove('lg:overflow-hidden');
             if (deskTabs) deskTabs.innerHTML = '';
 
             if (mod === 'hub') {
@@ -816,6 +817,7 @@
                 sub.textContent = 'Расчёт ΔU и выбор сечений 0,4 / 6 / 10 кВ';
                 switchLvSubTab(state.lvSub || 'drop');
             } else if (mod === 'hv') {
+                document.getElementById('app-content').classList.add('lg:overflow-hidden');
                 document.getElementById('view-hv').classList.remove('hidden');
                 sub.textContent = `Модуль ${state.hv.voltageKv || 10} кВ • По методике М.В. Дмитриева`;
                 switchHvSubTab(state.hvSub || 'cable');
@@ -893,6 +895,9 @@
                     <span>Заземление и ₽</span>
                 </button>
             </div>`;
+
+            const rCol = document.getElementById('hv-right-scroll-col');
+            if (rCol) rCol.scrollTop = 0;
 
             // Переключатель в шапке для ПК (переключает правую панель: подбор жилы/экрана или заземление/схемы/отчёт)
             const deskTabs = document.getElementById('desktop-header-tabs');
